@@ -31,6 +31,18 @@ const authServices = {
       return error;
     }
   },
+  // Update interest
+  updateInterest: async (data) => {
+    try {
+      const response = await axiosInstance.post(
+        '/api/auth/update-interest',
+        data
+      );
+      return response;
+    } catch (error) {
+      return error;
+    }
+  },
 };
 
 export default authServices;

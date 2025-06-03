@@ -129,14 +129,14 @@ export default function LandingPage() {
       </section>
 
       {/* AI Integration Highlight */}
-      <section className='py-16 md:py-24 bg-neutral text-neutral-content'>
+      <section className='py-16 md:py-24 bg-base-200 text-neutral-content'>
         <div className='container mx-auto px-4 md:px-8'>
           <div className='flex flex-col lg:flex-row items-center gap-12'>
             <div className='lg:w-1/2 text-center lg:text-left'>
-              <h2 className='text-3xl md:text-4xl font-bold mb-4'>
+              <h2 className='text-3xl md:text-4xl font-bold mb-4 text-base-content'>
                 Supercharge Your Studies with AI
               </h2>
-              <p className='text-lg opacity-80 mb-6'>
+              <p className='text-lg opacity-80 mb-6 text-base-content'>
                 Our integrated AI tools provide intelligent summaries, answer
                 complex questions from your documents, help draft essays, and
                 offer personalized feedback to accelerate your learning.

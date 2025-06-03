@@ -1,5 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { INTERESTS } from '../../constants';
+import toast from 'react-hot-toast';
 
 const InterestModel = ({ onConfirm }) => {
   const [selected, setSelected] = useState([]);
@@ -21,7 +22,9 @@ const InterestModel = ({ onConfirm }) => {
 
   const handleConfirm = () => {
     if (onConfirm) onConfirm(selected);
-    else console.log('Sở thích đã chọn:', selected);
+    else {
+      toast.error('Vui lòng chọn ít nhất 3 sở thích');
+    }
   };
 
   const handleClose = () => {

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import useAuthStore from '../../stores/useAuthStore';
 import { Link } from 'react-router';
 import InterestModel from '../../components/common/InterestModel';
@@ -6,8 +6,6 @@ import { INTERESTS } from '../../constants';
 
 const Profile = () => {
   const { user } = useAuthStore();
-  const [showInterestModal, setShowInterestModal] = useState(false);
-  const [selectedInterests, setSelectedInterests] = useState([]);
   // Fake payment history data
   const paymentHistory = [
     {
@@ -72,32 +70,7 @@ const Profile = () => {
     // Handle view payment details
     console.log('View payment:', paymentId);
   };
-  const handleConfirmInterest = async (selectedIds) => {
-    // Lấy ra object {id, name}
-    const selectedItems = INTERESTS.filter((i) =>
-      selectedIds.includes(i.id)
-    ).map((i) => ({ id: i.id, name: i.name }));
 
-    console.log('Sở thích đã chọn:', selectedItems);
-
-    try {
-      setTimeout(() => {
-        console.log('Cập nhật sở thích thành công');
-      }, 1000);
-      // const res = await fetch('/update-interest', {
-      //   method: 'POST',
-      //   headers: { 'Content-Type': 'application/json' },
-      //   body: JSON.stringify({ interests: selectedIds }),
-      // });
-      // if (!res.ok) throw new Error('Lỗi cập nhật sở thích');
-      // Xử lý thành công (ví dụ: toast, reload, ...)
-    } catch (err) {
-      console.error(err);
-      // Xử lý lỗi (ví dụ: toast, ...)
-    }
-    setShowInterestModal(false);
-    setSelectedInterests(selectedIds);
-  };
   if (!user) {
     return (
       <div className='h-screen flex items-center justify-center'>
@@ -111,14 +84,6 @@ const Profile = () => {
   return (
     <div className='min-h-screen bg-gray-50 py-8'>
       <div className='max-w-6xl mx-auto px-4 sm:px-6 lg:px-8'>
-        <div>
-          <button onClick={() => setShowInterestModal(true)}>
-            Chọn sở thích
-          </button>
-          {showInterestModal && (
-            <InterestModel onConfirm={handleConfirmInterest} />
-          )}
-        </div>
         {/* Header Section */}
         <div className='bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-8'>
           <div className='flex flex-col sm:flex-row sm:items-center sm:justify-between'>

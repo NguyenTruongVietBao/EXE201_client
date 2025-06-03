@@ -3,8 +3,8 @@ import React from 'react';
 
 function Footer() {
   return (
-    <div>
-      <footer className='footer sm:footer-horizontal bg-base-200 text-base-content p-10 border-t border-base-300'>
+    <footer>
+      <footer className='footer sm:footer-horizontal bg-base-300 text-base-content p-10'>
         <aside>
           <svg
             width='50'
@@ -44,7 +44,7 @@ function Footer() {
           <a className='link link-hover'>Cookie policy</a>
         </nav>
       </footer>
-      <footer className='footer footer-center p-4 bg-base-300 text-base-content'>
+      <footer className='footer footer-center p-4 bg-base-300 text-base-content border-t border-2 border-base-100'>
         <aside>
           <p>© {new Date().getFullYear()} StudySphere - All rights reserved.</p>
           <div className='flex gap-4 mt-2'>
@@ -60,7 +60,7 @@ function Footer() {
           </div>
         </aside>
       </footer>
-    </div>
+    </footer>
   );
 }
 

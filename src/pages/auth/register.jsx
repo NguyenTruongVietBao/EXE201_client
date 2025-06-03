@@ -11,6 +11,7 @@ function Register() {
   const [errors, setErrors] = useState({});
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
   const [form, setForm] = useState({
     firstName: 'Bao',
     lastName: 'Nguyen',
@@ -85,10 +86,6 @@ function Register() {
         console.log('An error occurred: ', error);
       }
     }
-  };
-
-  const handleOpenModel = () => {
-    console.log('🚀 ~ handleOpenModel: ~ handleOpenModel');
   };
 
   const handleChange = (e) => {
@@ -201,9 +198,6 @@ function Register() {
           </p>
         </div>
       </div>
-      <button className='btn btn-primary' onClick={handleOpenModel}>
-        Test
-      </button>
     </div>
   );
 }
