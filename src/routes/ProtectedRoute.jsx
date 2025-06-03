@@ -3,7 +3,7 @@ import { Navigate } from 'react-router';
 import useAuthStore from '../stores/useAuthStore';
 import { USER_ROLE } from '../constants';
 
-const { ADMIN, MANAGER, SELLER, USER, CUSTOMER } = USER_ROLE;
+const { ADMIN, MANAGER, SELLER, CUSTOMER } = USER_ROLE;
 
 const ProtectedRoute = ({
   children,
@@ -45,10 +45,10 @@ const ProtectedRoute = ({
           return <Navigate to='/manager' replace />;
         case SELLER:
           return <Navigate to='/seller' replace />;
-        case USER:
-          return <Navigate to='/' replace />;
         case CUSTOMER:
-          return <Navigate to='/' replace />;
+          return <Navigate to='/customer' replace />;
+        case 'User':
+          return <Navigate to='/customer' replace />;
         default:
           return <Navigate to='/' replace />;
       }

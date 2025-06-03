@@ -1,6 +1,6 @@
 import React from 'react';
 import useAuthStore from '../../stores/useAuthStore';
-import { LogOut, Settings, User } from 'lucide-react';
+import { LogOut, User, Lock } from 'lucide-react';
 import { Link, useNavigate } from 'react-router';
 
 export default function HeaderAvatar({ className }) {
@@ -42,11 +42,14 @@ export default function HeaderAvatar({ className }) {
           </Link>
         </li>
         <li>
-          <Link to='/setting' className='flex items-center justify-start gap-5'>
+          <Link
+            to='/change-password'
+            className='flex items-center justify-start gap-5'
+          >
             <span>
-              <Settings size={16} />
+              <Lock size={16} />
             </span>
-            Settings
+            Change Password
           </Link>
         </li>
         <li>

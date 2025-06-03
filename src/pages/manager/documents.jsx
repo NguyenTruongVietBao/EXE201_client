@@ -1,9 +1,9 @@
 import React from 'react';
 
-export default function AdminDashboard() {
+export default function ManagerDocuments() {
   return (
     <div className='container mx-auto h-full min-h-screen'>
-      <h1>Admin Dashboard</h1>
+      <h1>Manager Documents</h1>
     </div>
   );
 }

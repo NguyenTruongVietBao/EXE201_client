@@ -1,9 +1,9 @@
 import React from 'react';
 
-export default function AdminDashboard() {
+export default function ManagerDashboard() {
   return (
     <div className='container mx-auto h-full min-h-screen'>
-      <h1>Admin Dashboard</h1>
+      <h1>Manager Dashboard</h1>
     </div>
   );
 }

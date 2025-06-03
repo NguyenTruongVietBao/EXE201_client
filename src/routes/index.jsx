@@ -4,22 +4,32 @@ import { USER_ROLE } from '../constants';
 import Register from '../pages/auth/register';
 import Login from '../pages/auth/login';
 import NotFoundPage from '../pages/not-found';
-import HomePage from '../pages/public/home';
 import VerifyEmail from '../pages/auth/verify-email';
-import AboutPage from '../pages/public/about';
-import ContactPage from '../pages/public/contact';
+import AboutPage from '../pages/about';
+import ContactPage from '../pages/contact';
 import ProtectedRoute from './ProtectedRoute';
 import Profile from '../pages/private/profile';
-import Setting from '../pages/private/setting';
-import Dashboard from '../pages/admin/dashboard';
 import ForgotPassword from '../pages/auth/forgot-password';
 import ResetPassword from '../pages/auth/reset-password';
 import AuthLayout from '../AuthLayout';
+import RegisterSeller from '../pages/auth/register-seller';
+import ChangePassword from '../pages/private/change-password';
+import UpdateProfile from '../pages/private/update-profile';
+import LandingPage from '../pages/landing-page';
+import CustomerHome from '../pages/customer/home';
+import ManagerDashboard from '../pages/manager/dashboard';
+import AdminDashboard from '../pages/admin/dashboard';
+import CustomerDocuments from '../pages/customer/documents';
+import CustomerStudyPlan from '../pages/customer/study-plan';
+import CustomerGroupChat from '../pages/customer/group-chat';
+import SellerMyCourse from '../pages/seller/my-course';
+import SellerBilling from '../pages/seller/billing';
+import ManagerDocuments from '../pages/manager/documents';
+import ManagerRevenue from '../pages/manager/revenue';
 
-const { ADMIN, USER, SELLER, MANAGER } = USER_ROLE;
+const { ADMIN, CUSTOMER, SELLER, MANAGER } = USER_ROLE;
 
 const router = createBrowserRouter([
-  { path: '*', element: <NotFoundPage /> },
   //Public Routes
   {
     path: '/',
@@ -27,7 +37,7 @@ const router = createBrowserRouter([
     children: [
       {
         path: '',
-        element: <HomePage />,
+        element: <LandingPage />,
       },
       {
         path: 'about',
@@ -49,6 +59,10 @@ const router = createBrowserRouter([
         element: <Register />,
       },
       {
+        path: 'register-seller',
+        element: <RegisterSeller />,
+      },
+      {
         path: 'login',
         element: <Login />,
       },
@@ -66,7 +80,7 @@ const router = createBrowserRouter([
       },
     ],
   },
-  //Protected Routes
+  //Private Routes
   {
     path: '/',
     element: <App />,
@@ -80,10 +94,57 @@ const router = createBrowserRouter([
         ),
       },
       {
-        path: 'setting',
+        path: 'change-password',
         element: (
           <ProtectedRoute>
-            <Setting />
+            <ChangePassword />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: 'update-profile',
+        element: (
+          <ProtectedRoute>
+            <UpdateProfile />
+          </ProtectedRoute>
+        ),
+      },
+    ],
+  },
+  //Customer Routes
+  {
+    path: '/customer',
+    element: <App />,
+    children: [
+      {
+        path: '',
+        element: (
+          <ProtectedRoute requiredRoles={[CUSTOMER, 'User']}>
+            <CustomerHome />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: 'documents',
+        element: (
+          <ProtectedRoute requiredRoles={[CUSTOMER, 'User']}>
+            <CustomerDocuments />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: 'study-plan',
+        element: (
+          <ProtectedRoute requiredRoles={[CUSTOMER, 'User']}>
+            <CustomerStudyPlan />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: 'group-chat',
+        element: (
+          <ProtectedRoute requiredRoles={[CUSTOMER, 'User']}>
+            <CustomerGroupChat />
           </ProtectedRoute>
         ),
       },
@@ -91,22 +152,74 @@ const router = createBrowserRouter([
   },
   //Admin Routes
   {
-    path: '/',
+    path: '/admin',
     element: <App />,
     children: [
       {
         path: 'dashboard',
         element: (
           <ProtectedRoute requiredRoles={[ADMIN]}>
-            <Dashboard />
+            <AdminDashboard />
           </ProtectedRoute>
         ),
       },
     ],
   },
   //Manager Routes
+  {
+    path: '/manager',
+    element: <App />,
+    children: [
+      {
+        path: 'dashboard',
+        element: (
+          <ProtectedRoute requiredRoles={[MANAGER]}>
+            <ManagerDashboard />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: 'documents',
+        element: (
+          <ProtectedRoute requiredRoles={[MANAGER]}>
+            <ManagerDocuments />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: 'revenue',
+        element: (
+          <ProtectedRoute requiredRoles={[MANAGER]}>
+            <ManagerRevenue />
+          </ProtectedRoute>
+        ),
+      },
+    ],
+  },
   //Seller Routes
-  //User Routes
+  {
+    path: '/seller',
+    element: <App />,
+    children: [
+      {
+        path: 'my-course',
+        element: (
+          <ProtectedRoute requiredRoles={[SELLER]}>
+            <SellerMyCourse />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: 'billing',
+        element: (
+          <ProtectedRoute requiredRoles={[SELLER]}>
+            <SellerBilling />
+          </ProtectedRoute>
+        ),
+      },
+    ],
+  },
+  { path: '*', element: <NotFoundPage /> },
 ]);
 
 export default router;

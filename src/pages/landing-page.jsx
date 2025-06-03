@@ -14,8 +14,10 @@ import {
   Twitter,
   Instagram,
 } from 'lucide-react';
+import InterestModel from '../components/common/InterestModel';
+import HeroSection from '../components/common/HeroSection';
 
-export default function HomePage() {
+export default function LandingPage() {
   const features = [
     {
       icon: <BookOpenText className='w-12 h-12 text-primary' />,
@@ -66,31 +68,7 @@ export default function HomePage() {
   return (
     <main>
       {/* Hero Section */}
-      <section
-        className='hero min-h-screen'
-        style={{
-          backgroundImage:
-            'url(https://img.daisyui.com/images/stock/photo-1507358522600-9f71e620c44e.webp)',
-        }}
-      >
-        <div className='hero-overlay bg-opacity-70 bg-neutral'></div>
-        <div className='hero-content text-center text-neutral-content py-20'>
-          <div className='max-w-2xl'>
-            <h1 className='mb-6 text-4xl md:text-6xl font-bold leading-tight'>
-              Unlock Your Learning Potential
-            </h1>
-            <p className='mb-8 text-lg md:text-xl'>
-              Join StudySphere: Share documents, buy & sell notes, find study
-              partners, and leverage cutting-edge AI tools to supercharge your
-              academic journey.
-            </p>
-            <button className='btn btn-primary btn-lg'>
-              Get Started Free <ArrowRight className='w-5 h-5 ml-2' />
-            </button>
-          </div>
-        </div>
-      </section>
-
+      <HeroSection />
       {/* Features Section */}
       <section className='py-16 md:py-24 bg-base-200'>
         <div className='container mx-auto px-4 md:px-8 text-center'>

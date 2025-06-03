@@ -6,6 +6,8 @@ import { Link } from 'react-router';
 import { USER_ROLE } from '../../constants';
 import HeaderAvatar from './HeaderAvatar';
 
+const { CUSTOMER, MANAGER, SELLER, ADMIN } = USER_ROLE;
+
 const Header = () => {
   const { user } = useAuthStore();
   const userRole = user?.role;
@@ -14,18 +16,12 @@ const Header = () => {
     { href: '/', label: 'Home' },
     { href: '/about', label: 'About' },
     { href: '/contact', label: 'Contact' },
+    { href: '/register-seller', label: 'Become a Seller' },
   ];
   const customerLinks = [
-    { href: '/courses', label: 'Courses' },
-    { href: '/document', label: 'Documents' },
-    { href: '/services', label: 'Services' },
-    { href: '/contact', label: 'Contact' },
-  ];
-  const userLinks = [
-    { href: '/courses', label: 'Courses' },
-    { href: '/document', label: 'Documents' },
-    { href: '/services', label: 'Services' },
-    { href: '/contact', label: 'Contact' },
+    { href: '/customer', label: 'Home' },
+    { href: '/customer/documents', label: 'Documents Library' },
+    { href: '/customer/study-plan', label: 'Study Plan' },
   ];
 
   const managerLinks = [
@@ -47,22 +43,22 @@ const Header = () => {
   ];
 
   const navLinks =
-    userRole === USER_ROLE.CUSTOMER
+    userRole === CUSTOMER
       ? customerLinks
-      : userRole === USER_ROLE.MANAGER
+      : userRole === MANAGER
       ? managerLinks
-      : userRole === USER_ROLE.SELLER
+      : userRole === SELLER
       ? sellerLinks
-      : userRole === USER_ROLE.ADMIN
+      : userRole === ADMIN
       ? adminLinks
-      : userRole === USER_ROLE.USER
-      ? userLinks
+      : userRole === 'User'
+      ? customerLinks
       : guestLinks;
 
   return (
-    <div className='navbar  bg-base-100 shadow-md sticky top-0 z-50 '>
+    <div className='navbar bg-base-100 shadow-sm sticky top-0 z-50 px-20'>
       <div className='navbar-start flex items-center'>
-        <a className='btn btn-ghost text-xl'>Messenger App</a>
+        <a className='btn btn-ghost text-xl'>Prilab</a>
       </div>
       <div className='navbar-center flex items-start gap-16'>
         {navLinks.map((link) => (
@@ -76,12 +72,10 @@ const Header = () => {
         ))}
       </div>
       <div className='navbar-end flex items-center gap-5'>
-        {/* Search */}
-
         {/* User */}
         {user ? (
           <div className='flex items-center gap-4'>
-            <label className='input mr-10'>
+            <label className='input'>
               <svg
                 className='h-[1em] opacity-50'
                 xmlns='http://www.w3.org/2000/svg'
