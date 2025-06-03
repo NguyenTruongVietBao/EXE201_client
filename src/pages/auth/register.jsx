@@ -1,12 +1,16 @@
 import React, { useState } from 'react';
 import useAuthStore from '../../stores/useAuthStore';
 import { toast } from 'react-hot-toast';
-import { useNavigate } from 'react-router';
+import { Link, useNavigate } from 'react-router';
+import { UserPlus } from 'lucide-react';
+import InputCustom from '../../components/common/InputCustom';
 
 function Register() {
   const navigate = useNavigate();
   const { register, isLoading } = useAuthStore();
   const [errors, setErrors] = useState({});
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [form, setForm] = useState({
     firstName: 'Bao',
     lastName: 'Nguyen',
@@ -83,156 +87,123 @@ function Register() {
     }
   };
 
+  const handleOpenModel = () => {
+    console.log('🚀 ~ handleOpenModel: ~ handleOpenModel');
+  };
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setForm((prev) => ({ ...prev, [name]: value }));
-    // Clear error when user starts typing
     if (errors[name]) {
       setErrors((prev) => ({ ...prev, [name]: '' }));
     }
   };
 
   return (
-    <div className='hero bg-base-200 min-h-screen'>
-      <div className='hero-content flex-col lg:flex-row-reverse'>
-        <div className='text-center lg:text-left'>
-          <h1 className='text-5xl font-bold'>Register now!</h1>
-          <p className='py-6'>
-            Join our community and start your journey with us. Create your
-            account to get started.
+    <div className='min-h-screen bg-base-200 flex items-center justify-center p-4'>
+      <div className='card w-full max-w-lg bg-base-100 shadow-xl'>
+        <div className='card-body'>
+          <div className='text-center mb-8'>
+            <Link
+              href='/'
+              className='btn btn-ghost normal-case text-2xl font-bold text-primary mb-2'
+            >
+              StudySphere
+            </Link>
+            <h2 className='text-3xl font-semibold'>Create Your Account</h2>
+            <p className='text-base-content/70'>
+              Join StudySphere and unlock a world of learning.
+            </p>
+          </div>
+
+          <form onSubmit={handleSubmit} className='space-y-3'>
+            <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
+              <InputCustom
+                type='text'
+                name='firstName'
+                label='First Name'
+                placeholder='John'
+                form={form}
+                handleChange={handleChange}
+              />
+              <InputCustom
+                type='text'
+                name='lastName'
+                label='Last Name'
+                placeholder='Doe'
+                form={form}
+                handleChange={handleChange}
+              />
+            </div>
+
+            <InputCustom
+              type='email'
+              name='email'
+              label='Email'
+              placeholder='Nhập email'
+              form={form}
+              handleChange={handleChange}
+            />
+
+            <InputCustom
+              type='password'
+              name='password'
+              label='Mật khẩu'
+              placeholder='Nhập mật khẩu'
+              showPassword={showPassword}
+              setShowPassword={setShowPassword}
+              form={form}
+              handleChange={handleChange}
+            />
+
+            <InputCustom
+              type='password'
+              name='password'
+              label='Mật khẩu'
+              placeholder='Nhập mật khẩu'
+              showPassword={showConfirmPassword}
+              setShowPassword={setShowConfirmPassword}
+              form={form}
+              handleChange={handleChange}
+            />
+
+            <div className='form-control mt-6'>
+              <button
+                type='submit'
+                className='btn btn-primary w-full'
+                disabled={isLoading}
+              >
+                {isLoading ? (
+                  <span className='loading loading-spinner'></span>
+                ) : (
+                  <UserPlus className='w-5 h-5 mr-2' />
+                )}
+                {isLoading ? 'Creating Account...' : 'Create Account'}
+              </button>
+            </div>
+          </form>
+
+          <div className='divider my-6'>OR</div>
+
+          <div className='space-y-2'>
+            <button className='btn btn-outline btn-neutral w-full'>
+              {/* <GoogleIcon className="w-5 h-5 mr-2" /> */}{' '}
+              {/* Replace with actual icon */}
+              Sign up with Google
+            </button>
+          </div>
+
+          <p className='mt-8 text-center text-sm'>
+            Already have an account?{' '}
+            <Link href='/login' className='link link-primary font-medium'>
+              Log In
+            </Link>
           </p>
         </div>
-        <div className='card bg-base-100 w-full max-w-sm shrink-0 shadow-2xl'>
-          <div className='card-body'>
-            <form onSubmit={handleSubmit} className='space-y-4'>
-              <div className='form-control'>
-                <label className='label'>
-                  <span className='label-text'>First Name</span>
-                </label>
-                <input
-                  type='text'
-                  name='firstName'
-                  className={`input input-bordered ${
-                    errors.firstName ? 'input-error' : ''
-                  }`}
-                  placeholder='First Name'
-                  value={form.firstName}
-                  onChange={handleChange}
-                />
-                {errors.firstName && (
-                  <label className='label'>
-                    <span className='label-text-alt text-error'>
-                      {errors.firstName}
-                    </span>
-                  </label>
-                )}
-              </div>
-
-              <div className='form-control'>
-                <label className='label'>
-                  <span className='label-text'>Last Name</span>
-                </label>
-                <input
-                  type='text'
-                  name='lastName'
-                  className={`input input-bordered ${
-                    errors.lastName ? 'input-error' : ''
-                  }`}
-                  placeholder='Last Name'
-                  value={form.lastName}
-                  onChange={handleChange}
-                />
-                {errors.lastName && (
-                  <label className='label'>
-                    <span className='label-text-alt text-error'>
-                      {errors.lastName}
-                    </span>
-                  </label>
-                )}
-              </div>
-
-              <div className='form-control'>
-                <label className='label'>
-                  <span className='label-text'>Email</span>
-                </label>
-                <input
-                  type='email'
-                  name='email'
-                  className={`input input-bordered ${
-                    errors.email ? 'input-error' : ''
-                  }`}
-                  placeholder='Email'
-                  value={form.email}
-                  onChange={handleChange}
-                />
-                {errors.email && (
-                  <label className='label'>
-                    <span className='label-text-alt text-error'>
-                      {errors.email}
-                    </span>
-                  </label>
-                )}
-              </div>
-
-              <div className='form-control'>
-                <label className='label'>
-                  <span className='label-text'>Password</span>
-                </label>
-                <input
-                  type='password'
-                  name='password'
-                  className={`input input-bordered ${
-                    errors.password ? 'input-error' : ''
-                  }`}
-                  placeholder='Password'
-                  value={form.password}
-                  onChange={handleChange}
-                />
-                {errors.password && (
-                  <label className='label'>
-                    <span className='label-text-alt text-error'>
-                      {errors.password}
-                    </span>
-                  </label>
-                )}
-              </div>
-
-              <div className='form-control'>
-                <label className='label'>
-                  <span className='label-text'>Confirm Password</span>
-                </label>
-                <input
-                  type='password'
-                  name='confirmPassword'
-                  className={`input input-bordered ${
-                    errors.confirmPassword ? 'input-error' : ''
-                  }`}
-                  placeholder='Confirm Password'
-                  value={form.confirmPassword}
-                  onChange={handleChange}
-                />
-                {errors.confirmPassword && (
-                  <label className='label'>
-                    <span className='label-text-alt text-error'>
-                      {errors.confirmPassword}
-                    </span>
-                  </label>
-                )}
-              </div>
-
-              <div className='form-control mt-6'>
-                <button
-                  type='submit'
-                  className='btn btn-primary'
-                  disabled={isLoading}
-                >
-                  {isLoading ? 'Registering...' : 'Register'}
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
       </div>
+      <button className='btn btn-primary' onClick={handleOpenModel}>
+        Test
+      </button>
     </div>
   );
 }

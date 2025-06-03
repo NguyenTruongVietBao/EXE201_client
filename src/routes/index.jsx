@@ -14,6 +14,7 @@ import Setting from '../pages/private/setting';
 import Dashboard from '../pages/admin/dashboard';
 import ForgotPassword from '../pages/auth/forgot-password';
 import ResetPassword from '../pages/auth/reset-password';
+import AuthLayout from '../AuthLayout';
 
 const { ADMIN, USER, SELLER, MANAGER } = USER_ROLE;
 
@@ -41,7 +42,7 @@ const router = createBrowserRouter([
   //Auth Routes
   {
     path: '/',
-    element: <App />,
+    element: <AuthLayout />,
     children: [
       {
         path: 'register',
