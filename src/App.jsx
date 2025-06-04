@@ -10,7 +10,6 @@ function App() {
     <div className='min-h-screen' data-theme={theme}>
       <Header />
       <Outlet />
-
       <Footer />
     </div>
   );

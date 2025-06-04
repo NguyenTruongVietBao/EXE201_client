@@ -29,7 +29,6 @@ function AuthLayout() {
 
   return (
     <div data-theme={theme}>
-      <Header />
       <Outlet />
     </div>
   );

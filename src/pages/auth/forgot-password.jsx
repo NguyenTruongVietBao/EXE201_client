@@ -12,31 +12,29 @@ export default function ForgotPassword() {
   };
 
   return (
-    <div className='hero bg-base-200 min-h-screen'>
-      <div className='hero-content flex-col lg:flex-row-reverse'>
-        <div className='text-center lg:text-left'>
-          <h1 className='text-5xl font-bold'>Forgot Password</h1>
-        </div>
-        <div className='card bg-base-100 w-full max-w-sm shrink-0 shadow-2xl'>
-          <div className='card-body'>
-            <form onSubmit={handleSubmit}>
-              <div className='form-group'>
-                <label htmlFor='email'>Email</label>
-                <input
-                  type='email'
-                  className='input'
-                  placeholder='Email'
-                  required
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                />
-                <button type='submit' className='btn btn-primary'>
-                  Send Reset Link
-                </button>
-              </div>
-            </form>
+    <div className='flex flex-col items-center justify-center h-screen gap-10'>
+      <div className='flex flex-col items-center justify-center gap-2'>
+        <h1 className='text-3xl font-bold'>Forgot Password</h1>
+        <p className='text-sm text-gray-500'>
+          Please enter your email address to reset your password.
+        </p>
+      </div>
+      <div className=''>
+        <form onSubmit={handleSubmit} className='w-full max-w-xl'>
+          <div className='form-group flex gap-2 items-center w-full'>
+            <input
+              type='email'
+              className='input'
+              placeholder='Email'
+              required
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+            />
+            <button type='submit' className='btn btn-primary'>
+              Reset
+            </button>
           </div>
-        </div>
+        </form>
       </div>
     </div>
   );

@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import useAuthStore from '../../stores/useAuthStore';
 import { toast } from 'react-hot-toast';
 import { Link, useNavigate } from 'react-router';
-import { UserPlus } from 'lucide-react';
+import { ArrowLeftIcon, Loader2, UserPlus } from 'lucide-react';
 import InputCustom from '../../components/common/InputCustom';
 
 function Register() {
@@ -97,19 +97,25 @@ function Register() {
   };
 
   return (
-    <div className='min-h-screen bg-base-200 flex items-center justify-center p-4'>
+    <div className='min-h-screen flex items-center justify-center p-4'>
       <div className='card w-full max-w-lg bg-base-100 shadow-xl'>
         <div className='card-body'>
           <div className='text-center mb-8'>
-            <Link
-              href='/'
-              className='btn btn-ghost normal-case text-2xl font-bold text-primary mb-2'
-            >
-              StudySphere
-            </Link>
-            <h2 className='text-3xl font-semibold'>Create Your Account</h2>
+            <div className='grid grid-cols-3 items-center'>
+              <Link to='/' className='justify-self-start'>
+                <ArrowLeftIcon className='w-6 h-6 text-primary' />
+              </Link>
+              <Link
+                href='/'
+                className='btn btn-ghost normal-case text-3xl font-bold text-primary mb-2 justify-self-center'
+              >
+                Prilab
+              </Link>
+              <div></div>
+            </div>
+            <h2 className='text-2xl font-semibold'>Welcome Back!</h2>
             <p className='text-base-content/70'>
-              Join StudySphere and unlock a world of learning.
+              Sign up to continue to your account.
             </p>
           </div>
 
@@ -164,38 +170,28 @@ function Register() {
               handleChange={handleChange}
             />
 
-            <div className='form-control mt-6'>
+            <div className='form-control mt-10'>
               <button
                 type='submit'
-                className='btn btn-primary w-full'
+                className='btn btn-outline btn-primary btn-lg w-full py-3 border-2'
                 disabled={isLoading}
               >
                 {isLoading ? (
-                  <span className='loading loading-spinner'></span>
+                  <Loader2 className='w-5 h-5 mr-2 animate-spin' />
                 ) : (
                   <UserPlus className='w-5 h-5 mr-2' />
                 )}
-                {isLoading ? 'Creating Account...' : 'Create Account'}
+                {isLoading ? '' : 'Create Account'}
               </button>
             </div>
           </form>
 
-          <div className='divider my-6'>OR</div>
-
-          <div className='space-y-2'>
-            <button className='btn btn-outline btn-neutral w-full'>
-              {/* <GoogleIcon className="w-5 h-5 mr-2" /> */}{' '}
-              {/* Replace with actual icon */}
-              Sign up with Google
-            </button>
-          </div>
-
-          <p className='mt-8 text-center text-sm'>
+          <div className='mt-8 text-center text-md font-semibold'>
             Already have an account?{' '}
-            <Link href='/login' className='link link-primary font-medium'>
+            <Link to='/login' className='link link-primary font-semibold'>
               Log In
             </Link>
-          </p>
+          </div>
         </div>
       </div>
     </div>

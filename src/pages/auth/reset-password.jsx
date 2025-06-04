@@ -22,32 +22,40 @@ export default function ResetPassword() {
   };
   return (
     <div className='hero bg-base-200 min-h-screen'>
-      <div className='hero-content flex-col lg:flex-row-reverse'>
+      <div className='hero-content flex items-center justify-center gap-5'>
         <div className='text-center lg:text-left'>
           <h1 className='text-5xl font-bold'>Reset Password</h1>
         </div>
-        <div className='card bg-base-100 w-full max-w-sm shrink-0 shadow-2xl'>
-          <div className='card-body'>
-            <form onSubmit={handleSubmit}>
-              <div className='form-group'>
-                <label htmlFor='password'>Password</label>
-                <input
-                  type='password'
-                  className='input'
-                  placeholder='Password'
-                  required
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                />
-                <label htmlFor='confirmPassword'>Confirm Password</label>
-                <input
-                  type='password'
-                  className='input'
-                  required
-                  value={confirmPassword}
-                  onChange={(e) => setConfirmPassword(e.target.value)}
-                />
-                <button type='submit' className='btn btn-primary'>
+        <div className='card bg-base-100 shrink-0 shadow-2xl'>
+          <div className='card-body '>
+            <form onSubmit={handleSubmit} className=''>
+              <div className='form-group flex flex-col gap-5'>
+                <div>
+                  <label htmlFor='password'>Password</label>
+                  <input
+                    type='password'
+                    className='input'
+                    placeholder='Password'
+                    required
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                  />
+                </div>
+                <div>
+                  <label htmlFor='confirmPassword'>Confirm Password</label>
+                  <input
+                    type='password'
+                    className='input'
+                    placeholder='Confirm Password'
+                    required
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                  />
+                </div>
+                <button
+                  type='submit'
+                  className='btn btn-primary w-full max-w-sm'
+                >
                   Reset Password
                 </button>
               </div>

@@ -41,7 +41,7 @@ export default function InputCustom({
           type={inputType}
           name={name}
           placeholder={placeholder}
-          className={`input input-bordered w-full pl-10 ${
+          className={`border border-gray-400 rounded-lg text-gray-700 text-lg w-full pl-10 py-2 ${
             isPasswordType ? 'pr-10' : 'pr-4'
           }`}
           value={form?.[name] || ''}
@@ -56,7 +56,7 @@ export default function InputCustom({
           aria-label={showPassword ? 'Ẩn mật khẩu' : 'Hiện mật khẩu'}
           tabIndex={0}
         >
-          <IconComponent className='w-5 h-5' />
+          <IconComponent className='w-5 h-5 text-gray-500' />
         </button>
         {isPasswordType && setShowPassword && (
           <button
@@ -67,9 +67,9 @@ export default function InputCustom({
             tabIndex={0}
           >
             {showPassword ? (
-              <EyeOff className='w-5 h-5' />
+              <EyeOff className='w-5 h-5 text-gray-500' />
             ) : (
-              <Eye className='w-5 h-5' />
+              <Eye className='w-5 h-5 text-gray-500' />
             )}
           </button>
         )}

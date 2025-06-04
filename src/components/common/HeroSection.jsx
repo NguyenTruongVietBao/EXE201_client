@@ -21,7 +21,7 @@ export default function HeroSection() {
   ];
 
   return (
-    <section className='bg-base-100 py-16 md:py-24 lg:py-32'>
+    <section className='py-16 md:py-24 lg:py-32 bg-gradient-to-l from-emerald-50 from-10% via-base-100 via-30% to-cyan-50 to-90%'>
       <div className='container mx-auto pl-24'>
         <div className='grid lg:grid-cols-2 gap-12 items-center'>
           {/* Text Content */}

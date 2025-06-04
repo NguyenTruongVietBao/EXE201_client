@@ -59,7 +59,13 @@ function VerifyEmail() {
 
   return (
     <div className='flex flex-col items-center justify-center h-screen gap-10'>
-      <h1 className='text-2xl font-bold'>Verify Email</h1>
+      <div className='flex flex-col items-center justify-center gap-2'>
+        <h1 className='text-2xl font-bold'>Verify Email</h1>
+        <p className='text-sm text-gray-500'>
+          Please enter the 6-digit code sent to your email address to verify
+          your account.
+        </p>
+      </div>
       <div className='flex flex-col items-center justify-center'>
         <OtpInput
           value={otp}
@@ -83,7 +89,10 @@ function VerifyEmail() {
         />
       </div>
       <div className='flex justify-between gap-10'>
-        <button className='btn btn-ghost' onClick={handleVerifyEmail}>
+        <button
+          className='link link-primary text-sm'
+          onClick={handleVerifyEmail}
+        >
           Resend OTP (60s)
         </button>
         <button className='btn btn-primary' onClick={handleVerifyEmail}>
