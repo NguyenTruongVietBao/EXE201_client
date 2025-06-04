@@ -84,57 +84,148 @@ export default function LandingPage() {
       {/* Hero Section */}
       <HeroSection />
 
-      {/* Features Section - Background trắng với cards gradient */}
-      <section className='py-20 md:py-28 bg-gray-50'>
-        <div className='container mx-auto px-4 md:px-8 text-center'>
-          <div className='mb-16'>
-            <h2 className='text-4xl md:text-5xl font-bold mb-6 text-gray-900'>
-              Everything You Need to
-              <span className='bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent'>
-                {' '}
-                Succeed
-              </span>
-            </h2>
-            <p className='text-xl text-gray-600 mb-4 max-w-3xl mx-auto leading-relaxed'>
-              Our platform offers a comprehensive suite of tools designed to
-              enhance your learning experience and academic performance.
-            </p>
-            <div className='w-24 h-1 bg-gradient-to-r from-blue-500 to-purple-500 mx-auto rounded-full'></div>
-          </div>
+      {/* Lộ Trình Học Section */}
+      <section className='py-20 md:py-28 bg-white relative overflow-hidden'>
+        {/* Background decoration */}
+        <div className='absolute inset-0 bg-[radial-gradient(circle_at_20%_80%,rgba(59,130,246,0.05),transparent_50%)] pointer-events-none'></div>
+        <div className='absolute inset-0 bg-[radial-gradient(circle_at_80%_20%,rgba(168,85,247,0.05),transparent_50%)] pointer-events-none'></div>
 
-          <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8'>
-            {features.map((feature, index) => (
-              <div
-                key={index}
-                className='group relative bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-500 overflow-hidden transform hover:-translate-y-2'
-              >
-                {/* Gradient background overlay */}
-                <div
-                  className={`absolute inset-0 bg-gradient-to-br ${feature.gradient} opacity-0 group-hover:opacity-100 transition-opacity duration-300`}
-                ></div>
+        <div className='container mx-auto px-4 md:px-8'>
+          <div className='flex flex-col lg:flex-row items-center gap-16'>
+            {/* Left content */}
+            <div className='lg:w-1/2 text-center lg:text-left'>
+              <h2 className='text-4xl md:text-5xl font-bold mb-6 text-gray-900 leading-tight'>
+                Kế Hoạch Học Tập
+                <span className='bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent'>
+                  {' '}
+                  Dành Riêng Cho Bạn
+                </span>
+              </h2>
 
-                <div className='relative p-8'>
-                  {/* Icon container */}
-                  <div
-                    className={`${feature.iconBg} w-20 h-20 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform duration-300`}
-                  >
-                    {feature.icon}
+              <p className='text-xl text-gray-600 mb-12 leading-relaxed'>
+                AI sẽ tự động tạo kế hoạch học tập dựa trên nhu cầu của bạn, từ
+                những tài liệu chất lượng, giúp bạn dễ dàng bắt đầu hành trình
+                học tập một cách bài bản và hiệu quả.
+              </p>
+
+              {/* Learning path steps */}
+              <div className='grid grid-cols-1 md:grid-cols-2 gap-6 mb-12'>
+                <div className='bg-gradient-to-br from-emerald-50 to-emerald-100 rounded-2xl p-6 border border-emerald-200 hover:shadow-lg transition-all duration-300'>
+                  <div className='flex items-center gap-3 mb-3'>
+                    <div className='w-8 h-8 bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-xl flex items-center justify-center'>
+                      <span className='text-white font-bold text-sm'>1</span>
+                    </div>
+                    <h3 className='font-bold text-gray-900'>
+                      Kế hoạch học tập bài bản
+                    </h3>
                   </div>
-
-                  <h3 className='text-xl font-bold mb-4 text-gray-900 group-hover:text-gray-800'>
-                    {feature.title}
-                  </h3>
-                  <p className='text-gray-600 text-sm leading-relaxed group-hover:text-gray-700'>
-                    {feature.description}
-                  </p>
                 </div>
 
-                {/* Decorative elements */}
-                <div className='absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300'>
-                  <Sparkles className='w-5 h-5 text-yellow-400' />
+                <div className='bg-gradient-to-br from-blue-50 to-blue-100 rounded-2xl p-6 border border-blue-200 hover:shadow-lg transition-all duration-300'>
+                  <div className='flex items-center gap-3 mb-3'>
+                    <div className='w-8 h-8 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center'>
+                      <span className='text-white font-bold text-sm'>2</span>
+                    </div>
+                    <h3 className='font-bold text-gray-900'>
+                      Cá nhân hóa kế hoạch học tập
+                    </h3>
+                  </div>
+                </div>
+
+                <div className='bg-gradient-to-br from-purple-50 to-purple-100 rounded-2xl p-6 border border-purple-200 hover:shadow-lg transition-all duration-300'>
+                  <div className='flex items-center gap-3 mb-3'>
+                    <div className='w-8 h-8 bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl flex items-center justify-center'>
+                      <span className='text-white font-bold text-sm'>3</span>
+                    </div>
+                    <h3 className='font-bold text-gray-900'>
+                      Tài liệu chất lượng
+                    </h3>
+                  </div>
                 </div>
               </div>
-            ))}
+
+              {/* CTA Section */}
+              <div className='text-center lg:text-left'>
+                <p className='text-lg text-emerald-600 font-semibold mb-6'>
+                  Không biết bắt đầu từ đâu?
+                </p>
+                <button className='bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white font-bold text-lg px-8 py-4 rounded-2xl transition-all duration-300 transform hover:scale-105 hover:shadow-xl flex items-center gap-3 mx-auto lg:mx-0'>
+                  Tham gia ngay
+                  <ArrowRight className='w-5 h-5' />
+                </button>
+              </div>
+            </div>
+
+            {/* Right illustration */}
+            <div className='lg:w-1/2 relative'>
+              <div className='relative flex items-center justify-center'>
+                {/* 3D Isometric blocks illustration */}
+                <div className='relative w-96 h-96 flex items-center justify-center'>
+                  {/* Base green block */}
+                  <div className='absolute bottom-0 left-1/2 transform -translate-x-1/2'>
+                    <div className='relative'>
+                      <div className='w-32 h-20 bg-gradient-to-br from-emerald-400 to-emerald-600 rounded-lg transform -skew-y-12 shadow-xl'></div>
+                      <div className='absolute top-0 left-0 w-32 h-20 bg-gradient-to-br from-emerald-300 to-emerald-500 rounded-lg transform translate-y-2 translate-x-2 -skew-y-12'></div>
+                      <div className='absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-white font-bold text-xl z-10'>
+                        01
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Purple block */}
+                  <div className='absolute bottom-16 left-1/2 transform -translate-x-1/4'>
+                    <div className='relative'>
+                      <div className='w-28 h-18 bg-gradient-to-br from-purple-400 to-purple-600 rounded-lg transform -skew-y-12 shadow-xl'></div>
+                      <div className='absolute top-0 left-0 w-28 h-18 bg-gradient-to-br from-purple-300 to-purple-500 rounded-lg transform translate-y-2 translate-x-2 -skew-y-12'></div>
+                      <div className='absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-white font-bold text-lg z-10'>
+                        02
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Blue block */}
+                  <div className='absolute bottom-32 left-1/2 transform translate-x-1/4'>
+                    <div className='relative'>
+                      <div className='w-24 h-16 bg-gradient-to-br from-blue-400 to-blue-600 rounded-lg transform -skew-y-12 shadow-xl'></div>
+                      <div className='absolute top-0 left-0 w-24 h-16 bg-gradient-to-br from-blue-300 to-blue-500 rounded-lg transform translate-y-2 translate-x-2 -skew-y-12'></div>
+                      <div className='absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-white font-bold text-base z-10'>
+                        03
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Character illustration */}
+                  <div className='absolute top-0 right-0 transform translate-x-8 -translate-y-8'>
+                    <div className='w-24 h-32 relative'>
+                      {/* Head */}
+                      <div className='w-12 h-12 bg-gradient-to-br from-yellow-200 to-yellow-300 rounded-full mx-auto mb-2 relative'>
+                        <div className='absolute top-2 left-3 w-1 h-1 bg-gray-800 rounded-full'></div>
+                        <div className='absolute top-2 right-3 w-1 h-1 bg-gray-800 rounded-full'></div>
+                        <div className='absolute bottom-3 left-1/2 transform -translate-x-1/2 w-2 h-1 bg-gray-800 rounded-full'></div>
+                        {/* Hair */}
+                        <div className='absolute -top-1 left-1/2 transform -translate-x-1/2 w-14 h-8 bg-gradient-to-br from-blue-800 to-blue-900 rounded-t-full'></div>
+                      </div>
+
+                      {/* Body */}
+                      <div className='w-16 h-20 bg-gradient-to-br from-emerald-400 to-emerald-600 rounded-lg mx-auto relative'>
+                        {/* Arms */}
+                        <div className='absolute -left-2 top-2 w-3 h-12 bg-gradient-to-br from-emerald-400 to-emerald-600 rounded-full transform rotate-12'></div>
+                        <div className='absolute -right-2 top-2 w-3 h-12 bg-gradient-to-br from-emerald-400 to-emerald-600 rounded-full transform -rotate-12'></div>
+
+                        {/* Legs */}
+                        <div className='absolute -bottom-8 left-2 w-3 h-8 bg-gradient-to-br from-purple-500 to-purple-700 rounded-full'></div>
+                        <div className='absolute -bottom-8 right-2 w-3 h-8 bg-gradient-to-br from-purple-500 to-purple-700 rounded-full'></div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Floating elements */}
+                  <div className='absolute top-8 left-8 w-4 h-4 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-full animate-bounce'></div>
+                  <div className='absolute top-16 right-16 w-3 h-3 bg-gradient-to-br from-pink-400 to-red-500 rounded-full animate-pulse'></div>
+                  <div className='absolute bottom-40 left-4 w-5 h-5 bg-gradient-to-br from-cyan-400 to-blue-500 rounded-full animate-bounce delay-300'></div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </section>
@@ -273,6 +364,60 @@ export default function LandingPage() {
         </div>
       </section>
 
+      {/* Features Section - Background trắng với cards gradient */}
+      <section className='py-20 md:py-28 bg-gray-50'>
+        <div className='container mx-auto px-4 md:px-8 text-center'>
+          <div className='mb-16'>
+            <h2 className='text-4xl md:text-5xl font-bold mb-6 text-gray-900'>
+              Everything You Need to
+              <span className='bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent'>
+                {' '}
+                Succeed
+              </span>
+            </h2>
+            <p className='text-xl text-gray-600 mb-4 max-w-3xl mx-auto leading-relaxed'>
+              Our platform offers a comprehensive suite of tools designed to
+              enhance your learning experience and academic performance.
+            </p>
+            <div className='w-24 h-1 bg-gradient-to-r from-blue-500 to-purple-500 mx-auto rounded-full'></div>
+          </div>
+
+          <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8'>
+            {features.map((feature, index) => (
+              <div
+                key={index}
+                className='group relative bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-500 overflow-hidden transform hover:-translate-y-2'
+              >
+                {/* Gradient background overlay */}
+                <div
+                  className={`absolute inset-0 bg-gradient-to-br ${feature.gradient} opacity-0 group-hover:opacity-100 transition-opacity duration-300`}
+                ></div>
+
+                <div className='relative p-8'>
+                  {/* Icon container */}
+                  <div
+                    className={`${feature.iconBg} w-20 h-20 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform duration-300`}
+                  >
+                    {feature.icon}
+                  </div>
+
+                  <h3 className='text-xl font-bold mb-4 text-gray-900 group-hover:text-gray-800'>
+                    {feature.title}
+                  </h3>
+                  <p className='text-gray-600 text-sm leading-relaxed group-hover:text-gray-700'>
+                    {feature.description}
+                  </p>
+                </div>
+
+                {/* Decorative elements */}
+                <div className='absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300'>
+                  <Sparkles className='w-5 h-5 text-yellow-400' />
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
       {/* Call to Action Section - Final gradient mạnh mẽ */}
       <section className='py-20 md:py-28 bg-gradient-to-br from-blue-600 via-purple-600 to-indigo-700 relative overflow-hidden'>
         {/* Background patterns */}
