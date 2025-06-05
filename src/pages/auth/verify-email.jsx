@@ -10,6 +10,8 @@ function VerifyEmail() {
   const [otp, setOtp] = useState('');
   const [showInterestModal, setShowInterestModal] = useState(false);
   const [selectedInterests, setSelectedInterests] = useState([]);
+  const [countdown, setCountdown] = useState(0);
+  const [isResending, setIsResending] = useState(false);
   console.log('🚀 ~ VerifyEmail ~ selectedInterests:', selectedInterests);
   const { verifyEmail } = useAuthStore();
   const navigate = useNavigate();
@@ -32,7 +34,6 @@ function VerifyEmail() {
   };
 
   const handleConfirmInterest = async (selectedIds) => {
-    // Lấy ra array interest id
     const selectedItems = selectedIds.map((i) => i);
 
     console.log('Sở thích đã chọn:', selectedItems);
@@ -54,6 +55,26 @@ function VerifyEmail() {
     } finally {
       setShowInterestModal(false);
       setSelectedInterests(selectedIds);
+    }
+  };
+
+  const handleResendOtp = async () => {
+    const res = await authServices.resendOtp({ email });
+    console.log('🚀 ~ handleResendOtp ~ res:', res);
+    if (res.status === true) {
+      toast.success(res.message);
+      setIsResending(true);
+      setCountdown(60);
+      if (countdown > 0) {
+        const timer = setInterval(() => {
+          setCountdown((prev) => prev - 1);
+        }, 1000);
+        return () => clearInterval(timer);
+      } else {
+        setIsResending(false);
+      }
+    } else {
+      toast.error(res.message);
     }
   };
 
@@ -91,9 +112,10 @@ function VerifyEmail() {
       <div className='flex justify-between gap-10'>
         <button
           className='link link-primary text-sm'
-          onClick={handleVerifyEmail}
+          onClick={handleResendOtp}
+          disabled={isResending}
         >
-          Resend OTP (60s)
+          Resend OTP ({countdown > 0 ? countdown : '60s'})
         </button>
         <button className='btn btn-primary' onClick={handleVerifyEmail}>
           Verify

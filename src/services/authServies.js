@@ -31,7 +31,18 @@ const authServices = {
       return error;
     }
   },
-  // Update interest
+  // Resend email verification OTP
+  resendOtp: async (data) => {
+    try {
+      const response = await axiosInstance.post(
+        `/auth/resendemailverification?email=${data.email}`
+      );
+      return response;
+    } catch (error) {
+      return error;
+    }
+  },
+  // Create user's interests
   updateInterest: async (data) => {
     console.log('🚀 ~ updateInterest: ~ data:', data);
     try {
@@ -44,7 +55,6 @@ const authServices = {
       return error;
     }
   },
-
   // Get user's interests
   getUserInterests: async (email) => {
     try {
