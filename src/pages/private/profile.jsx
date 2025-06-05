@@ -5,7 +5,7 @@ import InterestModel from '../../components/common/InterestModel';
 import { INTERESTS } from '../../constants';
 
 const Profile = () => {
-  const { user } = useAuthStore();
+  const { user, userInterests } = useAuthStore();
   // Fake payment history data
   const paymentHistory = [
     {
@@ -82,7 +82,7 @@ const Profile = () => {
     );
   }
   return (
-    <div className='min-h-screen bg-gray-50 py-8'>
+    <div className='min-h-screen bg-white py-8'>
       <div className='max-w-6xl mx-auto px-4 sm:px-6 lg:px-8'>
         {/* Header Section */}
         <div className='bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-8'>
@@ -186,6 +186,14 @@ const Profile = () => {
                     Vai trò
                   </label>
                   <p className='mt-1 text-sm text-gray-900'>{user.role}</p>
+                </div>
+                <div>
+                  <label className='block text-sm font-medium text-gray-500'>
+                    Sở thích
+                  </label>
+                  <p className='mt-1 text-sm text-gray-900'>
+                    {userInterests.map((interest) => interest.name).join(', ')}
+                  </p>
                 </div>
               </div>
             </div>

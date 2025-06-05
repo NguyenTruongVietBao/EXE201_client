@@ -4,21 +4,28 @@ import {
   Filter,
   Star,
   Download,
-  Eye,
   Heart,
   BookOpen,
-  Calendar,
-  User,
-  ArrowUpDown,
   Grid3X3,
   List,
   ChevronDown,
   X,
-  DollarSign,
   Clock,
   Award,
+  Eye,
+  Bookmark,
+  Sparkles,
   TrendingUp,
+  Brain,
+  Users,
+  Tag,
+  Share2,
+  ExternalLink,
+  Play,
+  DollarSign,
+  Gift,
 } from 'lucide-react';
+import CreateDocModel from '../../components/common/customer/create-doc-model';
 
 export default function CustomerDocuments() {
   const [activeTab, setActiveTab] = useState('all'); // all, free, paid
@@ -30,62 +37,94 @@ export default function CustomerDocuments() {
   const [selectedRating, setSelectedRating] = useState('all');
   const [priceRange, setPriceRange] = useState('all');
 
-  // Mock data
+  // Mock data với tiếng Việt
   const categories = [
-    'Programming',
-    'Data Science',
-    'Mathematics',
-    'Physics',
-    'Chemistry',
-    'Biology',
-    'Business',
-    'Design',
+    'Lập trình',
+    'Khoa học dữ liệu',
+    'Toán học',
+    'Vật lý',
+    'Hóa học',
+    'Sinh học',
+    'Kinh doanh',
+    'Thiết kế',
+    'Ngoại ngữ',
+    'Kỹ thuật',
+  ];
+
+  // AI Suggested Documents
+  const aiSuggestions = [
+    {
+      id: 'ai-1',
+      title: 'React Advanced Patterns - Được đề xuất cho bạn',
+      author: 'Nguyễn Văn An',
+      reason: 'Dựa trên sở thích React và JavaScript của bạn',
+      isAI: true,
+    },
+    {
+      id: 'ai-2',
+      title: 'Machine Learning Thực Hành - Phù hợp với mức độ của bạn',
+      author: 'Trần Thị Bình',
+      reason: 'Tiếp tục hành trình học AI của bạn',
+      isAI: true,
+    },
   ];
 
   const documents = [
     {
       id: 1,
-      title: 'Complete React.js Guide 2024',
-      author: 'Sarah Johnson',
-      category: 'Programming',
+      title: 'Hướng dẫn React.js từ cơ bản đến nâng cao 2024',
+      author: 'Nguyễn Văn An',
+      authorAvatar: 'https://api.dicebear.com/9.x/avataaars/svg?seed=an',
+      category: 'Lập trình',
       rating: 4.8,
       reviews: 245,
       downloads: 1234,
       views: 5678,
       price: 0,
-      originalPrice: 29.99,
+      originalPrice: 299000,
       discount: 100,
-      thumbnail: 'https://api.dicebear.com/9.x/shapes/svg?seed=react',
+      thumbnail: 'https://api.dicebear.com/9.x/shapes/svg?seed=react-vn',
       tags: ['React', 'JavaScript', 'Frontend'],
       description:
-        'Master React.js from basics to advanced concepts with practical projects and real-world examples.',
-      level: 'Intermediate',
-      duration: '8 hours',
+        'Làm chủ React.js từ cơ bản đến nâng cao với các dự án thực tế và ví dụ trong thực tiễn.',
+      level: 'Trung cấp',
+      duration: '8 giờ',
       publishedAt: '2024-01-15',
       isFeatured: true,
       type: 'free',
+      isNew: false,
+      previewPages: 15,
+      totalPages: 120,
+      language: 'Tiếng Việt',
+      lastUpdated: '2024-01-20',
     },
     {
       id: 2,
-      title: 'Machine Learning Fundamentals',
-      author: 'Dr. Michael Chen',
-      category: 'Data Science',
+      title: 'Machine Learning cơ bản với Python',
+      author: 'TS. Trần Minh Hoàng',
+      authorAvatar: 'https://api.dicebear.com/9.x/avataaars/svg?seed=hoang',
+      category: 'Khoa học dữ liệu',
       rating: 4.9,
       reviews: 189,
       downloads: 2567,
       views: 8901,
-      price: 24.99,
-      originalPrice: 49.99,
+      price: 199000,
+      originalPrice: 399000,
       discount: 50,
-      thumbnail: 'https://api.dicebear.com/9.x/shapes/svg?seed=ml',
+      thumbnail: 'https://api.dicebear.com/9.x/shapes/svg?seed=ml-vn',
       tags: ['ML', 'Python', 'AI'],
       description:
-        'Comprehensive guide to machine learning algorithms, data preprocessing, and model evaluation.',
-      level: 'Advanced',
-      duration: '12 hours',
+        'Hướng dẫn toàn diện về thuật toán machine learning, tiền xử lý dữ liệu và đánh giá mô hình.',
+      level: 'Nâng cao',
+      duration: '12 giờ',
       publishedAt: '2024-01-10',
       isFeatured: true,
       type: 'paid',
+      isNew: false,
+      previewPages: 20,
+      totalPages: 180,
+      language: 'Tiếng Việt',
+      lastUpdated: '2024-01-18',
     },
     {
       id: 3,
@@ -192,8 +231,8 @@ export default function CustomerDocuments() {
     const matchesPrice =
       priceRange === 'all' ||
       (priceRange === 'free' && doc.price === 0) ||
-      (priceRange === 'under20' && doc.price > 0 && doc.price < 20) ||
-      (priceRange === 'over20' && doc.price >= 20);
+      (priceRange === 'under200k' && doc.price > 0 && doc.price < 200000) ||
+      (priceRange === 'over200k' && doc.price >= 200000);
 
     return (
       matchesTab &&
@@ -224,16 +263,61 @@ export default function CustomerDocuments() {
   });
 
   return (
-    <div className='min-h-screen '>
+    <div className='min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50'>
       <div className='container mx-auto px-4 md:px-8 py-8'>
         {/* Header */}
         <div className='mb-8'>
-          <h1 className='text-4xl font-bold mb-4 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent'>
-            Document Library 📚
-          </h1>
-          <p className='text-xl text-gray-600 mb-6'>
-            Discover high-quality learning materials from our community
-          </p>
+          <div className='bg-white/80 backdrop-blur-lg rounded-3xl p-8 shadow-xl border border-white/20 mb-8'>
+            <h1 className='text-4xl font-bold mb-4 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent'>
+              Thư viện tài liệu 📚
+            </h1>
+            <p className='text-xl text-gray-600 mb-6'>
+              Khám phá tài liệu học tập chất lượng cao từ cộng đồng của chúng
+              tôi
+            </p>
+
+            {/* AI Suggestions */}
+            <div className='bg-gradient-to-r from-purple-100 to-pink-100 rounded-2xl p-6 mb-6'>
+              <div className='flex items-center gap-3 mb-4'>
+                <div className='flex items-center gap-2 bg-gradient-to-r from-purple-500 to-pink-500 text-white px-4 py-2 rounded-full'>
+                  <Sparkles className='w-5 h-5' />
+                  <span className='font-semibold'>Gợi ý từ AI</span>
+                </div>
+                <p className='text-purple-700'>
+                  Được cá nhân hóa dành riêng cho bạn
+                </p>
+              </div>
+              <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
+                {aiSuggestions.map((suggestion) => (
+                  <div
+                    key={suggestion.id}
+                    className='bg-white/80 rounded-xl p-4 hover:bg-white transition-all duration-300'
+                  >
+                    <div className='flex items-center gap-3'>
+                      <div className='w-12 h-12 bg-gradient-to-r from-purple-500 to-pink-500 rounded-xl flex items-center justify-center'>
+                        <Brain className='w-6 h-6 text-white' />
+                      </div>
+                      <div className='flex-1'>
+                        <h3 className='font-semibold text-gray-900 text-sm'>
+                          {suggestion.title}
+                        </h3>
+                        <p className='text-xs text-gray-600'>
+                          bởi {suggestion.author}
+                        </p>
+                        <p className='text-xs text-purple-600 mt-1 flex items-center gap-1'>
+                          <Sparkles className='w-3 h-3' />
+                          {suggestion.reason}
+                        </p>
+                      </div>
+                      <button className='px-3 py-1 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-lg text-xs font-medium hover:from-purple-600 hover:to-pink-600 transition-all duration-300'>
+                        Xem
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
 
           {/* Search and Filters */}
           <div className='flex flex-col lg:flex-row gap-4 mb-6'>
@@ -244,7 +328,7 @@ export default function CustomerDocuments() {
               </div>
               <input
                 type='search'
-                placeholder='Search documents, authors, or tags...'
+                placeholder='Tìm kiếm tài liệu, tác giả, hoặc thẻ...'
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className='w-full pl-10 pr-4 py-3 bg-white border border-gray-200 rounded-xl text-base placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200'
@@ -257,7 +341,7 @@ export default function CustomerDocuments() {
               className='px-6 py-3 bg-white border border-gray-200 rounded-xl hover:bg-gray-50 transition-colors duration-200 flex items-center gap-2'
             >
               <Filter className='w-5 h-5' />
-              Filters
+              Bộ lọc
               {showFilters && <X className='w-4 h-4' />}
             </button>
 
@@ -268,12 +352,12 @@ export default function CustomerDocuments() {
                 onChange={(e) => setSortBy(e.target.value)}
                 className='appearance-none bg-white border border-gray-200 rounded-xl px-4 py-3 pr-8 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent'
               >
-                <option value='newest'>Newest First</option>
-                <option value='oldest'>Oldest First</option>
-                <option value='rating'>Highest Rated</option>
-                <option value='downloads'>Most Downloaded</option>
-                <option value='price-low'>Price: Low to High</option>
-                <option value='price-high'>Price: High to Low</option>
+                <option value='newest'>Mới nhất</option>
+                <option value='oldest'>Cũ nhất</option>
+                <option value='rating'>Đánh giá cao nhất</option>
+                <option value='downloads'>Tải nhiều nhất</option>
+                <option value='price-low'>Giá: Thấp đến cao</option>
+                <option value='price-high'>Giá: Cao đến thấp</option>
               </select>
               <ChevronDown className='absolute right-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none' />
             </div>
@@ -304,37 +388,40 @@ export default function CustomerDocuments() {
           </div>
 
           {/* Tabs */}
-          <div className='flex space-x-1 bg-white p-1 rounded-xl border border-gray-200 w-fit'>
-            <button
-              onClick={() => setActiveTab('all')}
-              className={`px-6 py-2 rounded-lg font-medium transition-all duration-200 ${
-                activeTab === 'all'
-                  ? 'bg-gradient-to-r from-blue-500 to-purple-500 text-white shadow-md'
-                  : 'text-gray-600 hover:text-gray-800'
-              }`}
-            >
-              All Documents ({documents.length})
-            </button>
-            <button
-              onClick={() => setActiveTab('free')}
-              className={`px-6 py-2 rounded-lg font-medium transition-all duration-200 ${
-                activeTab === 'free'
-                  ? 'bg-gradient-to-r from-emerald-500 to-teal-500 text-white shadow-md'
-                  : 'text-gray-600 hover:text-gray-800'
-              }`}
-            >
-              Free ({documents.filter((d) => d.type === 'free').length})
-            </button>
-            <button
-              onClick={() => setActiveTab('paid')}
-              className={`px-6 py-2 rounded-lg font-medium transition-all duration-200 ${
-                activeTab === 'paid'
-                  ? 'bg-gradient-to-r from-orange-500 to-red-500 text-white shadow-md'
-                  : 'text-gray-600 hover:text-gray-800'
-              }`}
-            >
-              Premium ({documents.filter((d) => d.type === 'paid').length})
-            </button>
+          <div className='flex justify-between w-full'>
+            <div className='flex space-x-1 bg-white p-1 rounded-xl border border-gray-200 w-fit'>
+              <button
+                onClick={() => setActiveTab('all')}
+                className={`px-6 py-2 rounded-lg font-medium transition-all duration-200 ${
+                  activeTab === 'all'
+                    ? 'bg-gradient-to-r from-blue-500 to-purple-500 text-white shadow-md'
+                    : 'text-gray-600 hover:text-gray-800'
+                }`}
+              >
+                Tất cả ({documents.length})
+              </button>
+              <button
+                onClick={() => setActiveTab('free')}
+                className={`px-6 py-2 rounded-lg font-medium transition-all duration-200 ${
+                  activeTab === 'free'
+                    ? 'bg-gradient-to-r from-emerald-500 to-teal-500 text-white shadow-md'
+                    : 'text-gray-600 hover:text-gray-800'
+                }`}
+              >
+                Miễn phí ({documents.filter((d) => d.type === 'free').length})
+              </button>
+              <button
+                onClick={() => setActiveTab('paid')}
+                className={`px-6 py-2 rounded-lg font-medium transition-all duration-200 ${
+                  activeTab === 'paid'
+                    ? 'bg-gradient-to-r from-orange-500 to-red-500 text-white shadow-md'
+                    : 'text-gray-600 hover:text-gray-800'
+                }`}
+              >
+                Trả phí ({documents.filter((d) => d.type === 'paid').length})
+              </button>
+            </div>
+            <CreateDocModel />
           </div>
         </div>
 
@@ -342,19 +429,19 @@ export default function CustomerDocuments() {
           {/* Filters Sidebar */}
           {showFilters && (
             <div className='w-64 bg-white rounded-2xl p-6 shadow-lg h-fit sticky top-8'>
-              <h3 className='font-bold text-gray-900 mb-4'>Filters</h3>
+              <h3 className='font-bold text-gray-900 mb-4'>Bộ lọc</h3>
 
               {/* Category Filter */}
               <div className='mb-6'>
                 <label className='block text-sm font-medium text-gray-700 mb-2'>
-                  Category
+                  Danh mục
                 </label>
                 <select
                   value={selectedCategory}
                   onChange={(e) => setSelectedCategory(e.target.value)}
                   className='w-full p-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500'
                 >
-                  <option value='all'>All Categories</option>
+                  <option value='all'>Tất cả danh mục</option>
                   {categories.map((category) => (
                     <option key={category} value={category}>
                       {category}
@@ -366,34 +453,34 @@ export default function CustomerDocuments() {
               {/* Rating Filter */}
               <div className='mb-6'>
                 <label className='block text-sm font-medium text-gray-700 mb-2'>
-                  Minimum Rating
+                  Đánh giá tối thiểu
                 </label>
                 <select
                   value={selectedRating}
                   onChange={(e) => setSelectedRating(e.target.value)}
                   className='w-full p-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500'
                 >
-                  <option value='all'>Any Rating</option>
-                  <option value='4.5'>4.5+ Stars</option>
-                  <option value='4.0'>4.0+ Stars</option>
-                  <option value='3.5'>3.5+ Stars</option>
+                  <option value='all'>Bất kỳ</option>
+                  <option value='4.5'>4.5+ sao</option>
+                  <option value='4.0'>4.0+ sao</option>
+                  <option value='3.5'>3.5+ sao</option>
                 </select>
               </div>
 
               {/* Price Range Filter */}
               <div className='mb-6'>
                 <label className='block text-sm font-medium text-gray-700 mb-2'>
-                  Price Range
+                  Khoảng giá
                 </label>
                 <select
                   value={priceRange}
                   onChange={(e) => setPriceRange(e.target.value)}
                   className='w-full p-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500'
                 >
-                  <option value='all'>Any Price</option>
-                  <option value='free'>Free</option>
-                  <option value='under20'>Under $20</option>
-                  <option value='over20'>$20 and above</option>
+                  <option value='all'>Bất kỳ</option>
+                  <option value='free'>Miễn phí</option>
+                  <option value='under200k'>Dưới 200.000 VNĐ</option>
+                  <option value='over200k'>Từ 200.000 VNĐ</option>
                 </select>
               </div>
 
@@ -407,7 +494,7 @@ export default function CustomerDocuments() {
                 }}
                 className='w-full py-2 text-sm text-gray-600 hover:text-gray-800 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors duration-200'
               >
-                Clear All Filters
+                Xóa tất cả bộ lọc
               </button>
             </div>
           )}
@@ -417,7 +504,8 @@ export default function CustomerDocuments() {
             {/* Results Count */}
             <div className='flex items-center justify-between mb-6'>
               <p className='text-gray-600'>
-                Showing {sortedDocuments.length} of {documents.length} documents
+                Hiển thị {sortedDocuments.length} trong tổng số{' '}
+                {documents.length} tài liệu
               </p>
             </div>
 
@@ -439,7 +527,7 @@ export default function CustomerDocuments() {
                       {doc.isFeatured && (
                         <div className='absolute top-3 left-3 bg-gradient-to-r from-yellow-400 to-orange-500 text-white text-xs font-bold px-2 py-1 rounded-full flex items-center gap-1'>
                           <Award className='w-3 h-3' />
-                          Featured
+                          Nổi bật
                         </div>
                       )}
                       {doc.discount > 0 && doc.price > 0 && (
@@ -460,17 +548,18 @@ export default function CustomerDocuments() {
                         <div className='text-right'>
                           {doc.price === 0 ? (
                             <span className='text-emerald-600 font-bold text-lg'>
-                              FREE
+                              MIỄN PHÍ
                             </span>
                           ) : (
-                            <div className='flex items-center gap-2'>
+                            <div className='flex flex-col items-end'>
                               {doc.originalPrice > doc.price && (
-                                <span className='text-gray-400 line-through text-sm'>
-                                  ${doc.originalPrice}
+                                <span className='text-gray-400 line-through text-xs'>
+                                  {doc.originalPrice.toLocaleString('vi-VN')}{' '}
+                                  VNĐ
                                 </span>
                               )}
-                              <span className='text-blue-600 font-bold text-lg'>
-                                ${doc.price}
+                              <span className='text-blue-600 font-bold text-sm'>
+                                {doc.price.toLocaleString('vi-VN')} VNĐ
                               </span>
                             </div>
                           )}
@@ -482,7 +571,7 @@ export default function CustomerDocuments() {
                         {doc.title}
                       </h3>
                       <p className='text-gray-600 text-sm mb-3'>
-                        by {doc.author}
+                        bởi {doc.author}
                       </p>
 
                       {/* Description */}
@@ -522,7 +611,7 @@ export default function CustomerDocuments() {
                       {/* Action Buttons */}
                       <div className='flex items-center gap-2'>
                         <button className='flex-1 bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white py-2 px-4 rounded-xl font-medium transition-all duration-300 transform hover:scale-105'>
-                          {doc.price === 0 ? 'Download Free' : 'Buy Now'}
+                          {doc.price === 0 ? 'Tải miễn phí' : 'Mua ngay'}
                         </button>
                         <button className='p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-xl transition-colors duration-200'>
                           <Heart className='w-5 h-5' />

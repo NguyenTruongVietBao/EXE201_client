@@ -1,12 +1,72 @@
 import React from 'react';
 import useAuthStore from '../../stores/useAuthStore';
-import { LogOut, User, Lock } from 'lucide-react';
+import { LogOut, User, Lock, BookOpen } from 'lucide-react';
 import { Link, useNavigate } from 'react-router';
+import { USER_ROLE } from '../../constants';
+
+const { CUSTOMER, MANAGER, SELLER, ADMIN } = USER_ROLE;
 
 export default function HeaderAvatar({ className }) {
   const { user, logout } = useAuthStore();
   const navigate = useNavigate();
-  console.log('🚀 ~ HeaderAvatar ~ user:', user);
+  const userRole = user?.role;
+
+  const customerLinks = [
+    {
+      href: '/customer/my-documents',
+      label: 'My Documents',
+      icon: <BookOpen size={16} />,
+    },
+  ];
+  const sellerLinks = [
+    {
+      href: '/seller/my-documents',
+      label: 'My Documents',
+      icon: <BookOpen size={16} />,
+    },
+    { href: '/seller/billing', label: 'Billing', icon: <BookOpen size={16} /> },
+  ];
+
+  const managerLinks = [
+    {
+      href: '/manager/dashboard',
+      label: 'Dashboard',
+      icon: <BookOpen size={16} />,
+    },
+    { href: '/manager/users', label: 'Users', icon: <BookOpen size={16} /> },
+    {
+      href: '/manager/documents',
+      label: 'Documents',
+      icon: <BookOpen size={16} />,
+    },
+  ];
+
+  const adminLinks = [
+    {
+      href: '/admin/dashboard',
+      label: 'Dashboard',
+      icon: <BookOpen size={16} />,
+    },
+    { href: '/admin/users', label: 'Users', icon: <BookOpen size={16} /> },
+    {
+      href: '/admin/documents',
+      label: 'Documents',
+      icon: <BookOpen size={16} />,
+    },
+  ];
+
+  const navLinks =
+    userRole === CUSTOMER
+      ? customerLinks
+      : userRole === MANAGER
+      ? managerLinks
+      : userRole === SELLER
+      ? sellerLinks
+      : userRole === ADMIN
+      ? adminLinks
+      : userRole === 'User'
+      ? customerLinks
+      : [];
 
   const handleLogout = () => {
     logout();
@@ -41,6 +101,17 @@ export default function HeaderAvatar({ className }) {
             Profile
           </Link>
         </li>
+        {navLinks.map((link) => (
+          <li key={link.href}>
+            <Link
+              to={link.href}
+              className='flex items-center justify-start gap-5'
+            >
+              <span>{link.icon}</span>
+              {link.label}
+            </Link>
+          </li>
+        ))}
         <li>
           <Link
             to='/change-password'
@@ -52,13 +123,14 @@ export default function HeaderAvatar({ className }) {
             Change Password
           </Link>
         </li>
+
         <li>
           <button
             onClick={handleLogout}
             className='text-red-700 font-bold flex items-center justify-start gap-5'
           >
             <span>
-              <LogOut size={16} />
+              <LogOut size={16} className='mr-1' />
             </span>
             Logout
           </button>

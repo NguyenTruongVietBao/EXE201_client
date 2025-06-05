@@ -1,28 +1,28 @@
 const envConfig = {
-  backendUrl: import.meta.env.VITE_BACKEND_URL,
-  frontendUrl: import.meta.env.VITE_FRONTEND_URL,
-  tokenKey: import.meta.env.VITE_TOKEN_KEY,
-  userKey: import.meta.env.VITE_USER_KEY,
-  authStoreKey: import.meta.env.VITE_AUTH_STORE_KEY,
+  BACKEND_URL: import.meta.env.VITE_BACKEND_URL || 'http://localhost:5299',
+  FRONTEND_URL: import.meta.env.VITE_FRONTEND_URL || 'http://localhost:5173',
+  TOKEN_KEY: import.meta.env.VITE_TOKEN_KEY || 'token',
+  USER_KEY: import.meta.env.VITE_USER_KEY || 'user',
+  AUTH_STORE_KEY: import.meta.env.VITE_AUTH_STORE_KEY || 'user-storage',
 };
 
-if (!envConfig.backendUrl) {
+if (!envConfig.BACKEND_URL) {
   throw new Error('BACKEND_URL is not defined');
 }
 
-if (!envConfig.frontendUrl) {
+if (!envConfig.FRONTEND_URL) {
   throw new Error('FRONTEND_URL is not defined');
 }
 
-if (!envConfig.tokenKey) {
+if (!envConfig.TOKEN_KEY) {
   throw new Error('TOKEN_KEY is not defined');
 }
 
-if (!envConfig.userKey) {
+if (!envConfig.USER_KEY) {
   throw new Error('USER_KEY is not defined');
 }
 
-if (!envConfig.authStoreKey) {
+if (!envConfig.AUTH_STORE_KEY) {
   throw new Error('AUTH_STORE_KEY is not defined');
 }
 

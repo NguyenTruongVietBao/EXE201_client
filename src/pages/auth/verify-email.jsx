@@ -3,7 +3,6 @@ import OtpInput from 'react-otp-input';
 import useAuthStore from '../../stores/useAuthStore';
 import { useLocation, useNavigate } from 'react-router';
 import { toast } from 'react-hot-toast';
-import { INTERESTS } from '../../constants';
 import InterestModel from '../../components/common/InterestModel';
 import authServices from '../../services/authServies';
 
@@ -11,7 +10,7 @@ function VerifyEmail() {
   const [otp, setOtp] = useState('');
   const [showInterestModal, setShowInterestModal] = useState(false);
   const [selectedInterests, setSelectedInterests] = useState([]);
-
+  console.log('🚀 ~ VerifyEmail ~ selectedInterests:', selectedInterests);
   const { verifyEmail } = useAuthStore();
   const navigate = useNavigate();
   const location = useLocation();
@@ -29,20 +28,21 @@ function VerifyEmail() {
     } else {
       toast.error(result.message);
     }
+    console.log('🚀 ~ handleVerifyEmail ~ result:', result);
   };
 
   const handleConfirmInterest = async (selectedIds) => {
-    // Lấy ra object {id, name}
-    const selectedItems = INTERESTS.filter((i) =>
-      selectedIds.includes(i.id)
-    ).map((i) => ({ id: i.id, name: i.name }));
+    // Lấy ra array interest id
+    const selectedItems = selectedIds.map((i) => i);
 
     console.log('Sở thích đã chọn:', selectedItems);
 
     try {
       const res = await authServices.updateInterest({
         interests: selectedItems,
+        email: email,
       });
+      console.log('🚀 ~ handleConfirmInterest ~ res:', res);
       if (res.status === true) {
         toast.success(res.message);
         navigate('/login');

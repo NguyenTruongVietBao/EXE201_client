@@ -1,18 +1,28 @@
-import React, { useState, useMemo } from 'react';
-import { INTERESTS } from '../../constants';
+import React, { useState, useMemo, useEffect } from 'react';
 import toast from 'react-hot-toast';
+import authServices from '../../services/authServies';
 
 const InterestModel = ({ onConfirm }) => {
   const [selected, setSelected] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
+  const [interestList, setInterestList] = useState([]);
+
+  useEffect(() => {
+    const fetchInterests = async () => {
+      const response = await authServices.getAllInterests();
+      console.log('🚀 ~ fetchInterests ~ response:', response);
+      setInterestList(response.data);
+    };
+    fetchInterests();
+  }, []);
 
   // Lọc sở thích dựa trên tìm kiếm
   const filteredInterests = useMemo(() => {
-    if (!searchQuery) return INTERESTS;
-    return INTERESTS.filter((interest) =>
+    if (!searchQuery) return interestList;
+    return interestList.filter((interest) =>
       interest.name.toLowerCase().includes(searchQuery.toLowerCase())
     );
-  }, [searchQuery]);
+  }, [searchQuery, interestList]);
 
   const handleToggle = (id) => {
     setSelected((prev) =>
@@ -113,9 +123,9 @@ const InterestModel = ({ onConfirm }) => {
                   onClick={() => handleToggle(interest.id)}
                   onKeyDown={(e) => handleKeyDown(e, interest.id)}
                 >
-                  <span className='text-2xl mr-3' aria-hidden='true'>
+                  {/* <span className='text-2xl mr-3' aria-hidden='true'>
                     {interest.emoji}
-                  </span>
+                  </span> */}
                   <span className='text-sm font-medium text-gray-700 flex-1 text-left'>
                     {interest.name}
                   </span>

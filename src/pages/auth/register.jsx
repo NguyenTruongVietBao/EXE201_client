@@ -97,7 +97,7 @@ function Register() {
   };
 
   return (
-    <div className='min-h-screen flex items-center justify-center p-4'>
+    <div className='min-h-screen bg-gradient-to-r from-emerald-50/90 via-white/95 to-cyan-50/90 backdrop-blur-sm flex items-center justify-center p-4'>
       <div className='card w-full max-w-lg bg-base-100 shadow-xl'>
         <div className='card-body'>
           <div className='text-center mb-8'>

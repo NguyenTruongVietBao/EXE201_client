@@ -26,6 +26,9 @@ import SellerMyCourse from '../pages/seller/my-course';
 import SellerBilling from '../pages/seller/billing';
 import ManagerDocuments from '../pages/manager/documents';
 import ManagerRevenue from '../pages/manager/revenue';
+import CustomerMyDocument from '../pages/customer/my-document';
+import SellerUploadDocument from '../pages/seller/upload-document';
+import CustomerPartner from '../pages/customer/partner';
 
 const { ADMIN, CUSTOMER, SELLER, MANAGER } = USER_ROLE;
 
@@ -148,6 +151,30 @@ const router = createBrowserRouter([
           </ProtectedRoute>
         ),
       },
+      {
+        path: 'my-documents',
+        element: (
+          <ProtectedRoute requiredRoles={[CUSTOMER, 'User']}>
+            <CustomerMyDocument />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: 'upload-document',
+        element: (
+          <ProtectedRoute requiredRoles={[CUSTOMER, 'User']}>
+            <SellerUploadDocument />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: 'partner',
+        element: (
+          <ProtectedRoute requiredRoles={[CUSTOMER, 'User']}>
+            <CustomerPartner />
+          </ProtectedRoute>
+        ),
+      },
     ],
   },
   //Admin Routes
@@ -214,6 +241,14 @@ const router = createBrowserRouter([
         element: (
           <ProtectedRoute requiredRoles={[SELLER]}>
             <SellerBilling />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: 'upload-document',
+        element: (
+          <ProtectedRoute requiredRoles={[SELLER]}>
+            <SellerUploadDocument />
           </ProtectedRoute>
         ),
       },

@@ -1,10 +1,11 @@
 import axios from 'axios';
+import envConfig from './envConfig';
 
-let BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
-let TOKEN_KEY = import.meta.env.VITE_TOKEN_KEY;
+const BACKEND_URL = envConfig.BACKEND_URL;
+const TOKEN_KEY = envConfig.TOKEN_KEY;
 
 const axiosInstance = axios.create({
-  baseURL: BACKEND_URL || 'http://localhost:5299',
+  baseURL: BACKEND_URL,
   timeout: 15000,
   headers: {
     'Content-Type': 'application/json',

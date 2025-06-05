@@ -1,6 +1,10 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import authServices from '../services/authServies';
+import envConfig from '../configs/envConfig';
+
+const AUTH_STORE_KEY = envConfig.AUTH_STORE_KEY;
+const TOKEN_KEY = envConfig.TOKEN_KEY;
 
 const useAuthStore = create(
   persist(
@@ -10,6 +14,7 @@ const useAuthStore = create(
       token: null,
       isLoading: false,
       isAuthenticated: false,
+      userInterests: [],
 
       // Actions
       setLoading: (loading) => set({ isLoading: loading }),
@@ -22,11 +27,15 @@ const useAuthStore = create(
           const response = await authServices.login(credentials);
           const { status, message, statusCode, data } = response;
           if (status === true) {
+            const userInterests = await authServices.getUserInterests(
+              data.user.email
+            );
             const { user, token } = data;
             set({
               user,
               token: token,
               isAuthenticated: true,
+              userInterests: userInterests.data,
             });
             return { status, message, statusCode, data };
           } else {
@@ -97,7 +106,7 @@ const useAuthStore = create(
 
       // Logout action
       logout: () => {
-        localStorage.removeItem(import.meta.env.VITE_TOKEN_KEY);
+        localStorage.removeItem(TOKEN_KEY);
         set({
           user: null,
           token: null,
@@ -130,11 +139,12 @@ const useAuthStore = create(
       },
     }),
     {
-      name: import.meta.env.VITE_AUTH_STORE_KEY,
+      name: AUTH_STORE_KEY,
       partialize: (state) => ({
         user: state.user,
         token: state.token,
         isAuthenticated: state.isAuthenticated,
+        userInterests: state.userInterests,
       }),
     }
   )

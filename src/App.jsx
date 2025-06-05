@@ -5,7 +5,6 @@ import Footer from './components/layout/Footer';
 
 function App() {
   const { theme } = useThemeStore();
-
   return (
     <div className='min-h-screen' data-theme={theme}>
       <Header />

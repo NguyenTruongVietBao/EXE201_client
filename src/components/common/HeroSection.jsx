@@ -1,11 +1,12 @@
 import React from 'react';
 import { ArrowRight, CheckCircle, Award, Briefcase } from 'lucide-react';
+import { Link } from 'react-router';
 
 export default function HeroSection() {
   const stats = [
     {
       value: '250+',
-      label: 'Projects',
+      label: 'Students',
       icon: <Briefcase className='w-5 h-5 text-primary' />,
     },
     {
@@ -14,40 +15,46 @@ export default function HeroSection() {
       icon: <CheckCircle className='w-5 h-5 text-primary' />,
     },
     {
-      value: '15+',
-      label: 'Awards',
+      value: '1020+',
+      label: 'Documents',
       icon: <Award className='w-5 h-5 text-primary' />,
     },
   ];
 
   return (
-    <section className='py-16 md:py-24 lg:py-32 bg-gradient-to-l from-emerald-50 from-10% via-base-100 via-30% to-cyan-50 to-90%'>
+    <section className='py-16 md:py-24 lg:py-24 bg-gradient-to-r from-emerald-50/90 via-white/95 to-cyan-50/90'>
       <div className='container mx-auto pl-24'>
         <div className='grid lg:grid-cols-2 gap-12 items-center'>
           {/* Text Content */}
           <div className='text-center lg:text-left'>
             <p className='text-sm font-medium text-gray-500 uppercase tracking-wider mb-2'>
-              Award-Winning Digital Agency
+              Improve your learning experience
             </p>
             <h1 className='text-4xl sm:text-5xl md:text-6xl font-bold text-secondary leading-tight'>
-              Elevate Your
+              Learning Assistant <span>#1</span>
               <br />
-              <span className='text-primary'>Digital Presence</span>
+              <span className='text-primary'>For You</span>
             </h1>
             <p className='mt-6 text-lg text-gray-600 max-w-xl mx-auto lg:mx-0'>
               Strategic digital solutions that drive measurable growth and
               create lasting customer connections through innovative technology.
             </p>
             <div className='mt-10 flex flex-col sm:flex-row gap-4 justify-center lg:justify-start'>
-              <button className='btn bg-primary hover:bg-primary/90 text-white rounded-lg px-8 py-3 text-lg font-medium transition-colors duration-300 flex items-center justify-center group'>
-                Start Project
+              <Link
+                to='/login'
+                className='btn bg-primary hover:bg-primary/90 text-white rounded-lg px-8 py-5 text-lg font-medium transition-colors duration-300 flex items-center justify-center group'
+              >
+                Get Started
                 <ArrowRight className='w-5 h-5 ml-2 transform transition-transform duration-300 group-hover:translate-x-1' />
-              </button>
-              <button className='btn bg-white hover:bg-gray-100 text-gray-700 border border-gray-300 rounded-lg px-8 py-3 text-lg font-medium transition-colors duration-300'>
-                View Case Studies
-              </button>
+              </Link>
+              <Link
+                to='/register'
+                className='btn bg-white hover:bg-gray-100 text-gray-700 border border-gray-300 rounded-lg px-8 py-5 text-lg font-medium transition-colors duration-300'
+              >
+                You are new ?
+              </Link>
             </div>
-            <div className='mt-12 grid grid-cols-2 sm:grid-cols-3 gap-6 text-left'>
+            <div className='mt-12 grid grid-cols-2 sm:grid-cols-3 6 text-left'>
               {stats.map((stat) => (
                 <div key={stat.label} className='p-4 rounded-lg'>
                   <div className='flex items-center mb-1'>
