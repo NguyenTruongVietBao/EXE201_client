@@ -1,7 +1,7 @@
 const envConfig = {
   BACKEND_URL: import.meta.env.VITE_BACKEND_URL || 'http://localhost:5299',
   FRONTEND_URL: import.meta.env.VITE_FRONTEND_URL || 'http://localhost:5173',
-  TOKEN_KEY: import.meta.env.VITE_TOKEN_KEY || 'token',
+  ACCESS_TOKEN_KEY: import.meta.env.VITE_ACCESS_TOKEN_KEY || 'accessToken',
   USER_KEY: import.meta.env.VITE_USER_KEY || 'user',
   AUTH_STORE_KEY: import.meta.env.VITE_AUTH_STORE_KEY || 'user-storage',
 };
@@ -14,8 +14,8 @@ if (!envConfig.FRONTEND_URL) {
   throw new Error('FRONTEND_URL is not defined');
 }
 
-if (!envConfig.TOKEN_KEY) {
-  throw new Error('TOKEN_KEY is not defined');
+if (!envConfig.ACCESS_TOKEN_KEY) {
+  throw new Error('ACCESS_TOKEN_KEY is not defined');
 }
 
 if (!envConfig.USER_KEY) {

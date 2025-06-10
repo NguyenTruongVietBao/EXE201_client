@@ -122,7 +122,7 @@ const router = createBrowserRouter([
       {
         path: '',
         element: (
-          <ProtectedRoute requiredRoles={[CUSTOMER, 'User']}>
+          <ProtectedRoute requiredRoles={[CUSTOMER]}>
             <CustomerHome />
           </ProtectedRoute>
         ),
@@ -130,7 +130,7 @@ const router = createBrowserRouter([
       {
         path: 'documents',
         element: (
-          <ProtectedRoute requiredRoles={[CUSTOMER, 'User']}>
+          <ProtectedRoute requiredRoles={[CUSTOMER]}>
             <CustomerDocuments />
           </ProtectedRoute>
         ),
@@ -138,7 +138,7 @@ const router = createBrowserRouter([
       {
         path: 'study-plan',
         element: (
-          <ProtectedRoute requiredRoles={[CUSTOMER, 'User']}>
+          <ProtectedRoute requiredRoles={[CUSTOMER]}>
             <CustomerStudyPlan />
           </ProtectedRoute>
         ),
@@ -146,7 +146,7 @@ const router = createBrowserRouter([
       {
         path: 'group-chat',
         element: (
-          <ProtectedRoute requiredRoles={[CUSTOMER, 'User']}>
+          <ProtectedRoute requiredRoles={[CUSTOMER]}>
             <CustomerGroupChat />
           </ProtectedRoute>
         ),
@@ -154,7 +154,7 @@ const router = createBrowserRouter([
       {
         path: 'my-documents',
         element: (
-          <ProtectedRoute requiredRoles={[CUSTOMER, 'User']}>
+          <ProtectedRoute requiredRoles={[CUSTOMER]}>
             <CustomerMyDocument />
           </ProtectedRoute>
         ),
@@ -162,7 +162,7 @@ const router = createBrowserRouter([
       {
         path: 'upload-document',
         element: (
-          <ProtectedRoute requiredRoles={[CUSTOMER, 'User']}>
+          <ProtectedRoute requiredRoles={[CUSTOMER]}>
             <SellerUploadDocument />
           </ProtectedRoute>
         ),
@@ -170,7 +170,7 @@ const router = createBrowserRouter([
       {
         path: 'partner',
         element: (
-          <ProtectedRoute requiredRoles={[CUSTOMER, 'User']}>
+          <ProtectedRoute requiredRoles={[CUSTOMER]}>
             <CustomerPartner />
           </ProtectedRoute>
         ),

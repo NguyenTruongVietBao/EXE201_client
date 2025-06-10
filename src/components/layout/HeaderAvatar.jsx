@@ -64,8 +64,6 @@ export default function HeaderAvatar({ className }) {
       ? sellerLinks
       : userRole === ADMIN
       ? adminLinks
-      : userRole === 'User'
-      ? customerLinks
       : [];
 
   const handleLogout = () => {

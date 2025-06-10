@@ -190,11 +190,11 @@ export default function LandingPage() {
               </p>
 
               <div className='flex flex-col sm:flex-row gap-4 mb-12 justify-center lg:justify-start'>
-                <button className='bg-gradient-to-r from-indigo-600 to-cyan-600 hover:from-indigo-700 hover:to-cyan-700 text-white font-semibold px-8 py-4 rounded-2xl transition-all duration-300 transform hover:scale-105 hover:shadow-xl flex items-center justify-center group'>
+                <button className='cursor-pointer bg-gradient-to-r from-indigo-600 to-cyan-600 hover:from-indigo-700 hover:to-cyan-700 text-white font-semibold px-8 py-4 rounded-2xl transition-all duration-300 transform hover:scale-105 hover:shadow-xl flex items-center justify-center group'>
                   Bắt đầu ngay
                   <ArrowRight className='w-5 h-5 ml-2 transform transition-transform duration-300 group-hover:translate-x-1' />
                 </button>
-                <button className='bg-white hover:bg-gray-50 text-gray-700 font-semibold border-2 border-gray-200 hover:border-gray-300 px-8 py-4 rounded-2xl transition-all duration-300'>
+                <button className=' cursor-pointer bg-white hover:bg-gray-50 text-gray-700 font-semibold border-2 border-gray-200 hover:border-gray-300 px-8 py-4 rounded-2xl transition-all duration-300'>
                   Tìm hiểu thêm
                 </button>
               </div>
@@ -355,7 +355,7 @@ export default function LandingPage() {
       </section>
 
       {/* Features Section */}
-      <section className='py-20 md:py-28'>
+      <section id='features' className='py-20 md:py-28'>
         <div className='container mx-auto px-4 md:px-8'>
           <div className='text-center mb-16'>
             <h2 className='text-4xl md:text-5xl font-bold mb-6 text-gray-900'>

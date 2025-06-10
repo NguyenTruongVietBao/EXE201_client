@@ -47,8 +47,6 @@ const ProtectedRoute = ({
           return <Navigate to='/seller' replace />;
         case CUSTOMER:
           return <Navigate to='/customer' replace />;
-        case 'User':
-          return <Navigate to='/customer' replace />;
         default:
           return <Navigate to='/' replace />;
       }

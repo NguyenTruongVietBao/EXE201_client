@@ -1,6 +1,6 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import toast from 'react-hot-toast';
-import authServices from '../../services/authServies';
+import interestServices from '../../services/interestServices';
 
 const InterestModel = ({ onConfirm }) => {
   const [selected, setSelected] = useState([]);
@@ -9,7 +9,7 @@ const InterestModel = ({ onConfirm }) => {
 
   useEffect(() => {
     const fetchInterests = async () => {
-      const response = await authServices.getAllInterests();
+      const response = await interestServices.getAllInterests();
       console.log('🚀 ~ fetchInterests ~ response:', response);
       setInterestList(response.data);
     };

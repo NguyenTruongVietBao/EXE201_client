@@ -4,7 +4,8 @@ import useAuthStore from '../../stores/useAuthStore';
 import { useLocation, useNavigate } from 'react-router';
 import { toast } from 'react-hot-toast';
 import InterestModel from '../../components/common/InterestModel';
-import authServices from '../../services/authServies';
+import authServices from '../../services/authServices';
+import interestServices from '../../services/interestServices';
 
 function VerifyEmail() {
   const [otp, setOtp] = useState('');
@@ -39,7 +40,7 @@ function VerifyEmail() {
     console.log('Sở thích đã chọn:', selectedItems);
 
     try {
-      const res = await authServices.updateInterest({
+      const res = await interestServices.updateInterest({
         interests: selectedItems,
         email: email,
       });

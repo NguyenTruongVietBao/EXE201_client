@@ -3,7 +3,7 @@ import React from 'react';
 
 function Footer() {
   return (
-    <footer className='footer footer-center p-4 bg-base-100 text-base-content'>
+    <footer className='p-4 footer footer-center bg-base-100 text-base-content'>
       <aside>
         <p>© {new Date().getFullYear()} StudySphere - All rights reserved.</p>
         <div className='flex gap-4 mt-2'>

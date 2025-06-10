@@ -1,17 +1,18 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import authServices from '../services/authServies';
+import authServices from '../services/authServices';
 import envConfig from '../configs/envConfig';
+import interestServices from '../services/interestServices';
 
 const AUTH_STORE_KEY = envConfig.AUTH_STORE_KEY;
-const TOKEN_KEY = envConfig.TOKEN_KEY;
+const ACCESS_TOKEN_KEY = envConfig.ACCESS_TOKEN_KEY;
 
 const useAuthStore = create(
   persist(
     (set, get) => ({
       // State
       user: null,
-      token: null,
+      accessToken: null,
       isLoading: false,
       isAuthenticated: false,
       userInterests: [],
@@ -27,13 +28,12 @@ const useAuthStore = create(
           const response = await authServices.login(credentials);
           const { status, message, statusCode, data } = response;
           if (status === true) {
-            const userInterests = await authServices.getUserInterests(
-              data.user.email
-            );
-            const { user, token } = data;
+            localStorage.setItem(ACCESS_TOKEN_KEY, data.accessToken);
+            const userInterests = await interestServices.getUserInterests();
+            const { user, accessToken } = data;
             set({
               user,
-              token: token,
+              accessToken,
               isAuthenticated: true,
               userInterests: userInterests.data,
             });
@@ -45,7 +45,7 @@ const useAuthStore = create(
           set({
             message: error.message || 'Đăng nhập thất bại',
             user: null,
-            token: null,
+            accessToken: null,
             isAuthenticated: false,
           });
 
@@ -106,10 +106,10 @@ const useAuthStore = create(
 
       // Logout action
       logout: () => {
-        localStorage.removeItem(TOKEN_KEY);
+        localStorage.removeItem(ACCESS_TOKEN_KEY);
         set({
           user: null,
-          token: null,
+          accessToken: null,
           isAuthenticated: false,
           error: null,
         });
@@ -124,14 +124,14 @@ const useAuthStore = create(
 
       // Check if user is authenticated (helper)
       checkAuth: () => {
-        const { token, user } = get();
-        return !!(token && user);
+        const { accessToken, user } = get();
+        return !!(accessToken && user);
       },
 
       // Initialize auth state (gọi khi app khởi động)
       initializeAuth: () => {
-        const { token, user } = get();
-        if (token && user) {
+        const { accessToken, user } = get();
+        if (accessToken && user) {
           set({ isAuthenticated: true });
         } else {
           set({ isAuthenticated: false });
@@ -142,7 +142,7 @@ const useAuthStore = create(
       name: AUTH_STORE_KEY,
       partialize: (state) => ({
         user: state.user,
-        token: state.token,
+        accessToken: state.accessToken,
         isAuthenticated: state.isAuthenticated,
         userInterests: state.userInterests,
       }),

@@ -70,8 +70,6 @@ const Header = () => {
       ? sellerLinks
       : userRole === ADMIN
       ? adminLinks
-      : userRole === 'User'
-      ? customerLinks
       : guestLinks;
 
   return (

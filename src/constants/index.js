@@ -1,8 +1,8 @@
 export const USER_ROLE = {
-  CUSTOMER: 'Customer',
-  MANAGER: 'Manager',
-  SELLER: 'Seller',
-  ADMIN: 'Admin',
+  CUSTOMER: 'CUSTOMER',
+  MANAGER: 'MANAGER',
+  SELLER: 'SELLER',
+  ADMIN: 'ADMIN',
 };
 
 export const INTERESTS = [

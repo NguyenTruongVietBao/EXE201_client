@@ -6,7 +6,7 @@ import { Loader2, LogInIcon, ArrowLeftIcon } from 'lucide-react';
 import InputCustom from '../../components/common/InputCustom';
 import envConfig from '../../configs/envConfig';
 
-const TOKEN_KEY = envConfig.TOKEN_KEY;
+const ACCESS_TOKEN_KEY = envConfig.ACCESS_TOKEN_KEY;
 
 function Login() {
   const { login, isLoading } = useAuthStore();
@@ -14,16 +14,14 @@ function Login() {
   const navigate = useNavigate();
 
   const [form, setForm] = useState({
-    email: 'a.baocute0204@gmail.com',
-    password: 'Baonguyen1303.',
+    email: 'bao@gmail.com',
+    password: '123123',
   });
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     const result = await login(form);
-    console.log('🚀 ~ handleSubmit: ~ result:', result);
     if (result.status === true) {
-      localStorage.setItem(TOKEN_KEY, result.data.token);
       toast.success('Login successfully');
       navigate('/profile');
     } else {

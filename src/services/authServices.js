@@ -42,40 +42,6 @@ const authServices = {
       return error;
     }
   },
-  // Create user's interests
-  updateInterest: async (data) => {
-    console.log('🚀 ~ updateInterest: ~ data:', data);
-    try {
-      const response = await axiosInstance.post(
-        `/user/interests?email=${data.email}`,
-        data.interests
-      );
-      return response;
-    } catch (error) {
-      return error;
-    }
-  },
-  // Get user's interests
-  getUserInterests: async (email) => {
-    try {
-      const response = await axiosInstance.get(
-        `/user/interests?email=${email}`
-      );
-      return response;
-    } catch (error) {
-      return error;
-    }
-  },
-  // Get all interests
-  getAllInterests: async () => {
-    try {
-      const response = await axiosInstance.get('/interest/interests');
-      console.log('🚀 ~ getAllInterests: ~ response:', response);
-      return response;
-    } catch (error) {
-      return error;
-    }
-  },
 };
 
 export default authServices;

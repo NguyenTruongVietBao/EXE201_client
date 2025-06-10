@@ -16,8 +16,6 @@ function AuthLayout() {
         return <Navigate to={'/admin'} replace />;
       case CUSTOMER:
         return <Navigate to={'/customer'} replace />;
-      case 'User':
-        return <Navigate to={'/customer'} replace />;
       case SELLER:
         return <Navigate to={'/seller'} replace />;
       case MANAGER:

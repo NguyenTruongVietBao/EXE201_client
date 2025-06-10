@@ -192,7 +192,11 @@ const Profile = () => {
                     Sở thích
                   </label>
                   <p className='mt-1 text-sm text-gray-900'>
-                    {userInterests.map((interest) => interest.name).join(', ')}
+                    {userInterests
+                      ? userInterests
+                          .map((interest) => interest.name)
+                          .join(', ')
+                      : 'Không có sở thích'}
                   </p>
                 </div>
               </div>
