@@ -4,14 +4,11 @@ import { toast } from 'react-hot-toast';
 import { Link, useNavigate } from 'react-router';
 import { Loader2, LogInIcon, ArrowLeftIcon } from 'lucide-react';
 import InputCustom from '../../components/common/InputCustom';
-import envConfig from '../../configs/envConfig';
-
-const ACCESS_TOKEN_KEY = envConfig.ACCESS_TOKEN_KEY;
 
 function Login() {
   const { login, isLoading } = useAuthStore();
-  const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
+  const [showPassword, setShowPassword] = useState(false);
 
   const [form, setForm] = useState({
     email: 'bao@gmail.com',
@@ -41,6 +38,7 @@ function Login() {
     const { name, value } = e.target;
     setForm((prev) => ({ ...prev, [name]: value }));
   };
+
   return (
     <div className='min-h-screen bg-gradient-to-r from-emerald-50/90 via-white/95 to-cyan-50/90 backdrop-blur-sm flex items-center justify-center p-4'>
       <div className='card w-full max-w-md bg-base-100 shadow-xl'>

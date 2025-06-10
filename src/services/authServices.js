@@ -10,10 +10,22 @@ const authServices = {
       return error;
     }
   },
-  // Register
-  register: async (data) => {
+  // Register Customer
+  registerCustomer: async (data) => {
     try {
-      const response = await axiosInstance.post('/auth/register', data);
+      const response = await axiosInstance.post(
+        '/auth/register-customer',
+        data
+      );
+      return response;
+    } catch (error) {
+      return error;
+    }
+  },
+  // Register Seller
+  registerSeller: async (data) => {
+    try {
+      const response = await axiosInstance.post('/auth/register-seller', data);
       return response;
     } catch (error) {
       return error;
@@ -22,10 +34,7 @@ const authServices = {
   // Verify email
   verifyEmail: async (data) => {
     try {
-      const response = await axiosInstance.post(
-        `/auth/emailverification?email=${data.email}&code=${data.otp}`,
-        data
-      );
+      const response = await axiosInstance.post(`/auth/verify-email`, data);
       return response;
     } catch (error) {
       return error;

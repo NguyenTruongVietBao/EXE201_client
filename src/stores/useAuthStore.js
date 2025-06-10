@@ -64,12 +64,11 @@ const useAuthStore = create(
         try {
           set({ isLoading: true });
 
-          const response = await authServices.register({
-            firstName: userData.firstName,
-            lastName: userData.lastName,
+          const response = await authServices.registerCustomer({
+            name: userData.name,
             email: userData.email,
             password: userData.password,
-            role: 'customer',
+            phone: userData.phone,
           });
           const { status, message, statusCode, data } = response;
           if (status === true) {
@@ -87,23 +86,6 @@ const useAuthStore = create(
         }
       },
 
-      // Verify email action
-      verifyEmail: async (verificationData) => {
-        try {
-          set({ isLoading: true });
-          const response = await authServices.verifyEmail(verificationData);
-          return response;
-        } catch (error) {
-          return {
-            success: error,
-            error: error.message || 'Xác thực email thất bại',
-            statusCode: error.statusCode,
-          };
-        } finally {
-          set({ isLoading: false });
-        }
-      },
-
       // Logout action
       logout: () => {
         localStorage.removeItem(ACCESS_TOKEN_KEY);
@@ -111,6 +93,7 @@ const useAuthStore = create(
           user: null,
           accessToken: null,
           isAuthenticated: false,
+          userInterests: [],
           error: null,
         });
       },
@@ -135,6 +118,42 @@ const useAuthStore = create(
           set({ isAuthenticated: true });
         } else {
           set({ isAuthenticated: false });
+        }
+      },
+
+      // Set user data when set user interests
+      initUserData: async (response) => {
+        set({ isLoading: true });
+        try {
+          const { status, message, statusCode, data } = response;
+          if (status === true) {
+            localStorage.setItem(ACCESS_TOKEN_KEY, data.accessToken);
+            const { user, accessToken } = data;
+            set({
+              user,
+              accessToken,
+              isAuthenticated: true,
+              userInterests: data.interests,
+            });
+            return { status, message, statusCode, data };
+          } else {
+            return { status, message, statusCode, data };
+          }
+        } catch (error) {
+          set({
+            message: error.message || 'Lỗi khi khởi tạo tài khoản',
+            user: null,
+            accessToken: null,
+            isAuthenticated: false,
+          });
+
+          return {
+            success: false,
+            error: error.message || 'Lỗi khi khởi tạo tài khoản',
+            statusCode: error.statusCode,
+          };
+        } finally {
+          set({ isLoading: false });
         }
       },
     }),

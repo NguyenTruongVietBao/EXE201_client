@@ -101,14 +101,14 @@ const InterestModel = ({ onConfirm }) => {
         <div className='grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 mb-6 '>
           {filteredInterests.length > 0 ? (
             filteredInterests.map((interest, idx) => {
-              const isSelected = selected.includes(interest.id);
+              const isSelected = selected.includes(interest._id);
               // Tạo hiệu ứng lệch lạc nhẹ
               const rotate = ((idx % 5) - 2) * 1.2; // -1, -0.5, 0, 0.5, 1 độ
               const translateX = ((idx % 3) - 2) * 0.3; // -0.2, 0, 0.2 rem
               const translateY = ((idx % 4) - 2) * 0.3; // -0.4, -0.2, 0, 0.2 rem
               return (
                 <button
-                  key={interest.id}
+                  key={interest._id}
                   type='button'
                   className={`relative flex items-center p-4 hover:scale-105 rounded-xl border-2 transition-all duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-400 hover:bg-blue-50 cursor-pointer shadow-md hover:shadow-lg z-10 ${
                     isSelected
@@ -120,12 +120,12 @@ const InterestModel = ({ onConfirm }) => {
                   }}
                   aria-pressed={isSelected}
                   aria-label={`Chọn ${interest.name}`}
-                  onClick={() => handleToggle(interest.id)}
-                  onKeyDown={(e) => handleKeyDown(e, interest.id)}
+                  onClick={() => handleToggle(interest._id)}
+                  onKeyDown={(e) => handleKeyDown(e, interest._id)}
                 >
-                  {/* <span className='text-2xl mr-3' aria-hidden='true'>
+                  <span className='text-2xl mr-3' aria-hidden='true'>
                     {interest.emoji}
-                  </span> */}
+                  </span>
                   <span className='text-sm font-medium text-gray-700 flex-1 text-left'>
                     {interest.name}
                   </span>
@@ -158,8 +158,8 @@ const InterestModel = ({ onConfirm }) => {
           <button
             className='btn btn-primary btn-lg w-full max-w-xl rounded-xl '
             onClick={handleConfirm}
-            disabled={selected.length <= 2}
-            aria-disabled={selected.length <= 2}
+            disabled={selected.length < 3}
+            aria-disabled={selected.length < 3}
           >
             Xác nhận ({selected.length} đã chọn)
           </button>

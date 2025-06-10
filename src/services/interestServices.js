@@ -2,12 +2,11 @@ import axiosInstance from '../configs/axios';
 
 const interestServices = {
   // Create user's interests
-  updateInterest: async (data) => {
-    console.log('🚀 ~ updateInterest: ~ data:', data);
+  setUserInterests: async (data) => {
     try {
-      const response = await axiosInstance.post(
-        `/user/interests?email=${data.email}`,
-        data.interests
+      const response = await axiosInstance.put(
+        `/users/${data.userId}/set-interests`,
+        { interests: data.interests }
       );
       return response;
     } catch (error) {
@@ -26,8 +25,16 @@ const interestServices = {
   // Get all interests
   getAllInterests: async () => {
     try {
-      const response = await axiosInstance.get('/interest/interests');
-      console.log('🚀 ~ getAllInterests: ~ response:', response);
+      const response = await axiosInstance.get('/interests');
+      return response;
+    } catch (error) {
+      return error;
+    }
+  },
+  // Get recommend documents and study groups and study partners
+  getRecommendData: async () => {
+    try {
+      const response = await axiosInstance.get('/interests/recommended');
       return response;
     } catch (error) {
       return error;

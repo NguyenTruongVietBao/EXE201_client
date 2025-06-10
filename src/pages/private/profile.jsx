@@ -93,14 +93,13 @@ const Profile = () => {
                 {user.profilePictureUrl ? (
                   <img
                     src={user.profilePictureUrl}
-                    alt={`${user.firstName} ${user.lastName}`}
+                    alt={`${user.name}`}
                     className='w-20 h-20 rounded-full object-cover border-4 border-blue-100'
                   />
                 ) : (
                   <div className='w-20 h-20 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center border-4 border-blue-100'>
                     <span className='text-2xl font-bold text-white'>
-                      {user.firstName?.charAt(0)}
-                      {user.lastName?.charAt(0)}
+                      {user.name?.charAt(0)}
                     </span>
                   </div>
                 )}
@@ -110,7 +109,7 @@ const Profile = () => {
               {/* User Info */}
               <div>
                 <h1 className='text-2xl font-bold text-gray-900'>
-                  {user.firstName} {user.lastName}
+                  {user.name}
                 </h1>
                 <p className='text-gray-600'>{user.email}</p>
                 <span className='inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 mt-1'>
@@ -163,17 +162,12 @@ const Profile = () => {
                     {user.id}
                   </p>
                 </div>
-                <div>
-                  <label className='block text-sm font-medium text-gray-500'>
-                    Họ
-                  </label>
-                  <p className='mt-1 text-sm text-gray-900'>{user.lastName}</p>
-                </div>
+
                 <div>
                   <label className='block text-sm font-medium text-gray-500'>
                     Tên
                   </label>
-                  <p className='mt-1 text-sm text-gray-900'>{user.firstName}</p>
+                  <p className='mt-1 text-sm text-gray-900'>{user.name}</p>
                 </div>
                 <div>
                   <label className='block text-sm font-medium text-gray-500'>

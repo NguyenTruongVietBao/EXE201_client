@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import ThemeToggle from '../common/ThemeToggle';
-import { LogIn, Search, UserPlus, Menu, X } from 'lucide-react';
+import { Search, UserPlus } from 'lucide-react';
 import useAuthStore from '../../stores/useAuthStore';
 import { Link, useLocation } from 'react-router';
 import { USER_ROLE } from '../../constants';
@@ -38,9 +37,9 @@ const Header = () => {
   ];
   const customerLinks = [
     { href: '/customer', label: 'Home' },
-    { href: '/customer/documents', label: 'Documents Library' },
-    { href: '/customer/partner', label: 'Partner' },
-    { href: '/customer/study-plan', label: 'Study Plan' },
+    { href: '/customer/documents', label: 'Documents' },
+    { href: '/customer/partners', label: 'Partners' },
+    { href: '/customer/study-plan', label: 'Study Plans' },
   ];
 
   const managerLinks = [

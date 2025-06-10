@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   BookOpen,
   Search,
@@ -29,147 +29,99 @@ import {
   ShoppingCart,
 } from 'lucide-react';
 import CreateDocModel from '../../components/common/customer/create-doc-model';
+import documentServices from '../../services/documentServices';
 
 export default function CustomerMyDocument() {
   const [activeTab, setActiveTab] = useState('shared');
   const [searchTerm, setSearchTerm] = useState('');
-  const [viewMode, setViewMode] = useState('grid'); // grid or list
+  const [viewMode, setViewMode] = useState('grid');
   const [sortBy, setSortBy] = useState('newest');
   const [filterStatus, setFilterStatus] = useState('all');
+  const [myDocuments, setMyDocuments] = useState({
+    shared: [],
+    purchased: [],
+    bookmarked: [],
+  });
 
-  // Mock data
-  const myDocuments = {
-    shared: [
-      {
-        id: 1,
-        title: 'Hướng dẫn React Hooks chi tiết',
-        description:
-          'Tài liệu hướng dẫn sử dụng React Hooks từ cơ bản đến nâng cao với các ví dụ thực tế',
-        category: 'Lập trình',
-        thumbnail: 'https://api.dicebear.com/9.x/shapes/svg?seed=react-hooks',
-        createdAt: '2024-01-15',
-        status: 'approved', // pending, approved, rejected
-        downloads: 1247,
-        views: 3892,
-        rating: 4.8,
-        reviewCount: 156,
-        tags: ['React', 'JavaScript', 'Frontend'],
-        fileSize: '2.5 MB',
-        pages: 45,
-      },
-      {
-        id: 2,
-        title: 'Cấu trúc dữ liệu và giải thuật',
-        description: 'Tổng hợp các cấu trúc dữ liệu và giải thuật quan trọng',
-        category: 'Khoa học máy tính',
-        thumbnail: 'https://api.dicebear.com/9.x/shapes/svg?seed=algorithm',
-        createdAt: '2024-01-10',
-        status: 'pending',
-        downloads: 0,
-        views: 0,
-        rating: 0,
-        reviewCount: 0,
-        tags: ['Algorithm', 'Data Structure', 'Programming'],
-        fileSize: '4.2 MB',
-        pages: 78,
-      },
-      {
-        id: 3,
-        title: 'Thiết kế UI/UX hiện đại',
-        description: 'Nguyên tắc và thực hành thiết kế giao diện người dùng',
-        category: 'Thiết kế',
-        thumbnail: 'https://api.dicebear.com/9.x/shapes/svg?seed=uiux',
-        createdAt: '2024-01-05',
-        status: 'rejected',
-        downloads: 0,
-        views: 0,
-        rating: 0,
-        reviewCount: 0,
-        tags: ['UI/UX', 'Design', 'Figma'],
-        fileSize: '6.8 MB',
-        pages: 92,
-        rejectionReason:
-          'Nội dung chưa đủ chi tiết, cần bổ sung thêm ví dụ thực tế',
-      },
-    ],
-    purchased: [
-      {
-        id: 4,
-        title: 'Machine Learning với Python',
-        author: 'Trần Văn A',
-        description: 'Khóa học machine learning từ cơ bản đến nâng cao',
-        category: 'AI & Machine Learning',
-        thumbnail: 'https://api.dicebear.com/9.x/shapes/svg?seed=ml-python',
-        purchasedAt: '2024-01-20',
-        price: '299.000 VNĐ',
-        rating: 4.9,
-        progress: 75,
-        lastAccessed: '2024-01-22',
-        fileSize: '15.6 MB',
-        pages: 234,
-        tags: ['Python', 'ML', 'AI'],
-      },
-      {
-        id: 5,
-        title: 'Toán cao cấp cho kỹ sư',
-        author: 'PGS. Nguyễn Thị B',
-        description: 'Giáo trình toán cao cấp dành cho sinh viên kỹ thuật',
-        category: 'Toán học',
-        thumbnail: 'https://api.dicebear.com/9.x/shapes/svg?seed=advanced-math',
-        purchasedAt: '2024-01-18',
-        price: '199.000 VNĐ',
-        rating: 4.7,
-        progress: 45,
-        lastAccessed: '2024-01-21',
-        fileSize: '8.9 MB',
-        pages: 156,
-        tags: ['Toán học', 'Kỹ thuật', 'Giải tích'],
-      },
-    ],
-    bookmarked: [
-      {
-        id: 6,
-        title: 'JavaScript ES6+ Modern Features',
-        author: 'Lê Văn C',
-        description: 'Tìm hiểu các tính năng mới của JavaScript ES6+',
-        category: 'Lập trình',
-        thumbnail: 'https://api.dicebear.com/9.x/shapes/svg?seed=js-es6',
-        bookmarkedAt: '2024-01-19',
-        price: 'Miễn phí',
-        rating: 4.6,
-        downloads: 2156,
-        views: 7892,
-        tags: ['JavaScript', 'ES6', 'Modern JS'],
-        fileSize: '3.4 MB',
-        pages: 67,
-      },
-      {
-        id: 7,
-        title: 'Docker và Kubernetes',
-        author: 'Phạm Minh D',
-        description: 'Hướng dẫn triển khai ứng dụng với Docker và Kubernetes',
-        category: 'DevOps',
-        thumbnail: 'https://api.dicebear.com/9.x/shapes/svg?seed=docker-k8s',
-        bookmarkedAt: '2024-01-17',
-        price: '149.000 VNĐ',
-        rating: 4.8,
-        downloads: 1534,
-        views: 4231,
-        tags: ['Docker', 'Kubernetes', 'DevOps'],
-        fileSize: '5.7 MB',
-        pages: 123,
-      },
-    ],
-  };
+  useEffect(() => {
+    const fetchMyDocuments = async () => {
+      try {
+        const response = await documentServices.getMyDocuments();
+        if (response.status && response.data) {
+          // Map documents từ API response
+          const mappedDocuments = response.data.documents.map((doc) => ({
+            id: doc._id,
+            title: doc.title,
+            description: doc.description,
+            price:
+              doc.price === 0
+                ? 'Miễn phí'
+                : `${doc.price.toLocaleString()} VNĐ`,
+            originalPrice: doc.price,
+            discount: doc.discount,
+            thumbnail: doc.imageUrl?.[0] || '/default-thumbnail.jpg',
+            documentUrl: doc.documentUrl?.[0],
+            videoUrl: doc.videoUrl?.[0],
+            tags: doc.interests?.map((interest) => interest.name) || [],
+            interests: doc.interests || [],
+            author: doc.author,
+            isPublic: doc.isPublic,
+            isBanned: doc.isBanned,
+            isDeleted: doc.isDeleted,
+            feedback: doc.feedback || [],
+            createdAt: new Date(doc.createdAt).toLocaleDateString('vi-VN'),
+            updatedAt: new Date(doc.updatedAt).toLocaleDateString('vi-VN'),
+            // Thêm các thuộc tính giả định cho UI
+            status:
+              doc.isPublic && !doc.isBanned
+                ? 'approved'
+                : doc.isBanned
+                ? 'rejected'
+                : 'pending',
+            downloads: Math.floor(Math.random() * 1000), // Giả định
+            views: Math.floor(Math.random() * 5000), // Giả định
+            rating: (Math.random() * 5).toFixed(1), // Giả định
+            reviewCount: Math.floor(Math.random() * 100), // Giả định
+            pages: Math.floor(Math.random() * 50) + 10, // Giả định
+            fileSize: `${(Math.random() * 10 + 1).toFixed(1)} MB`, // Giả định
+            progress: Math.floor(Math.random() * 100), // Cho purchased
+            purchasedAt: new Date().toLocaleDateString('vi-VN'), // Giả định
+            bookmarkedAt: new Date().toLocaleDateString('vi-VN'), // Giả định
+            rejectionReason: doc.isBanned
+              ? 'Nội dung không phù hợp với quy định'
+              : null,
+            category: doc.interests?.[0]?.name || 'Khác',
+          }));
+
+          // Phân loại documents theo tab (hiện tại tất cả vào shared)
+          // Bạn có thể thay đổi logic này tùy theo business logic
+          setMyDocuments({
+            shared: mappedDocuments,
+            purchased: [], // Sẽ được fetch từ API khác
+            bookmarked: [], // Sẽ được fetch từ API khác
+          });
+        }
+      } catch (error) {
+        console.error('Error fetching documents:', error);
+        setMyDocuments({
+          shared: [],
+          purchased: [],
+          bookmarked: [],
+        });
+      }
+    };
+    fetchMyDocuments();
+  }, []);
+
+  console.log('myDocuments', myDocuments);
 
   const stats = {
-    shared: myDocuments.shared.length,
-    purchased: myDocuments.purchased.length,
-    bookmarked: myDocuments.bookmarked.length,
-    totalDownloads: myDocuments.shared.reduce(
-      (sum, doc) => sum + doc.downloads,
-      0
-    ),
+    shared: myDocuments.shared?.length || 0,
+    purchased: myDocuments.purchased?.length || 0,
+    bookmarked: myDocuments.bookmarked?.length || 0,
+    totalDownloads:
+      myDocuments.shared?.reduce((sum, doc) => sum + (doc.downloads || 0), 0) ||
+      0,
   };
 
   const tabs = [
@@ -272,10 +224,6 @@ export default function CustomerMyDocument() {
             <MoreVertical className='w-4 h-4 text-gray-500' />
           </button>
         </div>
-
-        {document.author && (
-          <p className='text-sm text-gray-600 mb-2'>bởi {document.author}</p>
-        )}
 
         <p className='text-gray-600 text-sm mb-4 line-clamp-2'>
           {document.description}

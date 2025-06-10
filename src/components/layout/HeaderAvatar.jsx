@@ -82,7 +82,7 @@ export default function HeaderAvatar({ className }) {
             alt='Tailwind CSS Navbar component'
             src={
               user?.avatar ||
-              `https://api.dicebear.com/9.x/notionists-neutral/svg?seed=${user?.firstName}${user?.lastName}`
+              `https://api.dicebear.com/9.x/notionists-neutral/svg?seed=${user?.name}`
             }
           />
         </div>

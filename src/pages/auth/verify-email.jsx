@@ -1,37 +1,44 @@
 import React, { useState } from 'react';
 import OtpInput from 'react-otp-input';
-import useAuthStore from '../../stores/useAuthStore';
 import { useLocation, useNavigate } from 'react-router';
 import { toast } from 'react-hot-toast';
 import InterestModel from '../../components/common/InterestModel';
 import authServices from '../../services/authServices';
 import interestServices from '../../services/interestServices';
+import { Loader2 } from 'lucide-react';
+import useAuthStore from '../../stores/useAuthStore';
 
 function VerifyEmail() {
-  const [otp, setOtp] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const [verificationToken, setVerificationToken] = useState('');
   const [showInterestModal, setShowInterestModal] = useState(false);
   const [selectedInterests, setSelectedInterests] = useState([]);
+  console.log('🚀 ~ VerifyEmail ~ selectedInterests:', selectedInterests);
   const [countdown, setCountdown] = useState(0);
   const [isResending, setIsResending] = useState(false);
-  console.log('🚀 ~ VerifyEmail ~ selectedInterests:', selectedInterests);
-  const { verifyEmail } = useAuthStore();
   const navigate = useNavigate();
+  const { initUserData } = useAuthStore();
   const location = useLocation();
-  const { email } = location.state || '';
-
-  console.log('🚀 ~ email:', email);
+  const { email, userId } = location.state;
 
   const handleVerifyEmail = async () => {
-    const result = await verifyEmail({ otp, email });
+    setIsLoading(true);
+    const result = await authServices.verifyEmail({
+      verificationToken,
+      email,
+    });
     if (result.status === true) {
       toast.success(result.message);
-      setTimeout(() => {
-        setShowInterestModal(true);
-      }, 1000);
+      if (result.data.needSetInterests) {
+        setTimeout(() => {
+          setShowInterestModal(true);
+        }, 1000);
+      }
     } else {
       toast.error(result.message);
     }
     console.log('🚀 ~ handleVerifyEmail ~ result:', result);
+    setIsLoading(false);
   };
 
   const handleConfirmInterest = async (selectedIds) => {
@@ -40,14 +47,19 @@ function VerifyEmail() {
     console.log('Sở thích đã chọn:', selectedItems);
 
     try {
-      const res = await interestServices.updateInterest({
+      const res = await interestServices.setUserInterests({
         interests: selectedItems,
-        email: email,
+        userId,
       });
       console.log('🚀 ~ handleConfirmInterest ~ res:', res);
       if (res.status === true) {
         toast.success(res.message);
-        navigate('/login');
+        const response = await initUserData(res);
+        if (response.status === true) {
+          navigate('/customer');
+        } else {
+          toast.error(response.message);
+        }
       } else {
         toast.error(res.message);
       }
@@ -82,16 +94,16 @@ function VerifyEmail() {
   return (
     <div className='flex flex-col items-center justify-center h-screen gap-10'>
       <div className='flex flex-col items-center justify-center gap-2'>
-        <h1 className='text-2xl font-bold'>Verify Email</h1>
+        <h1 className='text-2xl font-bold'>Xác thực email</h1>
         <p className='text-sm text-gray-500'>
-          Please enter the 6-digit code sent to your email address to verify
-          your account.
+          Vui lòng nhập mã 6 chữ số đã được gửi đến email của bạn để xác thực
+          tài khoản của bạn.
         </p>
       </div>
       <div className='flex flex-col items-center justify-center'>
         <OtpInput
-          value={otp}
-          onChange={setOtp}
+          value={verificationToken}
+          onChange={setVerificationToken}
           numInputs={6}
           inputType='tel'
           inputStyle={{
@@ -116,10 +128,18 @@ function VerifyEmail() {
           onClick={handleResendOtp}
           disabled={isResending}
         >
-          Resend OTP ({countdown > 0 ? countdown : '60s'})
+          Gửi lại OTP ({countdown > 0 ? countdown : '60s'})
         </button>
-        <button className='btn btn-primary' onClick={handleVerifyEmail}>
-          Verify
+        <button
+          className='btn btn-primary'
+          onClick={handleVerifyEmail}
+          disabled={isLoading}
+        >
+          {isLoading ? (
+            <Loader2 className='w-5 h-5 mr-2 animate-spin' />
+          ) : (
+            'Xác thực'
+          )}
         </button>
       </div>
       <div>

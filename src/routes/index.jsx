@@ -168,7 +168,7 @@ const router = createBrowserRouter([
         ),
       },
       {
-        path: 'partner',
+        path: 'partners',
         element: (
           <ProtectedRoute requiredRoles={[CUSTOMER]}>
             <CustomerPartner />

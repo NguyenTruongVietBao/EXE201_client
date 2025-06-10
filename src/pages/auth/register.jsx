@@ -13,28 +13,21 @@ function Register() {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const [form, setForm] = useState({
-    firstName: 'Bao',
-    lastName: 'Nguyen',
-    email: 'bao@gmail.com',
-    password: 'Baonguyen1303.',
-    confirmPassword: 'Baonguyen1303.',
+    name: 'John Doe',
+    phone: '0888641656',
+    email: 'joindoe@gmail.com',
+    password: '123123',
+    confirmPassword: '123123',
   });
 
   const validateForm = () => {
     const newErrors = {};
 
     // Validate First Name
-    if (!form.firstName.trim()) {
-      newErrors.firstName = 'First name is required';
-    } else if (form.firstName.length < 2) {
-      newErrors.firstName = 'First name must be at least 3 characters';
-    }
-
-    // Validate Last Name
-    if (!form.lastName.trim()) {
-      newErrors.lastName = 'Last name is required';
-    } else if (form.lastName.length < 2) {
-      newErrors.lastName = 'Last name must be at least 3 characters';
+    if (!form.name.trim()) {
+      newErrors.name = 'Name is required';
+    } else if (form.name.length < 2) {
+      newErrors.name = 'Name must be at least 3 characters';
     }
 
     // Validate Email
@@ -46,12 +39,10 @@ function Register() {
     }
 
     // Validate Password
-    const passwordRegex = /^(?=.*[A-Z])(?=.*\d).{8,}$/;
     if (!form.password) {
       newErrors.password = 'Password is required';
-    } else if (!passwordRegex.test(form.password)) {
-      newErrors.password =
-        'Password > 8 characters with 1 uppercase and number';
+    } else if (form.password.length < 6) {
+      newErrors.password = 'Password must be at least 6 characters';
     }
 
     // Validate Confirm Password
@@ -77,6 +68,7 @@ function Register() {
           navigate('/verify-email', {
             state: {
               email: form.email,
+              userId: result.data.user._id,
             },
           });
         } else {
@@ -113,31 +105,21 @@ function Register() {
               </Link>
               <div></div>
             </div>
-            <h2 className='text-2xl font-semibold'>Welcome Back!</h2>
+            <h2 className='text-2xl font-semibold'>Đăng ký tài khoản</h2>
             <p className='text-base-content/70'>
-              Sign up to continue to your account.
+              Đăng ký để tiếp tục sử dụng dịch vụ của chúng tôi.
             </p>
           </div>
 
           <form onSubmit={handleSubmit} className='space-y-3'>
-            <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
-              <InputCustom
-                type='text'
-                name='firstName'
-                label='First Name'
-                placeholder='John'
-                form={form}
-                handleChange={handleChange}
-              />
-              <InputCustom
-                type='text'
-                name='lastName'
-                label='Last Name'
-                placeholder='Doe'
-                form={form}
-                handleChange={handleChange}
-              />
-            </div>
+            <InputCustom
+              type='text'
+              name='name'
+              label='Họ và tên'
+              placeholder='John Doe'
+              form={form}
+              handleChange={handleChange}
+            />
 
             <InputCustom
               type='email'
@@ -161,11 +143,19 @@ function Register() {
 
             <InputCustom
               type='password'
-              name='password'
-              label='Mật khẩu'
-              placeholder='Nhập mật khẩu'
+              name='confirmPassword'
+              label='Xác nhận mật khẩu'
+              placeholder='Nhập lại mật khẩu'
               showPassword={showConfirmPassword}
               setShowPassword={setShowConfirmPassword}
+              form={form}
+              handleChange={handleChange}
+            />
+            <InputCustom
+              type='text'
+              name='phone'
+              label='Số điện thoại'
+              placeholder='Nhập số điện thoại'
               form={form}
               handleChange={handleChange}
             />
@@ -181,15 +171,15 @@ function Register() {
                 ) : (
                   <UserPlus className='w-5 h-5 mr-2' />
                 )}
-                {isLoading ? '' : 'Create Account'}
+                {isLoading ? '' : 'Tạo tài khoản'}
               </button>
             </div>
           </form>
 
           <div className='mt-8 text-center text-md font-semibold'>
-            Already have an account?{' '}
+            Đã có tài khoản?{' '}
             <Link to='/login' className='link link-primary font-semibold'>
-              Log In
+              Đăng nhập
             </Link>
           </div>
         </div>

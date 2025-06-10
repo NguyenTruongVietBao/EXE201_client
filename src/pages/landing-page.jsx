@@ -225,7 +225,7 @@ export default function LandingPage() {
                 {/* Main image */}
                 <div className='relative bg-white rounded-2xl p-4 shadow-2xl'>
                   <img
-                    src='https://api.dicebear.com/9.x/lorelei/svg?seed=student-learning'
+                    src='https://api.dicebear.com/9.x/lorelei/svg?seed=Christopher'
                     alt='Học tập với AI'
                     className='rounded-xl w-full h-auto object-cover'
                     style={{ aspectRatio: '4/5' }}

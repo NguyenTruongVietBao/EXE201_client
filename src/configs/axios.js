@@ -3,7 +3,6 @@ import envConfig from './envConfig';
 
 const BACKEND_URL = envConfig.BACKEND_URL;
 const ACCESS_TOKEN_KEY = envConfig.ACCESS_TOKEN_KEY;
-console.log('🚀 ~ ACCESS_TOKEN_KEY:', ACCESS_TOKEN_KEY);
 
 const axiosInstance = axios.create({
   baseURL: BACKEND_URL,
@@ -18,7 +17,6 @@ const axiosInstance = axios.create({
 axiosInstance.interceptors.request.use(
   (config) => {
     const accessToken = localStorage.getItem(ACCESS_TOKEN_KEY);
-    console.log('🚀 ~ accessToken:', accessToken);
     if (accessToken) {
       config.headers.Authorization = `Bearer ${accessToken}`;
     }

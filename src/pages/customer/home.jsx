@@ -1,9 +1,8 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   BookOpen,
   Users,
   UserPlus,
-  Calendar,
   Star,
   Download,
   Eye,
@@ -18,98 +17,35 @@ import {
   Brain,
   Bookmark,
   Search,
-  Filter,
-  Bell,
   Gift,
+  User,
 } from 'lucide-react';
+import interestServices from '../../services/interestServices';
+import { Link } from 'react-router';
 
 export default function CustomerHome() {
-  // Mock data với tiếng Việt
-  const aiSuggestions = {
-    documents: [
-      {
-        id: 1,
-        title: 'Lập trình React từ cơ bản đến nâng cao',
-        author: 'Nguyễn Văn An',
-        category: 'Lập trình',
-        rating: 4.9,
-        downloads: 2156,
-        views: 8943,
-        price: 'Miễn phí',
-        thumbnail: 'https://api.dicebear.com/9.x/shapes/svg?seed=react-vn',
-        tags: ['React', 'JavaScript', 'Frontend'],
-        aiReason: 'Phù hợp với sở thích React và JavaScript của bạn',
-        isNew: true,
-      },
-      {
-        id: 2,
-        title: 'Machine Learning với Python - Thực hành',
-        author: 'Trần Thị Bình',
-        category: 'Khoa học dữ liệu',
-        rating: 4.8,
-        downloads: 1834,
-        views: 5672,
-        price: '199.000 VNĐ',
-        thumbnail: 'https://api.dicebear.com/9.x/shapes/svg?seed=ml-python',
-        tags: ['Python', 'ML', 'Data Science'],
-        aiReason: 'Tiếp tục hành trình học AI của bạn',
-        discount: '30%',
-      },
-    ],
-    studyPartners: [
-      {
-        id: 1,
-        name: 'Lê Minh Hoàng',
-        major: 'Khoa học máy tính',
-        year: 'Năm 3',
-        interests: ['React', 'Node.js', 'AI'],
-        avatar: 'https://api.dicebear.com/9.x/avataaars/svg?seed=hoang',
-        matchScore: 94,
-        location: 'TP. Hồ Chí Minh',
-        online: true,
-        commonInterests: 3,
-      },
-      {
-        id: 2,
-        name: 'Phạm Thu Hà',
-        major: 'Khoa học dữ liệu',
-        year: 'Năm 2',
-        interests: ['Python', 'Machine Learning', 'Statistics'],
-        avatar: 'https://api.dicebear.com/9.x/avataaars/svg?seed=ha',
-        matchScore: 89,
-        location: 'Hà Nội',
-        online: false,
-        commonInterests: 2,
-      },
-    ],
-    studyGroups: [
-      {
-        id: 1,
-        name: 'Cộng đồng React Việt Nam',
-        members: 1247,
-        category: 'Lập trình',
-        description: 'Chia sẻ kiến thức React, thảo luận dự án và tìm việc làm',
-        avatar: 'https://api.dicebear.com/9.x/initials/svg?seed=RVN',
-        isActive: true,
-        lastActivity: '5 phút trước',
-        newMessages: 12,
-        isRecommended: true,
-      },
-      {
-        id: 2,
-        name: 'AI & Machine Learning VN',
-        members: 892,
-        category: 'Trí tuệ nhân tạo',
-        description: 'Học tập và nghiên cứu AI, ML cùng cộng đồng Việt Nam',
-        avatar: 'https://api.dicebear.com/9.x/initials/svg?seed=AIVN',
-        isActive: true,
-        lastActivity: '15 phút trước',
-        newMessages: 5,
-        isRecommended: true,
-      },
-    ],
-  };
+  const [recommendDocuments, setRecommendDocuments] = useState([]);
+  const [recommendStudyPartners, setRecommendStudyPartners] = useState([]);
+  const [userInfo, setUserInfo] = useState(null);
+  const [loading, setLoading] = useState(true);
 
+  useEffect(() => {
+    const fetchRecommendDocuments = async () => {
+      try {
+        const response = await interestServices.getRecommendData();
+        setRecommendDocuments(response.data.recommendedDocuments.items);
+        setRecommendStudyPartners(response.data.recommendedUsers.items);
+        setUserInfo(response.data.userInfo);
+      } catch (error) {
+        console.error('Error fetching recommendations:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchRecommendDocuments();
+  }, []);
+
+  // Mock data không liên quan đến gợi ý - giữ nguyên
   const featuredDocuments = [
     {
       id: 3,
@@ -205,65 +141,84 @@ export default function CustomerHome() {
     },
   ];
 
+  // Hàm helper để định dạng giá
+  const formatPrice = (price, discount) => {
+    if (price === 0) return 'Miễn phí';
+    const discountedPrice = price * (1 - discount / 100);
+    return `${discountedPrice.toLocaleString('vi-VN')} VNĐ`;
+  };
+
+  // Hàm helper để định dạng ngày
+  const formatDate = (dateString) => {
+    return new Date(dateString).toLocaleDateString('vi-VN');
+  };
+
+  if (loading) {
+    return (
+      <div className='min-h-screen flex items-center justify-center'>
+        <div className='text-center'>
+          <div className='animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4'></div>
+          <p className='text-gray-600'>Đang tải dữ liệu...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className='min-h-screen'>
       <div className='container mx-auto px-4 md:px-8 py-6'>
         {/* Header Welcome */}
         <section className='mb-8'>
-          <div className='bg-white/70 backdrop-blur-lg rounded-3xl p-8 border border-white/20 shadow-xl'>
-            <div className='flex items-center justify-between mb-6'>
+          <div className='bg-white/70 backdrop-blur-lg rounded-3xl p-5 border border-white/20 shadow-xl'>
+            <div className='flex flex-col md:flex-row items-center justify-around mb-6'>
               <div>
-                <h1 className='text-3xl md:text-4xl font-bold mb-3 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent'>
-                  Chào mừng trở lại! 👋
+                <h1 className='text-3xl md:text-5xl md:mb-3 font-bold py-2 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent'>
+                  Chào mừng trở lại {userInfo?.name || 'bạn'}! 👋
                 </h1>
                 <p className='text-lg text-gray-600 max-w-2xl'>
                   Hành trình học tập của bạn tiếp tục với những gợi ý thông minh
                   từ AI
                 </p>
-              </div>
-              <div className='hidden md:block'>
-                <div className='bg-gradient-to-r from-blue-100 to-purple-100 rounded-2xl p-4'>
-                  <div className='flex items-center gap-2 text-blue-700 font-medium'>
-                    <Target className='w-5 h-5' />
-                    <span>
-                      Mục tiêu tuần: {userStats.weeklyProgress}/
-                      {userStats.weeklyGoal}h
+                {userInfo?.interests && (
+                  <div className='flex items-center gap-2 mt-3'>
+                    <span className='text-sm text-gray-600'>
+                      Sở thích của bạn:
                     </span>
+                    <div className='flex gap-2'>
+                      {userInfo.interests.map((interest) => (
+                        <span
+                          key={interest._id}
+                          className='px-2 py-1 bg-blue-100 text-blue-700 rounded-lg text-sm font-medium flex items-center gap-1'
+                        >
+                          <span>{interest.emoji}</span>
+                          {interest.name}
+                        </span>
+                      ))}
+                    </div>
                   </div>
-                  <div className='w-32 bg-white/50 rounded-full h-2 mt-2'>
-                    <div
-                      className='bg-gradient-to-r from-blue-500 to-purple-500 h-2 rounded-full transition-all duration-500'
-                      style={{
-                        width: `${
-                          (userStats.weeklyProgress / userStats.weeklyGoal) *
-                          100
-                        }%`,
-                      }}
-                    />
-                  </div>
-                </div>
+                )}
               </div>
-            </div>
-
-            {/* Quick Actions */}
-            <div className='grid grid-cols-2 md:grid-cols-4 gap-4'>
-              {quickActions.map((action, index) => (
-                <div
-                  key={index}
-                  className='group relative bg-white/80 backdrop-blur-sm rounded-2xl p-4 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 cursor-pointer border border-white/30'
-                >
+              <div className='grid grid-cols-2 gap-10'>
+                {quickActions.map((action, index) => (
                   <div
-                    className={`w-10 h-10 bg-gradient-to-br ${action.color} rounded-xl flex items-center justify-center mb-3 group-hover:scale-110 transition-transform duration-300`}
+                    key={index}
+                    className='group relative bg-white/80 backdrop-blur-sm rounded-2xl p-5 px-8 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 cursor-pointer border border-white/30'
                   >
-                    <div className='text-white'>{action.icon}</div>
+                    <div
+                      className={`w-10 h-10 bg-gradient-to-br ${action.color} rounded-xl flex items-center justify-center mb-3 group-hover:scale-110 transition-transform duration-300`}
+                    >
+                      <div className='text-white'>{action.icon}</div>
+                    </div>
+                    <h3 className='text-sm font-bold text-gray-900 mb-1'>
+                      {action.title}
+                    </h3>
+                    <p className='text-xs text-gray-600'>
+                      {action.description}
+                    </p>
+                    <ArrowRight className='absolute top-3 right-3 w-4 h-4 text-gray-400 opacity-0 group-hover:opacity-100 transition-opacity duration-300' />
                   </div>
-                  <h3 className='text-sm font-bold text-gray-900 mb-1'>
-                    {action.title}
-                  </h3>
-                  <p className='text-xs text-gray-600'>{action.description}</p>
-                  <ArrowRight className='absolute top-3 right-3 w-4 h-4 text-gray-400 opacity-0 group-hover:opacity-100 transition-opacity duration-300' />
-                </div>
-              ))}
+                ))}
+              </div>
             </div>
           </div>
         </section>
@@ -280,62 +235,81 @@ export default function CustomerHome() {
             </p>
           </div>
 
-          <div className='grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6'>
-            {/* AI Document Suggestions */}
+          <div className='grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6'>
+            {/* Document Recommend */}
             <div className='bg-white/80 backdrop-blur-sm rounded-2xl p-6 shadow-xl border border-white/20'>
-              <h3 className='text-xl font-bold text-gray-900 mb-4 flex items-center gap-2'>
-                <BookOpen className='w-5 h-5 text-blue-600' />
-                Tài liệu dành cho bạn
-              </h3>
+              <div className='flex items-center justify-between mb-4'>
+                <h3 className='text-xl font-bold text-gray-900 flex items-center gap-2'>
+                  <BookOpen className='w-5 h-5 text-blue-600' />
+                  Tài liệu dành cho bạn
+                </h3>
+                <Link
+                  to='documents'
+                  className='text-blue-600 hover:text-blue-700 font-medium flex items-center gap-2'
+                >
+                  Xem thêm <ArrowRight className='w-4 h-4' />
+                </Link>
+              </div>
               <div className='space-y-4'>
-                {aiSuggestions.documents.map((doc) => (
+                {recommendDocuments.slice(0, 3).map((doc) => (
                   <div
-                    key={doc.id}
-                    className='group relative bg-gray-50/50 rounded-xl p-4 hover:bg-white transition-all duration-300'
+                    key={doc._id}
+                    className=' h-36 group relative bg-white/80 backdrop-blur-sm rounded-2xl p-4 shadow-lg border border-white/20 hover:shadow-xl transition-all duration-300'
                   >
-                    <div className='flex items-start gap-3'>
-                      <img
-                        src={doc.thumbnail}
-                        alt={doc.title}
-                        className='w-12 h-12 rounded-lg object-cover'
-                      />
-                      <div className='flex-1'>
-                        <div className='flex items-start justify-between mb-2'>
+                    <div className='flex items-center gap-3'>
+                      <div className='flex flex-col items-center gap-2'>
+                        <img
+                          src={
+                            doc.imageUrl[0] ||
+                            'https://api.dicebear.com/9.x/shapes/svg?seed=default'
+                          }
+                          alt={doc.title}
+                          className='w-20 h-20 rounded-lg object-cover'
+                        />
+                        <p className='text-xs text-gray-600 mb-2'>
+                          bởi {doc.author.name}
+                        </p>
+                      </div>
+                      <div className='flex-1 ml-4 justify-between'>
+                        <div className='flex items-start justify-between'>
                           <h4 className='font-semibold text-gray-900 text-sm leading-tight'>
                             {doc.title}
                           </h4>
                           <div className='flex items-center gap-1'>
-                            {doc.isNew && (
-                              <span className='px-2 py-1 bg-green-100 text-green-700 rounded-full text-xs font-medium'>
-                                Mới
-                              </span>
-                            )}
-                            {doc.discount && (
-                              <span className='px-2 py-1 bg-red-100 text-red-700 rounded-full text-xs font-medium'>
-                                -{doc.discount}
-                              </span>
-                            )}
+                            <span className='px-2 py-1 bg-green-100 text-green-700 rounded-full text-xs font-medium'>
+                              {Math.round(doc.matchPercentage)}% phù hợp
+                            </span>
                           </div>
                         </div>
-                        <p className='text-xs text-gray-600 mb-2'>
-                          bởi {doc.author}
-                        </p>
-                        <div className='flex items-center gap-2 text-xs text-purple-600 mb-2'>
+                        <div className='flex items-center gap-2 text-xs text-purple-600 my-1'>
                           <Brain className='w-3 h-3' />
-                          <span>{doc.aiReason}</span>
+                          <span>
+                            {doc.sharedInterestsCount} /{' '}
+                            {userInfo?.interests.length} sở thích
+                          </span>
+                        </div>
+                        <div className='mt-2 mb-1'>
+                          {doc.discount > 0 ? (
+                            <span className='px-2 py-1 bg-red-100 text-red-700 rounded-md text-sm font-medium'>
+                              -{doc.discount}%
+                            </span>
+                          ) : (
+                            <span className='px-2 py-1 bg-green-100 text-green-700 rounded-md text-sm font-medium'>
+                              Miễn phí
+                            </span>
+                          )}
                         </div>
                         <div className='flex items-center justify-between'>
-                          <span
-                            className={`font-bold text-sm ${
-                              doc.price === 'Miễn phí'
-                                ? 'text-green-600'
-                                : 'text-blue-600'
-                            }`}
-                          >
-                            {doc.price}
+                          <span className='font-bold text-md text-blue-600'>
+                            {formatPrice(doc.price, doc.discount)}
+                            {doc.discount > 0 && doc.price > 0 && (
+                              <span className='ml-1 text-xs text-gray-400 line-through font-semibold'>
+                                {doc.price.toLocaleString('vi-VN')} VNĐ
+                              </span>
+                            )}
                           </span>
-                          <button className='px-3 py-1 bg-gradient-to-r from-blue-500 to-purple-500 text-white rounded-lg hover:from-blue-600 hover:to-purple-600 transition-all duration-300 text-xs font-medium'>
-                            Xem
+                          <button className='px-4 py-1 bg-gradient-to-r from-blue-500 to-purple-500 text-white rounded-lg hover:from-blue-600 hover:to-purple-600 transition-all duration-300 text-sm font-medium'>
+                            Chi tiết
                           </button>
                         </div>
                       </div>
@@ -345,59 +319,160 @@ export default function CustomerHome() {
               </div>
             </div>
 
-            {/* AI Study Group Suggestions */}
+            {/* Study Partners Recommend */}
             <div className='bg-white/80 backdrop-blur-sm rounded-2xl p-6 shadow-xl border border-white/20'>
-              <h3 className='text-xl font-bold text-gray-900 mb-4 flex items-center gap-2'>
-                <Users className='w-5 h-5 text-purple-600' />
-                Nhóm học phù hợp
-              </h3>
+              <div className='flex items-center justify-between mb-4'>
+                <h3 className='text-xl font-bold text-gray-900 flex items-center gap-2'>
+                  <User className='w-5 h-5 text-purple-600' />
+                  Bạn học gợi ý
+                </h3>
+                <Link
+                  to='partners'
+                  className='text-blue-600 hover:text-blue-700 font-medium flex items-center gap-2'
+                >
+                  Xem thêm <ArrowRight className='w-4 h-4' />
+                </Link>
+              </div>
               <div className='space-y-4'>
-                {aiSuggestions.studyGroups.map((group) => (
+                {recommendStudyPartners.map((partner) => (
                   <div
-                    key={group.id}
-                    className='bg-gray-50/50 rounded-xl p-4 hover:bg-white transition-all duration-300'
+                    key={partner._id}
+                    className='group relative h-36 bg-white/80 backdrop-blur-sm rounded-2xl p-4 shadow-lg border border-white/20 hover:shadow-xl transition-all duration-300'
                   >
-                    <div className='flex items-start gap-3'>
-                      <img
-                        src={group.avatar}
-                        alt={group.name}
-                        className='w-12 h-12 rounded-lg'
-                      />
+                    <div className='flex items-center gap-3 mb-3'>
+                      <div className='relative'>
+                        <img
+                          src={partner.avatar}
+                          alt={partner.name}
+                          className='w-10 h-10 rounded-xl'
+                        />
+                        <div className='absolute -bottom-1 -right-1 w-3 h-3 bg-green-400 border-2 border-white rounded-full' />
+                      </div>
                       <div className='flex-1'>
-                        <div className='flex items-center gap-2 mb-1'>
-                          <h4 className='font-semibold text-gray-900 text-sm'>
-                            {group.name}
-                          </h4>
-                          {group.isActive && (
-                            <div className='w-2 h-2 bg-green-400 rounded-full' />
-                          )}
-                          {group.isRecommended && (
-                            <Sparkles className='w-3 h-3 text-purple-500' />
-                          )}
-                        </div>
-                        <p className='text-xs text-gray-600 mb-2 line-clamp-2'>
-                          {group.description}
+                        <h3 className='font-bold text-gray-900 text-sm'>
+                          {partner.name}
+                        </h3>
+                        <p className='text-xs text-gray-600'>
+                          Tham gia từ {formatDate(partner.createdAt)}
                         </p>
-                        <div className='flex items-center justify-between text-xs'>
-                          <div className='flex items-center gap-3'>
-                            <span className='text-gray-500'>
-                              {group.members} thành viên
-                            </span>
-                            {group.newMessages > 0 && (
-                              <span className='flex items-center gap-1 text-blue-600'>
-                                <MessageSquare className='w-3 h-3' />
-                                {group.newMessages} tin mới
-                              </span>
-                            )}
-                          </div>
-                          <button className='px-3 py-1 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-lg hover:from-purple-600 hover:to-pink-600 transition-all duration-300 font-medium'>
-                            Tham gia
-                          </button>
+                      </div>
+                      <div className='text-right'>
+                        <div
+                          className={`text-xs font-bold px-2 py-1 rounded-full ${
+                            partner.matchPercentage >= 90
+                              ? 'bg-green-100 text-green-700'
+                              : 'bg-blue-100 text-blue-700'
+                          }`}
+                        >
+                          {Math.round(partner.matchPercentage)}% phù hợp
                         </div>
                       </div>
                     </div>
+                    <div className='flex items-center gap-2 mb-3'>
+                      <span className='text-xs text-gray-500'>
+                        {partner.sharedInterestsCount} sở thích chung
+                      </span>
+                      <div className='flex items-center gap-1'>
+                        <Brain className='w-3 h-3 text-purple-500' />
+                        <span className='text-xs text-purple-600'>
+                          AI gợi ý
+                        </span>
+                      </div>
+                    </div>
+                    <button className='w-full py-2 bg-gradient-to-r from-emerald-500 to-teal-500 text-white rounded-xl hover:from-emerald-600 hover:to-teal-600 transition-all duration-300 text-sm font-medium'>
+                      Kết nối
+                    </button>
                   </div>
                 ))}
+                {recommendStudyPartners.length === 0 && (
+                  <div className='text-center py-8 text-gray-500'>
+                    <Users className='w-12 h-12 mx-auto mb-3 opacity-50' />
+                    <p>Chưa có gợi ý bạn học phù hợp</p>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Study Groups Recommend - Giữ nguyên mock data */}
+            <div className='bg-white/80 backdrop-blur-sm rounded-2xl p-6 shadow-xl border border-white/20'>
+              <div className='flex items-center justify-between mb-4'>
+                <h3 className='text-xl font-bold text-gray-900 flex items-center gap-2'>
+                  <Users className='w-5 h-5 text-purple-600' />
+                  Nhóm học phù hợp
+                </h3>
+                <Link
+                  to='/groups'
+                  className='text-blue-600 hover:text-blue-700 font-medium flex items-center gap-2'
+                >
+                  Xem thêm <ArrowRight className='w-4 h-4' />
+                </Link>
+              </div>
+              <div className='space-y-4'>
+                <div className='bg-gray-50/50 rounded-xl p-4 hover:bg-white transition-all duration-300'>
+                  <div className='flex items-start gap-3'>
+                    <img
+                      src='https://api.dicebear.com/9.x/initials/svg?seed=RVN'
+                      alt='Cộng đồng React Việt Nam'
+                      className='w-12 h-12 rounded-lg'
+                    />
+                    <div className='flex-1'>
+                      <div className='flex items-center gap-2 mb-1'>
+                        <h4 className='font-semibold text-gray-900 text-sm'>
+                          Cộng đồng React Việt Nam
+                        </h4>
+                        <div className='w-2 h-2 bg-green-400 rounded-full' />
+                        <Sparkles className='w-3 h-3 text-purple-500' />
+                      </div>
+                      <p className='text-xs text-gray-600 mb-2 line-clamp-2'>
+                        Chia sẻ kiến thức React, thảo luận dự án và tìm việc làm
+                      </p>
+                      <div className='flex items-center justify-between text-xs'>
+                        <div className='flex items-center gap-3'>
+                          <span className='text-gray-500'>1247 thành viên</span>
+                          <span className='flex items-center gap-1 text-blue-600'>
+                            <MessageSquare className='w-3 h-3' />
+                            12 tin mới
+                          </span>
+                        </div>
+                        <button className='px-3 py-1 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-lg hover:from-purple-600 hover:to-pink-600 transition-all duration-300 font-medium'>
+                          Tham gia
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div className='bg-gray-50/50 rounded-xl p-4 hover:bg-white transition-all duration-300'>
+                  <div className='flex items-start gap-3'>
+                    <img
+                      src='https://api.dicebear.com/9.x/initials/svg?seed=AIVN'
+                      alt='AI & Machine Learning VN'
+                      className='w-12 h-12 rounded-lg'
+                    />
+                    <div className='flex-1'>
+                      <div className='flex items-center gap-2 mb-1'>
+                        <h4 className='font-semibold text-gray-900 text-sm'>
+                          AI & Machine Learning VN
+                        </h4>
+                        <div className='w-2 h-2 bg-green-400 rounded-full' />
+                        <Sparkles className='w-3 h-3 text-purple-500' />
+                      </div>
+                      <p className='text-xs text-gray-600 mb-2 line-clamp-2'>
+                        Học tập và nghiên cứu AI, ML cùng cộng đồng Việt Nam
+                      </p>
+                      <div className='flex items-center justify-between text-xs'>
+                        <div className='flex items-center gap-3'>
+                          <span className='text-gray-500'>892 thành viên</span>
+                          <span className='flex items-center gap-1 text-blue-600'>
+                            <MessageSquare className='w-3 h-3' />5 tin mới
+                          </span>
+                        </div>
+                        <button className='px-3 py-1 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-lg hover:from-purple-600 hover:to-pink-600 transition-all duration-300 font-medium'>
+                          Tham gia
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -623,82 +698,6 @@ export default function CustomerHome() {
                 ))}
               </div>
             </section>
-
-            {/* Suggested Study Partners */}
-            <section>
-              <div className='flex items-center justify-between mb-4'>
-                <h2 className='text-xl font-bold text-gray-900'>
-                  Bạn học gợi ý
-                </h2>
-                <button className='text-blue-600 hover:text-blue-700 font-medium flex items-center gap-1 text-sm'>
-                  Xem thêm <ArrowRight className='w-3 h-3' />
-                </button>
-              </div>
-              <div className='space-y-4'>
-                {aiSuggestions.studyPartners.map((partner) => (
-                  <div
-                    key={partner.id}
-                    className='bg-white/80 backdrop-blur-sm rounded-2xl p-4 shadow-lg border border-white/20 hover:shadow-xl transition-all duration-300'
-                  >
-                    <div className='flex items-center gap-3 mb-3'>
-                      <div className='relative'>
-                        <img
-                          src={partner.avatar}
-                          alt={partner.name}
-                          className='w-10 h-10 rounded-xl'
-                        />
-                        {partner.online && (
-                          <div className='absolute -bottom-1 -right-1 w-3 h-3 bg-green-400 border-2 border-white rounded-full' />
-                        )}
-                      </div>
-                      <div className='flex-1'>
-                        <h3 className='font-bold text-gray-900 text-sm'>
-                          {partner.name}
-                        </h3>
-                        <p className='text-xs text-gray-600'>
-                          {partner.major} • {partner.year}
-                        </p>
-                      </div>
-                      <div className='text-right'>
-                        <div
-                          className={`text-xs font-bold px-2 py-1 rounded-full ${
-                            partner.matchScore >= 90
-                              ? 'bg-green-100 text-green-700'
-                              : 'bg-blue-100 text-blue-700'
-                          }`}
-                        >
-                          {partner.matchScore}% phù hợp
-                        </div>
-                      </div>
-                    </div>
-                    <div className='flex items-center gap-2 mb-3'>
-                      <span className='text-xs text-gray-500'>
-                        {partner.commonInterests} sở thích chung:
-                      </span>
-                      <div className='flex gap-1'>
-                        {partner.interests.slice(0, 2).map((interest, idx) => (
-                          <span
-                            key={idx}
-                            className='px-2 py-1 bg-blue-50 text-blue-700 rounded-lg text-xs font-medium'
-                          >
-                            {interest}
-                          </span>
-                        ))}
-                        {partner.interests.length > 2 && (
-                          <span className='px-2 py-1 bg-gray-100 text-gray-600 rounded-lg text-xs'>
-                            +{partner.interests.length - 2}
-                          </span>
-                        )}
-                      </div>
-                    </div>
-                    <button className='w-full py-2 bg-gradient-to-r from-emerald-500 to-teal-500 text-white rounded-xl hover:from-emerald-600 hover:to-teal-600 transition-all duration-300 text-sm font-medium'>
-                      Kết nối
-                    </button>
-                  </div>
-                ))}
-              </div>
-            </section>
-
             {/* Quick Links */}
             <section>
               <div className='bg-gradient-to-br from-blue-100 to-purple-100 rounded-2xl p-4 border border-blue-200'>
