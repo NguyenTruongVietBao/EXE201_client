@@ -35,6 +35,23 @@ const interestServices = {
   getRecommendData: async () => {
     try {
       const response = await axiosInstance.get('/interests/recommended');
+      console.log('🚀 ~ getRecommendData: ~ response:', response);
+      return response;
+    } catch (error) {
+      return error;
+    }
+  },
+  getPrioriryDocuments: async () => {
+    try {
+      const response = await axiosInstance.get('/interests/priority-documents');
+      return response;
+    } catch (error) {
+      return error;
+    }
+  },
+  getPrioriryUsers: async () => {
+    try {
+      const response = await axiosInstance.get('/interests/priority-users');
       return response;
     } catch (error) {
       return error;

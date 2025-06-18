@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   Search,
   Filter,
@@ -24,210 +24,83 @@ import {
   Play,
   DollarSign,
   Gift,
+  Edit,
+  Trash2,
+  MoreVertical,
+  Percent,
+  Target,
+  AwardIcon,
+  CheckCircle,
 } from 'lucide-react';
 import CreateDocModel from '../../components/common/customer/create-doc-model';
+import interestServices from '../../services/interestServices';
+import { Link } from 'react-router';
+import customerService from '../../services/customerService';
 
 export default function CustomerDocuments() {
-  const [activeTab, setActiveTab] = useState('all'); // all, free, paid
+  const [activeTab, setActiveTab] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
-  const [viewMode, setViewMode] = useState('grid'); // grid, list
+  const [viewMode, setViewMode] = useState('grid');
   const [sortBy, setSortBy] = useState('newest');
+  const [enrolledDocuments, setEnrolledDocuments] = useState([]);
   const [showFilters, setShowFilters] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [selectedRating, setSelectedRating] = useState('all');
   const [priceRange, setPriceRange] = useState('all');
+  const [priorityDocuments, setPriorityDocuments] = useState([]);
 
-  // Mock data với tiếng Việt
+  useEffect(() => {
+    const fetchPriorityDocuments = async () => {
+      const response = await interestServices.getPrioriryDocuments();
+      setPriorityDocuments(response.data || []);
+    };
+    fetchPriorityDocuments();
+  }, []);
+
+  useEffect(() => {
+    const fetchEnrolledDocuments = async () => {
+      const response = await customerService.getMyEnrolledDocuments();
+      setEnrolledDocuments(response.data || []);
+    };
+    fetchEnrolledDocuments();
+  }, []);
+
+  // Tạo danh sách categories từ documents thật
   const categories = [
-    'Lập trình',
-    'Khoa học dữ liệu',
-    'Toán học',
-    'Vật lý',
-    'Hóa học',
-    'Sinh học',
-    'Kinh doanh',
-    'Thiết kế',
-    'Ngoại ngữ',
-    'Kỹ thuật',
+    ...new Set(
+      priorityDocuments.flatMap(
+        (doc) => doc.interests?.map((interest) => interest.name) || []
+      )
+    ),
   ];
 
-  // AI Suggested Documents
-  const aiSuggestions = [
-    {
-      id: 'ai-1',
-      title: 'React Advanced Patterns - Được đề xuất cho bạn',
-      author: 'Nguyễn Văn An',
-      reason: 'Dựa trên sở thích React và JavaScript của bạn',
-      isAI: true,
-    },
-    {
-      id: 'ai-2',
-      title: 'Machine Learning Thực Hành - Phù hợp với mức độ của bạn',
-      author: 'Trần Thị Bình',
-      reason: 'Tiếp tục hành trình học AI của bạn',
-      isAI: true,
-    },
-  ];
+  // AI Suggested Documents từ 2 documents đầu tiên
+  const aiSuggestions = priorityDocuments.slice(0, 2).map((doc, index) => ({
+    id: `ai-${index + 1}`,
+    title: `${doc.title} - Được đề xuất cho bạn`,
+    author: doc.author?.name || 'Tác giả ẩn danh',
+    reason: `${doc.matchPercentage}% phù hợp - Cùng ${doc.sharedInterestsCount} sở thích`,
+    isAI: true,
+    documentId: doc._id,
+    image: doc.imageUrls[0],
+    matchPercentage: doc.matchPercentage || 0,
+  }));
 
-  const documents = [
-    {
-      id: 1,
-      title: 'Hướng dẫn React.js từ cơ bản đến nâng cao 2024',
-      author: 'Nguyễn Văn An',
-      authorAvatar: 'https://api.dicebear.com/9.x/avataaars/svg?seed=an',
-      category: 'Lập trình',
-      rating: 4.8,
-      reviews: 245,
-      downloads: 1234,
-      views: 5678,
-      price: 0,
-      originalPrice: 299000,
-      discount: 100,
-      thumbnail: 'https://api.dicebear.com/9.x/shapes/svg?seed=react-vn',
-      tags: ['React', 'JavaScript', 'Frontend'],
-      description:
-        'Làm chủ React.js từ cơ bản đến nâng cao với các dự án thực tế và ví dụ trong thực tiễn.',
-      level: 'Trung cấp',
-      duration: '8 giờ',
-      publishedAt: '2024-01-15',
-      isFeatured: true,
-      type: 'free',
-      isNew: false,
-      previewPages: 15,
-      totalPages: 120,
-      language: 'Tiếng Việt',
-      lastUpdated: '2024-01-20',
-    },
-    {
-      id: 2,
-      title: 'Machine Learning cơ bản với Python',
-      author: 'TS. Trần Minh Hoàng',
-      authorAvatar: 'https://api.dicebear.com/9.x/avataaars/svg?seed=hoang',
-      category: 'Khoa học dữ liệu',
-      rating: 4.9,
-      reviews: 189,
-      downloads: 2567,
-      views: 8901,
-      price: 199000,
-      originalPrice: 399000,
-      discount: 50,
-      thumbnail: 'https://api.dicebear.com/9.x/shapes/svg?seed=ml-vn',
-      tags: ['ML', 'Python', 'AI'],
-      description:
-        'Hướng dẫn toàn diện về thuật toán machine learning, tiền xử lý dữ liệu và đánh giá mô hình.',
-      level: 'Nâng cao',
-      duration: '12 giờ',
-      publishedAt: '2024-01-10',
-      isFeatured: true,
-      type: 'paid',
-      isNew: false,
-      previewPages: 20,
-      totalPages: 180,
-      language: 'Tiếng Việt',
-      lastUpdated: '2024-01-18',
-    },
-    {
-      id: 3,
-      title: 'Advanced Calculus Study Guide',
-      author: 'Prof. Emma Wilson',
-      category: 'Mathematics',
-      rating: 4.7,
-      reviews: 156,
-      downloads: 890,
-      views: 3456,
-      price: 15.99,
-      originalPrice: 19.99,
-      discount: 20,
-      thumbnail: 'https://api.dicebear.com/9.x/shapes/svg?seed=math',
-      tags: ['Calculus', 'Math', 'Study Guide'],
-      description:
-        'Complete calculus reference with solved examples and practice problems.',
-      level: 'Advanced',
-      duration: '6 hours',
-      publishedAt: '2024-01-08',
-      isFeatured: false,
-      type: 'paid',
-    },
-    {
-      id: 4,
-      title: 'JavaScript ES6+ Complete Course',
-      author: 'John Doe',
-      category: 'Programming',
-      rating: 4.6,
-      reviews: 312,
-      downloads: 1890,
-      views: 7234,
-      price: 0,
-      originalPrice: 39.99,
-      discount: 100,
-      thumbnail: 'https://api.dicebear.com/9.x/shapes/svg?seed=js',
-      tags: ['JavaScript', 'ES6', 'Programming'],
-      description:
-        'Modern JavaScript features and best practices for web development.',
-      level: 'Beginner',
-      duration: '10 hours',
-      publishedAt: '2024-01-05',
-      isFeatured: false,
-      type: 'free',
-    },
-    {
-      id: 5,
-      title: 'Data Structures & Algorithms',
-      author: 'Alex Thompson',
-      category: 'Programming',
-      rating: 4.8,
-      reviews: 278,
-      downloads: 1567,
-      views: 6789,
-      price: 19.99,
-      originalPrice: 29.99,
-      discount: 33,
-      thumbnail: 'https://api.dicebear.com/9.x/shapes/svg?seed=dsa',
-      tags: ['DSA', 'Algorithms', 'Computer Science'],
-      description:
-        'Essential data structures and algorithms with implementation examples.',
-      level: 'Intermediate',
-      duration: '15 hours',
-      publishedAt: '2024-01-12',
-      isFeatured: true,
-      type: 'paid',
-    },
-    {
-      id: 6,
-      title: 'Introduction to Python Programming',
-      author: 'Maria Garcia',
-      category: 'Programming',
-      rating: 4.5,
-      reviews: 467,
-      downloads: 3245,
-      views: 9876,
-      price: 0,
-      originalPrice: 24.99,
-      discount: 100,
-      thumbnail: 'https://api.dicebear.com/9.x/shapes/svg?seed=python',
-      tags: ['Python', 'Programming', 'Beginner'],
-      description:
-        'Learn Python programming from scratch with hands-on exercises.',
-      level: 'Beginner',
-      duration: '8 hours',
-      publishedAt: '2024-01-20',
-      isFeatured: false,
-      type: 'free',
-    },
-  ];
-
-  const filteredDocuments = documents.filter((doc) => {
-    const matchesTab = activeTab === 'all' || doc.type === activeTab;
+  const filteredDocuments = priorityDocuments.filter((doc) => {
+    const docType = doc.price === 0 ? 'free' : 'paid';
+    const matchesTab = activeTab === 'all' || docType === activeTab;
     const matchesSearch =
-      doc.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      doc.author.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      doc.tags.some((tag) =>
-        tag.toLowerCase().includes(searchQuery.toLowerCase())
+      doc.title?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      doc.author?.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      doc.interests?.some((interest) =>
+        interest.name?.toLowerCase().includes(searchQuery.toLowerCase())
       );
     const matchesCategory =
-      selectedCategory === 'all' || doc.category === selectedCategory;
+      selectedCategory === 'all' ||
+      doc.interests?.some((interest) => interest.name === selectedCategory);
     const matchesRating =
-      selectedRating === 'all' || doc.rating >= parseFloat(selectedRating);
+      selectedRating === 'all' ||
+      (doc.matchPercentage || 0) >= parseFloat(selectedRating);
     const matchesPrice =
       priceRange === 'all' ||
       (priceRange === 'free' && doc.price === 0) ||
@@ -246,13 +119,13 @@ export default function CustomerDocuments() {
   const sortedDocuments = [...filteredDocuments].sort((a, b) => {
     switch (sortBy) {
       case 'newest':
-        return new Date(b.publishedAt) - new Date(a.publishedAt);
+        return new Date(b.createdAt) - new Date(a.createdAt);
       case 'oldest':
-        return new Date(a.publishedAt) - new Date(b.publishedAt);
-      case 'rating':
-        return b.rating - a.rating;
-      case 'downloads':
-        return b.downloads - a.downloads;
+        return new Date(a.createdAt) - new Date(b.createdAt);
+      case 'match':
+        return (b.matchPercentage || 0) - (a.matchPercentage || 0);
+      case 'popularity':
+        return (b.sharedInterestsCount || 0) - (a.sharedInterestsCount || 0);
       case 'price-low':
         return a.price - b.price;
       case 'price-high':
@@ -261,6 +134,14 @@ export default function CustomerDocuments() {
         return 0;
     }
   });
+
+  // Helper function to get match percentage color
+  const getMatchColor = (percentage) => {
+    if (percentage >= 80) return 'text-green-600 bg-green-100';
+    if (percentage >= 60) return 'text-blue-600 bg-blue-100';
+    if (percentage >= 40) return 'text-yellow-600 bg-yellow-100';
+    return 'text-gray-600 bg-gray-100';
+  };
 
   return (
     <div className='min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50'>
@@ -277,7 +158,7 @@ export default function CustomerDocuments() {
             </p>
 
             {/* AI Suggestions */}
-            <div className='bg-gradient-to-r from-purple-100 to-pink-100 rounded-2xl p-6 mb-6'>
+            <div className='bg-gradient-to-r from-purple-100 to-pink-100 rounded-2xl p-6 '>
               <div className='flex items-center gap-3 mb-4'>
                 <div className='flex items-center gap-2 bg-gradient-to-r from-purple-500 to-pink-500 text-white px-4 py-2 rounded-full'>
                   <Sparkles className='w-5 h-5' />
@@ -295,8 +176,18 @@ export default function CustomerDocuments() {
                   >
                     <div className='flex items-center gap-3'>
                       <div className='w-12 h-12 bg-gradient-to-r from-purple-500 to-pink-500 rounded-xl flex items-center justify-center'>
-                        <Brain className='w-6 h-6 text-white' />
+                        <div className='relative'>
+                          <img
+                            src={suggestion.image}
+                            alt={suggestion.title}
+                            className='w-12 h-12 rounded-xl'
+                          />
+                          <div className='absolute -top-1 -right-1 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full p-1'>
+                            <Brain className='w-3 h-3 text-white' />
+                          </div>
+                        </div>
                       </div>
+
                       <div className='flex-1'>
                         <h3 className='font-semibold text-gray-900 text-sm'>
                           {suggestion.title}
@@ -304,14 +195,19 @@ export default function CustomerDocuments() {
                         <p className='text-xs text-gray-600'>
                           bởi {suggestion.author}
                         </p>
-                        <p className='text-xs text-purple-600 mt-1 flex items-center gap-1'>
-                          <Sparkles className='w-3 h-3' />
-                          {suggestion.reason}
-                        </p>
+                        <div className='flex items-center gap-2 mt-1'>
+                          <p className='text-xs text-purple-600 flex items-center gap-1'>
+                            <Sparkles className='w-3 h-3' />
+                            {suggestion.reason}
+                          </p>
+                        </div>
                       </div>
-                      <button className='px-3 py-1 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-lg text-xs font-medium hover:from-purple-600 hover:to-pink-600 transition-all duration-300'>
+                      <Link
+                        to={`/customer/documents/${suggestion.documentId}`}
+                        className='px-3 py-1 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-lg text-xs font-medium hover:from-purple-600 hover:to-pink-600 transition-all duration-300'
+                      >
                         Xem
-                      </button>
+                      </Link>
                     </div>
                   </div>
                 ))}
@@ -354,8 +250,8 @@ export default function CustomerDocuments() {
               >
                 <option value='newest'>Mới nhất</option>
                 <option value='oldest'>Cũ nhất</option>
-                <option value='rating'>Đánh giá cao nhất</option>
-                <option value='downloads'>Tải nhiều nhất</option>
+                <option value='match'>Phù hợp nhất</option>
+                <option value='popularity'>Phổ biến nhất</option>
                 <option value='price-low'>Giá: Thấp đến cao</option>
                 <option value='price-high'>Giá: Cao đến thấp</option>
               </select>
@@ -398,7 +294,7 @@ export default function CustomerDocuments() {
                     : 'text-gray-600 hover:text-gray-800'
                 }`}
               >
-                Tất cả ({documents.length})
+                Tất cả ({priorityDocuments.length})
               </button>
               <button
                 onClick={() => setActiveTab('free')}
@@ -408,7 +304,8 @@ export default function CustomerDocuments() {
                     : 'text-gray-600 hover:text-gray-800'
                 }`}
               >
-                Miễn phí ({documents.filter((d) => d.type === 'free').length})
+                Miễn phí (
+                {priorityDocuments.filter((d) => d.price === 0).length})
               </button>
               <button
                 onClick={() => setActiveTab('paid')}
@@ -418,7 +315,7 @@ export default function CustomerDocuments() {
                     : 'text-gray-600 hover:text-gray-800'
                 }`}
               >
-                Trả phí ({documents.filter((d) => d.type === 'paid').length})
+                Trả phí ({priorityDocuments.filter((d) => d.price > 0).length})
               </button>
             </div>
             <CreateDocModel />
@@ -450,10 +347,10 @@ export default function CustomerDocuments() {
                 </select>
               </div>
 
-              {/* Rating Filter */}
+              {/* Match Percentage Filter */}
               <div className='mb-6'>
                 <label className='block text-sm font-medium text-gray-700 mb-2'>
-                  Đánh giá tối thiểu
+                  Độ phù hợp tối thiểu
                 </label>
                 <select
                   value={selectedRating}
@@ -461,9 +358,10 @@ export default function CustomerDocuments() {
                   className='w-full p-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500'
                 >
                   <option value='all'>Bất kỳ</option>
-                  <option value='4.5'>4.5+ sao</option>
-                  <option value='4.0'>4.0+ sao</option>
-                  <option value='3.5'>3.5+ sao</option>
+                  <option value='80'>80%+ phù hợp</option>
+                  <option value='60'>60%+ phù hợp</option>
+                  <option value='40'>40%+ phù hợp</option>
+                  <option value='20'>20%+ phù hợp</option>
                 </select>
               </div>
 
@@ -505,192 +403,352 @@ export default function CustomerDocuments() {
             <div className='flex items-center justify-between mb-6'>
               <p className='text-gray-600'>
                 Hiển thị {sortedDocuments.length} trong tổng số{' '}
-                {documents.length} tài liệu
+                {priorityDocuments.length} tài liệu
               </p>
             </div>
 
             {/* Documents Display */}
             {viewMode === 'grid' ? (
-              <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6'>
-                {sortedDocuments.map((doc) => (
-                  <div
-                    key={doc.id}
-                    className='bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden group transform hover:-translate-y-1'
-                  >
-                    {/* Document Thumbnail */}
-                    <div className='relative h-48 bg-gradient-to-br from-blue-100 to-purple-100'>
-                      <img
-                        src={doc.thumbnail}
-                        alt={doc.title}
-                        className='w-full h-full object-cover'
-                      />
-                      {doc.isFeatured && (
-                        <div className='absolute top-3 left-3 bg-gradient-to-r from-yellow-400 to-orange-500 text-white text-xs font-bold px-2 py-1 rounded-full flex items-center gap-1'>
-                          <Award className='w-3 h-3' />
-                          Nổi bật
-                        </div>
-                      )}
-                      {doc.discount > 0 && doc.price > 0 && (
-                        <div className='absolute top-3 right-3 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-full'>
-                          -{doc.discount}%
-                        </div>
-                      )}
-                      <div className='absolute inset-0 bg-black opacity-0 group-hover:opacity-20 transition-opacity duration-300'></div>
-                    </div>
+              // Grid View
+              <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10'>
+                {sortedDocuments.map((doc) => {
+                  const finalPrice =
+                    doc.discount > 0
+                      ? doc.price * (1 - doc.discount / 100)
+                      : doc.price;
 
-                    {/* Document Info */}
-                    <div className='p-6'>
-                      {/* Price and Category */}
-                      <div className='flex items-center justify-between mb-3'>
-                        <span className='px-2 py-1 bg-blue-100 text-blue-700 rounded-lg text-xs font-medium'>
-                          {doc.category}
-                        </span>
-                        <div className='text-right'>
-                          {doc.price === 0 ? (
-                            <span className='text-emerald-600 font-bold text-lg'>
-                              MIỄN PHÍ
-                            </span>
-                          ) : (
-                            <div className='flex flex-col items-end'>
-                              {doc.originalPrice > doc.price && (
-                                <span className='text-gray-400 line-through text-xs'>
-                                  {doc.originalPrice.toLocaleString('vi-VN')}{' '}
-                                  VNĐ
-                                </span>
-                              )}
-                              <span className='text-blue-600 font-bold text-sm'>
-                                {doc.price.toLocaleString('vi-VN')} VNĐ
-                              </span>
+                  return (
+                    <div
+                      key={doc._id}
+                      className={`bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden group transform hover:-translate-y-1 `}
+                    >
+                      {/* Document Thumbnail */}
+                      <div className='relative h-48 bg-gradient-to-br from-blue-100 to-purple-100'>
+                        <img
+                          src={
+                            doc.imageUrls?.[0] ||
+                            'https://api.dicebear.com/9.x/shapes/svg?seed=default'
+                          }
+                          alt={doc.title}
+                          className='w-full h-full object-cover'
+                        />
+                        {doc.price === 0 ||
+                          (enrolledDocuments.some((d) => d._id === doc._id) && (
+                            <div className='absolute top-3 left-3 bg-gradient-to-r from-blue-500 to-purple-500 text-white text-xs font-bold px-3 py-1 rounded-full flex items-center gap-1'>
+                              <Edit className='w-3 h-3' />
+                              Đã thanh toán
+                            </div>
+                          ))}
+                        {doc.price > 0 &&
+                          !enrolledDocuments.some((d) => d._id === doc._id) &&
+                          doc.sharedInterestsCount > 3 && (
+                            <div className='absolute top-3 left-3 bg-gradient-to-r from-yellow-400 to-orange-500 text-white text-xs font-bold px-2 py-1 rounded-full flex items-center gap-1'>
+                              <Award className='w-3 h-3' />
+                              Nổi bật
                             </div>
                           )}
-                        </div>
-                      </div>
-
-                      {/* Title and Author */}
-                      <h3 className='font-bold text-gray-900 text-lg mb-2 line-clamp-2 group-hover:text-blue-600 transition-colors'>
-                        {doc.title}
-                      </h3>
-                      <p className='text-gray-600 text-sm mb-3'>
-                        bởi {doc.author}
-                      </p>
-
-                      {/* Description */}
-                      <p className='text-gray-600 text-sm mb-4 line-clamp-2'>
-                        {doc.description}
-                      </p>
-
-                      {/* Stats */}
-                      <div className='flex items-center gap-4 text-sm text-gray-500 mb-4'>
-                        <div className='flex items-center gap-1'>
-                          <Star className='w-4 h-4 text-yellow-400 fill-current' />
-                          <span>{doc.rating}</span>
-                          <span>({doc.reviews})</span>
-                        </div>
-                        <div className='flex items-center gap-1'>
-                          <Download className='w-4 h-4' />
-                          <span>{doc.downloads}</span>
-                        </div>
-                        <div className='flex items-center gap-1'>
-                          <Clock className='w-4 h-4' />
-                          <span>{doc.duration}</span>
-                        </div>
-                      </div>
-
-                      {/* Tags */}
-                      <div className='flex gap-2 mb-4'>
-                        {doc.tags.slice(0, 3).map((tag, idx) => (
-                          <span
-                            key={idx}
-                            className='px-2 py-1 bg-gray-100 text-gray-700 rounded-lg text-xs'
+                        {doc.matchPercentage > 0 && (
+                          <div
+                            className={`absolute top-3 right-3 px-2 py-1 rounded-full text-xs font-bold ${getMatchColor(
+                              doc.matchPercentage
+                            )}`}
                           >
-                            {tag}
-                          </span>
-                        ))}
+                            <Target className='w-3 h-3 inline mr-1' />
+                            {doc.matchPercentage}%
+                          </div>
+                        )}
+                        {doc.discount > 0 && doc.price > 0 && (
+                          <div className='absolute bottom-3 right-3 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-full'>
+                            -{doc.discount}%
+                          </div>
+                        )}
+
+                        <div className='absolute inset-0 bg-black opacity-0 group-hover:opacity-20 transition-opacity duration-300'></div>
                       </div>
 
-                      {/* Action Buttons */}
-                      <div className='flex items-center gap-2'>
-                        <button className='flex-1 bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white py-2 px-4 rounded-xl font-medium transition-all duration-300 transform hover:scale-105'>
-                          {doc.price === 0 ? 'Tải miễn phí' : 'Mua ngay'}
-                        </button>
-                        <button className='p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-xl transition-colors duration-200'>
-                          <Heart className='w-5 h-5' />
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              /* List View */
-              <div className='space-y-4'>
-                {sortedDocuments.map((doc) => (
-                  <div
-                    key={doc.id}
-                    className='bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 p-6 group'
-                  >
-                    <div className='flex items-start gap-4'>
-                      <img
-                        src={doc.thumbnail}
-                        alt={doc.title}
-                        className='w-20 h-20 rounded-xl object-cover'
-                      />
-                      <div className='flex-1'>
-                        <div className='flex items-start justify-between mb-2'>
-                          <div>
-                            <h3 className='font-bold text-gray-900 text-lg group-hover:text-blue-600 transition-colors'>
-                              {doc.title}
-                            </h3>
-                            <p className='text-gray-600 text-sm'>
-                              by {doc.author}
-                            </p>
+                      {/* Document Info */}
+                      <div className='p-6'>
+                        {/* Price and Interests */}
+                        <div className='flex items-center justify-between mb-3'>
+                          <div className='flex gap-1'>
+                            {doc.interests?.slice(0, 2).map((interest) => (
+                              <span
+                                key={interest._id}
+                                className='px-2 py-1 bg-blue-100 text-blue-700 rounded-lg text-xs font-medium flex items-center gap-1'
+                              >
+                                <span>{interest.emoji}</span>
+                                <span>{interest.name}</span>
+                              </span>
+                            ))}
                           </div>
                           <div className='text-right'>
                             {doc.price === 0 ? (
                               <span className='text-emerald-600 font-bold text-lg'>
-                                FREE
+                                MIỄN PHÍ
                               </span>
                             ) : (
-                              <div className='flex items-center gap-2'>
-                                {doc.originalPrice > doc.price && (
-                                  <span className='text-gray-400 line-through text-sm'>
-                                    ${doc.originalPrice}
+                              <div className='flex flex-col items-end'>
+                                {doc.discount > 0 && (
+                                  <span className='text-gray-400 line-through text-xs'>
+                                    {doc.price.toLocaleString('vi-VN')} VNĐ
                                   </span>
                                 )}
-                                <span className='text-blue-600 font-bold text-lg'>
-                                  ${doc.price}
+                                <span className='text-blue-600 font-bold text-sm'>
+                                  {finalPrice.toLocaleString('vi-VN')} VNĐ
                                 </span>
                               </div>
                             )}
                           </div>
                         </div>
-                        <p className='text-gray-600 text-sm mb-3'>
+
+                        {/* Title and Author */}
+                        <Link
+                          to={`/customer/documents/${doc._id}`}
+                          className='font-bold text-gray-900 text-lg mb-2 line-clamp-2 group-hover:text-blue-600 transition-colors block'
+                        >
+                          {doc.title}
+                        </Link>
+                        <div className='flex items-center gap-2 mb-3'>
+                          <img
+                            src={
+                              doc.author?.avatar ||
+                              'https://api.dicebear.com/9.x/initials/svg?seed=default'
+                            }
+                            alt={doc.author?.name}
+                            className='w-6 h-6 rounded-full'
+                          />
+                          <p className='text-gray-600 text-sm'>
+                            bởi {doc.author?.name}
+                          </p>
+                        </div>
+                        {/* Description */}
+                        <p className='text-gray-600 text-sm mb-4 line-clamp-2'>
                           {doc.description}
                         </p>
-                        <div className='flex items-center justify-between'>
-                          <div className='flex items-center gap-4 text-sm text-gray-500'>
-                            <div className='flex items-center gap-1'>
-                              <Star className='w-4 h-4 text-yellow-400 fill-current' />
-                              <span>
-                                {doc.rating} ({doc.reviews})
-                              </span>
+                        {/* Stats */}
+                        <div className='flex items-center gap-4 text-sm text-gray-500 mb-4'>
+                          {doc.matchPercentage > 0 && (
+                            <div
+                              className={`flex items-center gap-1 px-2 py-1 rounded-lg ${getMatchColor(
+                                doc.matchPercentage
+                              )}`}
+                            >
+                              <Target className='w-4 h-4' />
+                              <span>{doc.matchPercentage}%</span>
                             </div>
-                            <div className='flex items-center gap-1'>
-                              <Download className='w-4 h-4' />
-                              <span>{doc.downloads}</span>
-                            </div>
-                            <span className='px-2 py-1 bg-blue-100 text-blue-700 rounded-lg text-xs'>
-                              {doc.category}
+                          )}
+                          <div className='flex items-center gap-1'>
+                            <Users className='w-4 h-4' />
+                            <span>{doc.sharedInterestsCount || 0}</span>
+                          </div>
+                          <div className='flex items-center gap-1'>
+                            <Clock className='w-4 h-4' />
+                            <span>
+                              {new Date(doc.createdAt).toLocaleDateString(
+                                'vi-VN'
+                              )}
                             </span>
                           </div>
-                          <button className='bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white py-2 px-6 rounded-xl font-medium transition-all duration-300'>
-                            {doc.price === 0 ? 'Download' : 'Buy Now'}
+                        </div>
+
+                        {/* Action Buttons */}
+                        <div className='flex items-center gap-2'>
+                          {enrolledDocuments.some((d) => d._id === doc._id) ? (
+                            // Đã đăng ký - hiển thị nút xem chi tiết
+                            <>
+                              <Link
+                                to={`/customer/documents/${document._id}`}
+                                className='flex-1 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white py-2 px-4 rounded-xl font-medium transition-all duration-300 transform hover:scale-105 flex items-center justify-center gap-2'
+                              >
+                                <CheckCircle className='w-4 h-4' />
+                                Đã đăng ký
+                              </Link>
+                              <button className='p-2 text-gray-400 hover:text-green-500 hover:bg-green-50 rounded-xl transition-colors duration-200'>
+                                <Download className='w-5 h-5' />
+                              </button>
+                            </>
+                          ) : doc.price === 0 ? (
+                            // Khóa miễn phí chưa đăng ký - nút tham gia ngay
+                            <Link
+                              to={`/customer/documents/${doc._id}`}
+                              className='flex-1 bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white py-2 px-4 rounded-xl font-medium transition-all duration-300 transform hover:scale-105 flex items-center justify-center gap-2'
+                            >
+                              <AwardIcon className='w-4 h-4' />
+                              Đăng ký ngay
+                            </Link>
+                          ) : (
+                            // Khóa trả phí chưa mua - nút mua ngay
+                            <Link
+                              to={`/customer/documents/${doc._id}`}
+                              className='flex-1 bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white py-2 px-4 rounded-xl font-medium transition-all duration-300 transform hover:scale-105 flex items-center justify-center gap-2'
+                            >
+                              <DollarSign className='w-4 h-4' />
+                              Mua tài liệu
+                            </Link>
+                          )}
+                          <button className='p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-xl transition-colors duration-200'>
+                            <Heart className='w-5 h-5' />
                           </button>
                         </div>
                       </div>
                     </div>
-                  </div>
-                ))}
+                  );
+                })}
+              </div>
+            ) : (
+              // List View
+              <div className='space-y-4'>
+                {sortedDocuments.map((doc) => {
+                  const finalPrice =
+                    doc.discount > 0
+                      ? doc.price * (1 - doc.discount / 100)
+                      : doc.price;
+
+                  return (
+                    <div
+                      key={doc._id}
+                      className={`bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 p-6 group `}
+                    >
+                      <div className='flex items-start gap-4'>
+                        <div className='relative'>
+                          <img
+                            src={
+                              doc.imageUrls?.[0] ||
+                              'https://api.dicebear.com/9.x/shapes/svg?seed=default'
+                            }
+                            alt={doc.title}
+                            className='w-20 h-20 rounded-xl object-cover'
+                          />
+                        </div>
+                        <div className='flex-1'>
+                          <div className='flex items-start justify-between mb-2'>
+                            <div className='flex-1'>
+                              <div className='flex items-center gap-2 mb-1'>
+                                <h3 className='font-bold text-gray-900 text-lg group-hover:text-blue-600 transition-colors'>
+                                  {doc.title}
+                                </h3>
+                                {doc.matchPercentage > 0 && (
+                                  <span
+                                    className={`text-xs px-2 py-1 rounded-full ${getMatchColor(
+                                      doc.matchPercentage
+                                    )}`}
+                                  >
+                                    {doc.matchPercentage}% phù hợp
+                                  </span>
+                                )}
+                              </div>
+                              <div className='flex items-center gap-2'>
+                                <img
+                                  src={
+                                    doc.author?.avatar ||
+                                    'https://api.dicebear.com/9.x/initials/svg?seed=default'
+                                  }
+                                  alt={doc.author?.name}
+                                  className='w-4 h-4 rounded-full'
+                                />
+                                <p className='text-gray-600 text-sm'>
+                                  bởi {doc.author?.name}
+                                </p>
+                              </div>
+                            </div>
+                            <div className='flex items-center gap-2'>
+                              <div className='text-right'>
+                                {doc.price === 0 ? (
+                                  <span className='text-emerald-600 font-bold text-lg'>
+                                    MIỄN PHÍ
+                                  </span>
+                                ) : (
+                                  <div className='flex items-center gap-2'>
+                                    {doc.discount > 0 && (
+                                      <span className='text-gray-400 line-through text-sm'>
+                                        {doc.price.toLocaleString('vi-VN')} VNĐ
+                                      </span>
+                                    )}
+                                    <span className='text-blue-600 font-bold text-lg'>
+                                      {finalPrice.toLocaleString('vi-VN')} VNĐ
+                                    </span>
+                                  </div>
+                                )}
+                              </div>
+
+                              <div className='dropdown dropdown-end'>
+                                <div
+                                  tabIndex={0}
+                                  role='button'
+                                  className='btn btn-ghost btn-sm'
+                                >
+                                  <MoreVertical className='w-4 h-4' />
+                                </div>
+                                <ul
+                                  tabIndex={0}
+                                  className='dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-52'
+                                >
+                                  <li>
+                                    <a className='flex items-center gap-2'>
+                                      <Edit className='w-4 h-4' />
+                                      Chỉnh sửa
+                                    </a>
+                                  </li>
+                                  <li>
+                                    <a className='flex items-center gap-2 text-red-600'>
+                                      <Trash2 className='w-4 h-4' />
+                                      Xóa
+                                    </a>
+                                  </li>
+                                </ul>
+                              </div>
+                            </div>
+                          </div>
+                          <p className='text-gray-600 text-sm mb-3'>
+                            {doc.description}
+                          </p>
+                          <div className='flex items-center justify-between'>
+                            <div className='flex items-center gap-4 text-sm text-gray-500'>
+                              <div className='flex items-center gap-1'>
+                                <Users className='w-4 h-4' />
+                                <span>{doc.sharedInterestsCount || 0}</span>
+                              </div>
+                              <div className='flex gap-1'>
+                                {doc.interests?.slice(0, 2).map((interest) => (
+                                  <span
+                                    key={interest._id}
+                                    className='px-2 py-1 bg-blue-100 text-blue-700 rounded-lg text-xs flex items-center gap-1'
+                                  >
+                                    <span>{interest.emoji}</span>
+                                    <span>{interest.name}</span>
+                                  </span>
+                                ))}
+                              </div>
+                            </div>
+                            <button className='bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white py-2 px-6 rounded-xl font-medium transition-all duration-300 flex items-center gap-2'>
+                              {enrolledDocuments.some(
+                                (d) => d._id === doc._id
+                              ) ? (
+                                // Đã đăng ký - hiển thị nút xem chi tiết
+                                <>
+                                  <Eye className='w-4 h-4' />
+                                  Xem chi tiết
+                                </>
+                              ) : doc.price === 0 ? (
+                                // Khóa miễn phí chưa đăng ký - nút tham gia ngay
+                                <>
+                                  <AwardIcon className='w-4 h-4' />
+                                  Tham gia ngay
+                                </>
+                              ) : (
+                                // Khóa trả phí chưa mua - nút mua ngay
+                                <>
+                                  <DollarSign className='w-4 h-4' />
+                                  Mua ngay
+                                </>
+                              )}
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
               </div>
             )}
 
@@ -699,10 +757,10 @@ export default function CustomerDocuments() {
               <div className='text-center py-12'>
                 <BookOpen className='w-16 h-16 text-gray-300 mx-auto mb-4' />
                 <h3 className='text-xl font-medium text-gray-900 mb-2'>
-                  No documents found
+                  Không tìm thấy tài liệu nào
                 </h3>
                 <p className='text-gray-600 mb-4'>
-                  Try adjusting your search or filter criteria
+                  Thử điều chỉnh từ khóa tìm kiếm hoặc bộ lọc của bạn
                 </p>
                 <button
                   onClick={() => {
@@ -712,9 +770,9 @@ export default function CustomerDocuments() {
                     setPriceRange('all');
                     setActiveTab('all');
                   }}
-                  className='bg-gradient-to-r from-blue-500 to-purple-500 text-white px-6 py-2 rounded-xl hover:from-blue-600 hover:to-purple-600 transition-all duration-300'
+                  className='rounded-xl bg-gradient-to-r from-blue-500 to-purple-500 px-6 py-2 text-white transition-all duration-300 hover:from-blue-600 hover:to-purple-600'
                 >
-                  Clear All Filters
+                  Xóa tất cả bộ lọc
                 </button>
               </div>
             )}

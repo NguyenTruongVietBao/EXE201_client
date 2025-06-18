@@ -2,126 +2,79 @@ import React, { useEffect, useState } from 'react';
 import {
   BookOpen,
   Search,
-  Filter,
   Download,
-  Eye,
   Star,
-  Calendar,
   Bookmark,
   Share2,
   MoreVertical,
   Clock,
   CheckCircle,
   XCircle,
-  AlertCircle,
-  Plus,
-  Grid3X3,
-  List,
-  SortAsc,
-  SortDesc,
   Edit,
   Trash2,
-  ExternalLink,
-  Heart,
   TrendingUp,
-  FileText,
-  Users,
   ShoppingCart,
 } from 'lucide-react';
 import CreateDocModel from '../../components/common/customer/create-doc-model';
 import documentServices from '../../services/documentServices';
+import { Link } from 'react-router';
 
 export default function CustomerMyDocument() {
   const [activeTab, setActiveTab] = useState('shared');
   const [searchTerm, setSearchTerm] = useState('');
-  const [viewMode, setViewMode] = useState('grid');
-  const [sortBy, setSortBy] = useState('newest');
   const [filterStatus, setFilterStatus] = useState('all');
-  const [myDocuments, setMyDocuments] = useState({
-    shared: [],
-    purchased: [],
-    bookmarked: [],
-  });
+  const [myEnrolledDocuments, setMyEnrolledDocuments] = useState([]);
+  const [mySharedDocuments, setMySharedDocuments] = useState([]);
+  const [myPurchasedDocuments, setMyPurchasedDocuments] = useState([]);
 
   useEffect(() => {
-    const fetchMyDocuments = async () => {
+    const fetchMyEnrolledDocuments = async () => {
       try {
-        const response = await documentServices.getMyDocuments();
-        if (response.status && response.data) {
-          // Map documents từ API response
-          const mappedDocuments = response.data.documents.map((doc) => ({
-            id: doc._id,
-            title: doc.title,
-            description: doc.description,
-            price:
-              doc.price === 0
-                ? 'Miễn phí'
-                : `${doc.price.toLocaleString()} VNĐ`,
-            originalPrice: doc.price,
-            discount: doc.discount,
-            thumbnail: doc.imageUrl?.[0] || '/default-thumbnail.jpg',
-            documentUrl: doc.documentUrl?.[0],
-            videoUrl: doc.videoUrl?.[0],
-            tags: doc.interests?.map((interest) => interest.name) || [],
-            interests: doc.interests || [],
-            author: doc.author,
-            isPublic: doc.isPublic,
-            isBanned: doc.isBanned,
-            isDeleted: doc.isDeleted,
-            feedback: doc.feedback || [],
-            createdAt: new Date(doc.createdAt).toLocaleDateString('vi-VN'),
-            updatedAt: new Date(doc.updatedAt).toLocaleDateString('vi-VN'),
-            // Thêm các thuộc tính giả định cho UI
-            status:
-              doc.isPublic && !doc.isBanned
-                ? 'approved'
-                : doc.isBanned
-                ? 'rejected'
-                : 'pending',
-            downloads: Math.floor(Math.random() * 1000), // Giả định
-            views: Math.floor(Math.random() * 5000), // Giả định
-            rating: (Math.random() * 5).toFixed(1), // Giả định
-            reviewCount: Math.floor(Math.random() * 100), // Giả định
-            pages: Math.floor(Math.random() * 50) + 10, // Giả định
-            fileSize: `${(Math.random() * 10 + 1).toFixed(1)} MB`, // Giả định
-            progress: Math.floor(Math.random() * 100), // Cho purchased
-            purchasedAt: new Date().toLocaleDateString('vi-VN'), // Giả định
-            bookmarkedAt: new Date().toLocaleDateString('vi-VN'), // Giả định
-            rejectionReason: doc.isBanned
-              ? 'Nội dung không phù hợp với quy định'
-              : null,
-            category: doc.interests?.[0]?.name || 'Khác',
-          }));
-
-          // Phân loại documents theo tab (hiện tại tất cả vào shared)
-          // Bạn có thể thay đổi logic này tùy theo business logic
-          setMyDocuments({
-            shared: mappedDocuments,
-            purchased: [], // Sẽ được fetch từ API khác
-            bookmarked: [], // Sẽ được fetch từ API khác
-          });
+        const response = await documentServices.getMyEnrolledDocuments();
+        console.log('🚀 ~ myEnrolledDocuments ~ response:', response);
+        if (response.status) {
+          const documents = response.data || [];
+          setMyEnrolledDocuments(
+            documents.filter((doc) => doc.isFree === true)
+          );
+          setMyPurchasedDocuments(
+            documents.filter((doc) => doc.isFree === false)
+          );
         }
       } catch (error) {
-        console.error('Error fetching documents:', error);
-        setMyDocuments({
-          shared: [],
-          purchased: [],
-          bookmarked: [],
-        });
+        console.error('Error fetching enrolled documents:', error);
+        setMyEnrolledDocuments([]);
+        setMyPurchasedDocuments([]);
       }
     };
-    fetchMyDocuments();
+    fetchMyEnrolledDocuments();
   }, []);
 
-  console.log('myDocuments', myDocuments);
+  // Fetch my shared documents
+  useEffect(() => {
+    const fetchMySharedDocuments = async () => {
+      try {
+        const response = await documentServices.getMyDocuments();
+        if (response.status) {
+          setMySharedDocuments(response.data || []);
+        }
+      } catch (error) {
+        console.error('Error fetching shared documents:', error);
+        setMySharedDocuments([]);
+      }
+    };
+    fetchMySharedDocuments();
+  }, []);
 
   const stats = {
-    shared: myDocuments.shared?.length || 0,
-    purchased: myDocuments.purchased?.length || 0,
-    bookmarked: myDocuments.bookmarked?.length || 0,
-    totalDownloads:
-      myDocuments.shared?.reduce((sum, doc) => sum + (doc.downloads || 0), 0) ||
-      0,
+    shared: mySharedDocuments?.length || 0,
+    purchased: myPurchasedDocuments?.length || 0,
+    enrolled: myEnrolledDocuments?.length || 0,
+    totalDownloads: [
+      ...(mySharedDocuments || []),
+      ...(myPurchasedDocuments || []),
+      ...(myEnrolledDocuments || []),
+    ].reduce((sum, doc) => sum + (doc.download || 0), 0),
   };
 
   const tabs = [
@@ -140,235 +93,265 @@ export default function CustomerMyDocument() {
       color: 'text-green-600 border-green-600',
     },
     {
-      id: 'bookmarked',
-      label: 'Đã lưu',
-      count: stats.bookmarked,
+      id: 'enrolled',
+      label: 'Đã đăng ký',
+      count: stats.enrolled,
       icon: <Bookmark className='w-4 h-4' />,
       color: 'text-purple-600 border-purple-600',
     },
   ];
 
-  const getStatusBadge = (status) => {
-    const statusConfig = {
-      approved: {
-        label: 'Đã duyệt',
-        className: 'bg-green-100 text-green-700 border-green-200',
-        icon: <CheckCircle className='w-3 h-3' />,
-      },
-      pending: {
-        label: 'Chờ duyệt',
-        className: 'bg-yellow-100 text-yellow-700 border-yellow-200',
-        icon: <Clock className='w-3 h-3' />,
-      },
-      rejected: {
-        label: 'Bị từ chối',
-        className: 'bg-red-100 text-red-700 border-red-200',
-        icon: <XCircle className='w-3 h-3' />,
-      },
-    };
-
-    const config = statusConfig[status];
-    return (
-      <span
-        className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium border ${config.className}`}
-      >
-        {config.icon}
-        {config.label}
-      </span>
-    );
+  // Helper function to get document data based on activeTab
+  const getCurrentDocuments = () => {
+    switch (activeTab) {
+      case 'shared':
+        return mySharedDocuments || [];
+      case 'purchased':
+        return myPurchasedDocuments || [];
+      case 'enrolled':
+        return myEnrolledDocuments || [];
+      default:
+        return [];
+    }
   };
 
-  const DocumentCard = ({ document, type }) => (
-    <div className='bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-100 group'>
-      <div className='relative'>
-        <img
-          src={document.thumbnail}
-          alt={document.title}
-          className='w-full h-48 object-cover rounded-t-2xl'
-        />
-        <div className='absolute top-3 right-3 flex items-center gap-2'>
-          {type === 'shared' && getStatusBadge(document.status)}
-          {type === 'purchased' && (
-            <span className='bg-blue-100 text-blue-700 px-2 py-1 rounded-full text-xs font-medium'>
-              Đã mua
-            </span>
-          )}
-          {type === 'bookmarked' && (
-            <button className='p-1.5 bg-white/90 hover:bg-white rounded-full shadow-sm transition-colors'>
-              <Heart className='w-4 h-4 text-red-500 fill-current' />
-            </button>
-          )}
-        </div>
+  const DocumentCard = ({ document, type }) => {
+    const finalPrice =
+      document.discount > 0
+        ? document.price * (1 - document.discount / 100)
+        : document.price;
 
-        {type === 'purchased' && document.progress > 0 && (
-          <div className='absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 to-transparent p-3'>
-            <div className='flex items-center gap-2 text-white text-sm'>
-              <span>Tiến độ: {document.progress}%</span>
-              <div className='flex-1 bg-white/30 rounded-full h-2'>
-                <div
-                  className='bg-white h-2 rounded-full transition-all duration-300'
-                  style={{ width: `${document.progress}%` }}
-                />
-              </div>
-            </div>
+    return (
+      <div className='bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden group transform hover:-translate-y-1'>
+        {/* Document Thumbnail */}
+        <div className='relative h-48 bg-gradient-to-br from-blue-100 to-purple-100'>
+          <img
+            src={document.imageUrls?.[0] || '/placeholder.jpg'}
+            alt={document.title}
+            className='w-full h-full object-cover'
+          />
+
+          {/* Status badges */}
+          <div className='absolute top-3 left-3'>
+            {type === 'shared' && (
+              <span
+                className={`px-3 py-1 rounded-full text-xs font-medium border ${
+                  document.status === 'APPROVED'
+                    ? 'bg-green-50 text-green-700 border-green-200'
+                    : document.status === 'PENDING'
+                    ? 'bg-yellow-50 text-yellow-700 border-yellow-200'
+                    : 'bg-red-50 text-red-700 border-red-200'
+                }`}
+              >
+                {document.status === 'APPROVED' && (
+                  <span className='inline-flex items-center gap-1'>
+                    <CheckCircle className='w-3 h-3' />
+                    Đã duyệt
+                  </span>
+                )}
+                {document.status === 'PENDING' && (
+                  <span className='inline-flex items-center gap-1'>
+                    <Clock className='w-3 h-3' />
+                    Chờ duyệt
+                  </span>
+                )}
+                {document.status === 'REJECTED' && (
+                  <span className='inline-flex items-center gap-1'>
+                    <XCircle className='w-3 h-3' />
+                    Bị từ chối
+                  </span>
+                )}
+              </span>
+            )}
+            {type === 'purchased' && (
+              <span className='bg-green-50 text-green-700 px-3 py-1 rounded-full text-xs font-medium border border-green-200'>
+                Đã mua
+              </span>
+            )}
+            {type === 'enrolled' && (
+              <span className='bg-purple-50 text-purple-700 px-3 py-1 rounded-full text-xs font-medium border border-purple-200'>
+                Đã đăng ký
+              </span>
+            )}
           </div>
-        )}
-      </div>
 
-      <div className='p-5'>
-        <div className='flex items-start justify-between mb-3'>
-          <h3 className='text-lg font-bold text-gray-900 group-hover:text-blue-600 transition-colors line-clamp-2 leading-tight'>
-            {document.title}
-          </h3>
-          <button className='p-1 hover:bg-gray-100 rounded-lg transition-colors opacity-0 group-hover:opacity-100'>
-            <MoreVertical className='w-4 h-4 text-gray-500' />
-          </button>
-        </div>
-
-        <p className='text-gray-600 text-sm mb-4 line-clamp-2'>
-          {document.description}
-        </p>
-
-        {/* Tags */}
-        <div className='flex flex-wrap gap-1 mb-4'>
-          {document.tags.slice(0, 3).map((tag, idx) => (
-            <span
-              key={idx}
-              className='px-2 py-1 bg-gray-100 text-gray-700 rounded-lg text-xs'
-            >
-              {tag}
-            </span>
-          ))}
-          {document.tags.length > 3 && (
-            <span className='px-2 py-1 bg-gray-100 text-gray-700 rounded-lg text-xs'>
-              +{document.tags.length - 3}
-            </span>
-          )}
-        </div>
-
-        {/* Stats */}
-        <div className='flex items-center justify-between text-sm text-gray-500 mb-4'>
-          <div className='flex items-center gap-4'>
-            {document.rating > 0 && (
-              <div className='flex items-center gap-1'>
-                <Star className='w-4 h-4 text-yellow-400 fill-current' />
-                <span>{document.rating}</span>
-                {document.reviewCount && <span>({document.reviewCount})</span>}
+          {/* Discount badge */}
+          <div className='absolute top-3 right-3'>
+            {document.discount > 0 && document.price > 0 && (
+              <div className='bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-full'>
+                -{document.discount}%
               </div>
             )}
+          </div>
 
+          {/* Dropdown menu */}
+          <div className='absolute bottom-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300'>
+            <div className='dropdown dropdown-end'>
+              <div
+                tabIndex={0}
+                role='button'
+                className='btn btn-ghost btn-sm bg-white/90 hover:bg-white'
+              >
+                <MoreVertical className='w-4 h-4' />
+              </div>
+              <ul
+                tabIndex={0}
+                className='dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-52'
+              >
+                <li>
+                  <a className='flex items-center gap-2'>
+                    <Edit className='w-4 h-4' />
+                    Chỉnh sửa
+                  </a>
+                </li>
+                <li>
+                  <a className='flex items-center gap-2 text-red-600'>
+                    <Trash2 className='w-4 h-4' />
+                    Xóa
+                  </a>
+                </li>
+              </ul>
+            </div>
+          </div>
+
+          <div className='absolute inset-0 bg-black opacity-0 group-hover:opacity-20 transition-opacity duration-300'></div>
+        </div>
+
+        {/* Document Info */}
+        <div className='p-6'>
+          {/* Price and Interests */}
+          <div className='flex items-center justify-between mb-3'>
+            <div className='flex gap-1'>
+              {document.interests?.slice(0, 2).map((interest) => (
+                <span
+                  key={interest._id}
+                  className='px-2 py-1 bg-blue-100 text-blue-700 rounded-lg text-xs font-medium flex items-center gap-1'
+                >
+                  <span>{interest.emoji}</span>
+                  <span>{interest.name}</span>
+                </span>
+              ))}
+            </div>
+            <div className='text-right'>
+              {document.price === 0 || document.isFree ? (
+                <span className='text-emerald-600 font-bold text-lg'>
+                  MIỄN PHÍ
+                </span>
+              ) : (
+                <div className='flex flex-col items-end'>
+                  {document.discount > 0 && (
+                    <span className='text-gray-400 line-through text-xs'>
+                      {document.price} VNĐ
+                    </span>
+                  )}
+                  <span className='text-blue-600 font-bold text-sm'>
+                    {finalPrice} VNĐ
+                  </span>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Title */}
+          <Link
+            to={`/customer/documents/${document._id}`}
+            className='font-bold text-gray-900 text-lg mb-2 line-clamp-2 group-hover:text-blue-600 transition-colors'
+          >
+            {document.title}
+          </Link>
+
+          {/* Description */}
+          <p className='text-gray-600 text-sm mb-4 line-clamp-2'>
+            {document.description}
+          </p>
+
+          {/* Stats */}
+          <div className='flex items-center gap-4 text-sm text-gray-500 mb-4'>
+            <div className='flex items-center gap-1'>
+              <Star className='w-4 h-4 text-yellow-400 fill-current' />
+              <span>
+                {document.feedback?.length > 0
+                  ? (
+                      document.feedback.reduce((sum, f) => sum + f.rating, 0) /
+                      document.feedback.length
+                    ).toFixed(1)
+                  : '0.0'}
+              </span>
+              <span>({document.feedback?.length || 0})</span>
+            </div>
+            <div className='flex items-center gap-1'>
+              <Download className='w-4 h-4' />
+              <span>{document.download || 0}</span>
+            </div>
+            <div className='flex items-center gap-1'>
+              <Clock className='w-4 h-4' />
+              <span>
+                {new Date(document.createdAt).toLocaleDateString('vi-VN')}
+              </span>
+            </div>
+          </div>
+
+          {/* Action Buttons */}
+          <div className='flex items-center gap-2'>
             {type === 'shared' && (
               <>
-                <div className='flex items-center gap-1'>
-                  <Download className='w-4 h-4' />
-                  <span>{document.downloads}</span>
-                </div>
-                <div className='flex items-center gap-1'>
-                  <Eye className='w-4 h-4' />
-                  <span>{document.views}</span>
-                </div>
+                {document.status === 'APPROVED' && (
+                  <button className='flex-1 bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white py-2 px-4 rounded-xl font-medium transition-all duration-300 transform hover:scale-105 flex items-center justify-center gap-2'>
+                    <TrendingUp className='w-4 h-4' />
+                    Xem thống kê
+                  </button>
+                )}
+                {document.status === 'PENDING' && (
+                  <button className='flex-1 bg-gray-200 text-gray-600 py-2 px-4 rounded-xl font-medium cursor-not-allowed'>
+                    Đang xử lý
+                  </button>
+                )}
+                {document.status === 'REJECTED' && (
+                  <button className='flex-1 bg-gradient-to-r from-red-500 to-pink-500 hover:from-red-600 hover:to-pink-600 text-white py-2 px-4 rounded-xl font-medium transition-all duration-300 transform hover:scale-105'>
+                    Xem lý do
+                  </button>
+                )}
               </>
             )}
 
-            {(type === 'purchased' || type === 'bookmarked') &&
-              document.price && (
-                <span
-                  className={`font-medium ${
-                    document.price === 'Miễn phí'
-                      ? 'text-green-600'
-                      : 'text-blue-600'
-                  }`}
-                >
-                  {document.price}
-                </span>
-              )}
-          </div>
-
-          <div className='flex items-center gap-1 text-xs'>
-            <FileText className='w-3 h-3' />
-            <span>{document.pages} trang</span>
-          </div>
-        </div>
-
-        {/* Actions */}
-        <div className='flex items-center gap-2'>
-          {type === 'shared' && (
             <>
-              {document.status === 'approved' && (
-                <button className='flex-1 py-2 bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 transition-colors text-sm font-medium'>
-                  Xem thống kê
-                </button>
-              )}
-              {document.status === 'pending' && (
-                <button className='flex-1 py-2 bg-gray-100 text-gray-700 rounded-lg text-sm font-medium cursor-not-allowed'>
-                  Đang xử lý
-                </button>
-              )}
-              {document.status === 'rejected' && (
-                <button className='flex-1 py-2 bg-red-100 text-red-700 rounded-lg hover:bg-red-200 transition-colors text-sm font-medium'>
-                  Xem lý do
-                </button>
-              )}
-              <button className='p-2 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors'>
-                <Edit className='w-4 h-4 text-gray-600' />
-              </button>
-            </>
-          )}
-
-          {type === 'purchased' && (
-            <>
-              <button className='flex-1 py-2 bg-green-100 text-green-700 rounded-lg hover:bg-green-200 transition-colors text-sm font-medium'>
-                Tiếp tục đọc
-              </button>
-              <button className='p-2 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors'>
-                <Download className='w-4 h-4 text-gray-600' />
-              </button>
-            </>
-          )}
-
-          {type === 'bookmarked' && (
-            <>
-              <button className='flex-1 py-2 bg-purple-100 text-purple-700 rounded-lg hover:bg-purple-200 transition-colors text-sm font-medium'>
+              <Link
+                to={`/customer/documents/${document._id}`}
+                className='flex-1 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white py-2 px-4 rounded-xl font-medium transition-all duration-300 transform hover:scale-105 flex items-center justify-center gap-2'
+              >
+                <BookOpen className='w-4 h-4' />
                 Xem chi tiết
-              </button>
-              <button className='p-2 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors'>
-                <ExternalLink className='w-4 h-4 text-gray-600' />
+              </Link>
+              <button className='p-2 text-gray-400 hover:text-green-500 hover:bg-green-50 rounded-xl transition-colors duration-200'>
+                <Download className='w-5 h-5' />
               </button>
             </>
-          )}
-        </div>
+          </div>
 
-        {/* Rejection reason */}
-        {type === 'shared' &&
-          document.status === 'rejected' &&
-          document.rejectionReason && (
-            <div className='mt-4 p-3 bg-red-50 border border-red-200 rounded-lg'>
-              <div className='flex items-start gap-2'>
-                <AlertCircle className='w-4 h-4 text-red-600 mt-0.5 flex-shrink-0' />
-                <div>
-                  <p className='text-sm font-medium text-red-800'>
-                    Lý do từ chối:
-                  </p>
-                  <p className='text-sm text-red-700 mt-1'>
-                    {document.rejectionReason}
-                  </p>
-                </div>
-              </div>
-            </div>
-          )}
-
-        {/* Additional info */}
-        <div className='mt-4 pt-3 border-t border-gray-100 flex items-center justify-between text-xs text-gray-500'>
-          <span>
-            {type === 'shared' && `Đăng ngày ${document.createdAt}`}
-            {type === 'purchased' && `Mua ngày ${document.purchasedAt}`}
-            {type === 'bookmarked' && `Lưu ngày ${document.bookmarkedAt}`}
-          </span>
-          <span>{document.fileSize}</span>
+          {/* Additional info */}
+          <div className='mt-4 pt-3 border-t border-gray-100 flex items-center justify-between text-xs text-gray-500'>
+            <span>
+              {type === 'shared' &&
+                `Đăng ngày ${new Date(document.createdAt).toLocaleDateString(
+                  'vi-VN'
+                )}`}
+              {type === 'purchased' &&
+                `Mua ngày ${new Date(document.updatedAt).toLocaleDateString(
+                  'vi-VN'
+                )}`}
+              {type === 'enrolled' &&
+                `Đăng ký ngày ${new Date(document.updatedAt).toLocaleDateString(
+                  'vi-VN'
+                )}`}
+            </span>
+            <span>
+              {document.duration ? `${document.duration}` : 'Chưa xác định'}
+            </span>
+          </div>
         </div>
       </div>
-    </div>
-  );
+    );
+  };
 
   const EmptyState = ({ type }) => {
     const emptyStates = {
@@ -384,10 +367,10 @@ export default function CustomerMyDocument() {
         description: 'Khám phá thư viện tài liệu phong phú của chúng tôi',
         action: 'Duyệt tài liệu',
       },
-      bookmarked: {
+      enrolled: {
         icon: <Bookmark className='w-16 h-16 text-gray-300' />,
-        title: 'Chưa có tài liệu nào được lưu',
-        description: 'Lưu các tài liệu yêu thích để đọc sau',
+        title: 'Chưa có tài liệu nào được đăng ký',
+        description: 'Đăng ký các tài liệu yêu thích để đọc sau',
         action: 'Tìm tài liệu hay',
       },
     };
@@ -410,13 +393,25 @@ export default function CustomerMyDocument() {
     );
   };
 
-  const filteredDocuments =
-    myDocuments[activeTab]?.filter(
-      (doc) =>
-        doc.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        doc.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        doc.category.toLowerCase().includes(searchTerm.toLowerCase())
-    ) || [];
+  // Updated filtering logic
+  const filteredDocuments = getCurrentDocuments().filter((doc) => {
+    // Search term matching
+    const matchesSearch = searchTerm
+      ? doc.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        doc.description?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        doc.interests?.some((interest) =>
+          interest.name.toLowerCase().includes(searchTerm.toLowerCase())
+        )
+      : true;
+
+    // Status filtering for shared documents
+    const matchesStatus =
+      activeTab !== 'shared' ||
+      filterStatus === 'all' ||
+      doc.status === filterStatus.toUpperCase();
+
+    return matchesSearch && matchesStatus;
+  });
 
   return (
     <div className='min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50'>
@@ -426,10 +421,10 @@ export default function CustomerMyDocument() {
           <div className='bg-white/80 backdrop-blur-lg rounded-3xl p-8 shadow-xl border border-white/20'>
             <div className='flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6'>
               <div>
-                <h1 className='text-3xl font-bold text-gray-900 mb-2'>
-                  Tài liệu của tôi
+                <h1 className='text-4xl font-bold mb-4 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent'>
+                  Tài liệu của tôi 📚
                 </h1>
-                <p className='text-gray-600'>
+                <p className='text-xl text-gray-600'>
                   Quản lý và theo dõi tài liệu đã chia sẻ, mua và lưu trữ
                 </p>
               </div>
@@ -451,9 +446,9 @@ export default function CustomerMyDocument() {
                   </div>
                   <div className='text-center'>
                     <div className='text-2xl font-bold text-purple-600'>
-                      {stats.bookmarked}
+                      {stats.enrolled}
                     </div>
-                    <div className='text-gray-600'>Đã lưu</div>
+                    <div className='text-gray-600'>Đã đăng ký</div>
                   </div>
                   <div className='text-center'>
                     <div className='text-2xl font-bold text-orange-600'>
@@ -475,7 +470,7 @@ export default function CustomerMyDocument() {
                 <button
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id)}
-                  className={`flex items-center gap-2 px-6 py-3 rounded-xl font-medium transition-all duration-300 ${
+                  className={`ml-3 flex items-center gap-2 px-6 py-3 rounded-xl font-medium transition-all duration-300 ${
                     activeTab === tab.id
                       ? `bg-white shadow-lg ${tab.color} scale-105`
                       : 'text-gray-600 hover:bg-white/50'
@@ -498,7 +493,7 @@ export default function CustomerMyDocument() {
           </div>
         </div>
 
-        {/* Filters & Search */}
+        {/* Search and Filter */}
         <div className='mb-8'>
           <div className='bg-white/80 backdrop-blur-sm rounded-2xl p-6 shadow-lg border border-white/20'>
             <div className='flex flex-col md:flex-row gap-4'>
@@ -514,44 +509,7 @@ export default function CustomerMyDocument() {
                 />
               </div>
 
-              {/* View Mode */}
-              <div className='flex items-center gap-2 bg-gray-100 rounded-xl p-1'>
-                <button
-                  onClick={() => setViewMode('grid')}
-                  className={`p-2 rounded-lg transition-all duration-200 ${
-                    viewMode === 'grid'
-                      ? 'bg-white shadow-sm text-blue-600'
-                      : 'text-gray-600 hover:text-gray-900'
-                  }`}
-                >
-                  <Grid3X3 className='w-4 h-4' />
-                </button>
-                <button
-                  onClick={() => setViewMode('list')}
-                  className={`p-2 rounded-lg transition-all duration-200 ${
-                    viewMode === 'list'
-                      ? 'bg-white shadow-sm text-blue-600'
-                      : 'text-gray-600 hover:text-gray-900'
-                  }`}
-                >
-                  <List className='w-4 h-4' />
-                </button>
-              </div>
-
-              {/* Sort */}
-              <select
-                value={sortBy}
-                onChange={(e) => setSortBy(e.target.value)}
-                className='px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200'
-              >
-                <option value='newest'>Mới nhất</option>
-                <option value='oldest'>Cũ nhất</option>
-                <option value='name'>Tên A-Z</option>
-                <option value='downloads'>Lượt tải cao</option>
-                <option value='rating'>Đánh giá cao</option>
-              </select>
-
-              {/* Filter by status (for shared documents) */}
+              {/* Filter by status (only for shared tab) */}
               {activeTab === 'shared' && (
                 <select
                   value={filterStatus}
@@ -568,23 +526,24 @@ export default function CustomerMyDocument() {
           </div>
         </div>
 
-        {/* Documents Grid/List */}
+        {/* Documents Grid */}
         <div className='min-h-[400px]'>
+          {/* Results Count */}
+          <div className='mb-6 flex items-center justify-between'>
+            <p className='text-gray-600'>
+              Hiển thị {filteredDocuments.length} tài liệu
+            </p>
+          </div>
+
           {filteredDocuments.length === 0 ? (
             <div className='bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg border border-white/20'>
               <EmptyState type={activeTab} />
             </div>
           ) : (
-            <div
-              className={`grid gap-6 ${
-                viewMode === 'grid'
-                  ? 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3'
-                  : 'grid-cols-1'
-              }`}
-            >
+            <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6'>
               {filteredDocuments.map((document) => (
                 <DocumentCard
-                  key={document.id}
+                  key={document._id}
                   document={document}
                   type={activeTab}
                 />
@@ -592,15 +551,6 @@ export default function CustomerMyDocument() {
             </div>
           )}
         </div>
-
-        {/* Load More */}
-        {filteredDocuments.length > 0 && (
-          <div className='text-center mt-8'>
-            <button className='px-8 py-3 bg-white/80 backdrop-blur-sm border border-gray-200 text-gray-700 rounded-xl hover:bg-white hover:shadow-lg transition-all duration-300 font-medium'>
-              Xem thêm tài liệu
-            </button>
-          </div>
-        )}
       </div>
     </div>
   );

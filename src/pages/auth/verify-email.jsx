@@ -7,6 +7,9 @@ import authServices from '../../services/authServices';
 import interestServices from '../../services/interestServices';
 import { Loader2 } from 'lucide-react';
 import useAuthStore from '../../stores/useAuthStore';
+import { USER_ROLE } from '../../constants';
+
+const { CUSTOMER, SELLER } = USER_ROLE;
 
 function VerifyEmail() {
   const [isLoading, setIsLoading] = useState(false);
@@ -29,10 +32,12 @@ function VerifyEmail() {
     });
     if (result.status === true) {
       toast.success(result.message);
-      if (result.data.needSetInterests) {
+      if (result.data.needSetInterests && result.data.user.role === CUSTOMER) {
         setTimeout(() => {
           setShowInterestModal(true);
         }, 1000);
+      } else if (result.data.user.role === SELLER) {
+        navigate('/login');
       }
     } else {
       toast.error(result.message);
@@ -55,7 +60,7 @@ function VerifyEmail() {
       if (res.status === true) {
         toast.success(res.message);
         const response = await initUserData(res);
-        if (response.status === true) {
+        if (response.status === true && res.data.user.role === CUSTOMER) {
           navigate('/customer');
         } else {
           toast.error(response.message);

@@ -19,8 +19,16 @@ function Login() {
     e.preventDefault();
     const result = await login(form);
     if (result.status === true) {
-      toast.success('Login successfully');
-      navigate('/profile');
+      toast.success('Đăng nhập thành công');
+      if (result.user.role === 'CUSTOMER') {
+        navigate('/customer');
+      } else if (result.user.role === 'ADMIN') {
+        navigate('/admin');
+      } else if (result.user.role === 'MANAGER') {
+        navigate('/manager');
+      } else if (result.user.role === 'SELLER') {
+        navigate('/seller');
+      }
     } else {
       if (result.statusCode === 403) {
         toast.error(result.message);
@@ -56,9 +64,9 @@ function Login() {
               </Link>
               <div></div>
             </div>
-            <h2 className='text-2xl font-semibold'>Welcome Back!</h2>
+            <h2 className='text-2xl font-semibold'>Chào mừng trở lại !</h2>
             <p className='text-base-content/70'>
-              Sign in to continue to your account.
+              Đăng nhập để tiếp tục sử dụng hệ thống
             </p>
           </div>
 
@@ -85,7 +93,7 @@ function Login() {
                 to='/forgot-password'
                 className='text-sm text-gray-500 hover:text-gray-700 font-semibold'
               >
-                Forgot password?
+                Quên mật khẩu?
               </Link>
             </div>
             <div className='form-control mt-5 '>
@@ -99,15 +107,15 @@ function Login() {
                 ) : (
                   <LogInIcon className='w-5 h-5 mr-2' />
                 )}
-                {isLoading ? '' : 'Login'}
+                {isLoading ? '' : 'Đăng nhập'}
               </button>
             </div>
           </form>
 
           <div className='mt-8 text-center text-md font-semibold'>
-            Don&apos;t have an account?{' '}
+            Chưa có tài khoản?{' '}
             <Link to='/register' className='link link-primary font-semibold'>
-              Sign Up
+              Đăng ký
             </Link>
           </div>
         </div>

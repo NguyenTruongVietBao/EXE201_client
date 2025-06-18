@@ -22,13 +22,21 @@ import AdminDashboard from '../pages/admin/dashboard';
 import CustomerDocuments from '../pages/customer/documents';
 import CustomerStudyPlan from '../pages/customer/study-plan';
 import CustomerGroupChat from '../pages/customer/group-chat';
-import SellerMyCourse from '../pages/seller/my-course';
+import SellerMyDocuments from '../pages/seller/my-documents';
 import SellerBilling from '../pages/seller/billing';
 import ManagerDocuments from '../pages/manager/documents';
 import ManagerRevenue from '../pages/manager/revenue';
 import CustomerMyDocument from '../pages/customer/my-document';
-import SellerUploadDocument from '../pages/seller/upload-document';
+import SellerCreateDocument from '../pages/seller/create-document';
 import CustomerPartner from '../pages/customer/partner';
+import SellerHome from '../pages/seller/home';
+import CustomerDocumentDetail from '../pages/customer/document-detail';
+import CustomerDocumentsAuthor from '../pages/customer/documents-author';
+import ManagerDocumentDetail from '../pages/manager/document-detail';
+import AdminUsers from '../pages/admin/users';
+import PaymentProcess from '../pages/customer/payment-process';
+import Chat from '../pages/customer/chat';
+import ChatGroup from '../pages/customer/chat-group';
 
 const { ADMIN, CUSTOMER, SELLER, MANAGER } = USER_ROLE;
 
@@ -49,6 +57,10 @@ const router = createBrowserRouter([
       {
         path: 'contact',
         element: <ContactPage />,
+      },
+      {
+        path: 'payment-process',
+        element: <PaymentProcess />,
       },
     ],
   },
@@ -160,10 +172,18 @@ const router = createBrowserRouter([
         ),
       },
       {
-        path: 'upload-document',
+        path: 'documents/:id',
         element: (
           <ProtectedRoute requiredRoles={[CUSTOMER]}>
-            <SellerUploadDocument />
+            <CustomerDocumentDetail />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: 'documents/author/:id',
+        element: (
+          <ProtectedRoute requiredRoles={[CUSTOMER]}>
+            <CustomerDocumentsAuthor />
           </ProtectedRoute>
         ),
       },
@@ -175,6 +195,10 @@ const router = createBrowserRouter([
           </ProtectedRoute>
         ),
       },
+      {
+        path: 'chat',
+        element: <Chat />,
+      },
     ],
   },
   //Admin Routes
@@ -183,10 +207,18 @@ const router = createBrowserRouter([
     element: <App />,
     children: [
       {
-        path: 'dashboard',
+        path: '',
         element: (
           <ProtectedRoute requiredRoles={[ADMIN]}>
             <AdminDashboard />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: 'users',
+        element: (
+          <ProtectedRoute requiredRoles={[ADMIN]}>
+            <AdminUsers />
           </ProtectedRoute>
         ),
       },
@@ -198,7 +230,7 @@ const router = createBrowserRouter([
     element: <App />,
     children: [
       {
-        path: 'dashboard',
+        path: '',
         element: (
           <ProtectedRoute requiredRoles={[MANAGER]}>
             <ManagerDashboard />
@@ -210,6 +242,14 @@ const router = createBrowserRouter([
         element: (
           <ProtectedRoute requiredRoles={[MANAGER]}>
             <ManagerDocuments />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: 'documents/:id',
+        element: (
+          <ProtectedRoute requiredRoles={[MANAGER]}>
+            <ManagerDocumentDetail />
           </ProtectedRoute>
         ),
       },
@@ -229,10 +269,18 @@ const router = createBrowserRouter([
     element: <App />,
     children: [
       {
-        path: 'my-course',
+        path: '',
         element: (
           <ProtectedRoute requiredRoles={[SELLER]}>
-            <SellerMyCourse />
+            <SellerHome />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: 'my-documents',
+        element: (
+          <ProtectedRoute requiredRoles={[SELLER]}>
+            <SellerMyDocuments />
           </ProtectedRoute>
         ),
       },
@@ -245,10 +293,10 @@ const router = createBrowserRouter([
         ),
       },
       {
-        path: 'upload-document',
+        path: 'create-documents',
         element: (
           <ProtectedRoute requiredRoles={[SELLER]}>
-            <SellerUploadDocument />
+            <SellerCreateDocument />
           </ProtectedRoute>
         ),
       },

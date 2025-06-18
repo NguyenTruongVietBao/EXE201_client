@@ -13,6 +13,7 @@ import {
   Video,
   Play,
   Loader2,
+  Clock,
 } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
 import interestServices from '../../../services/interestServices';
@@ -27,16 +28,17 @@ export default function CreateDocModel() {
       'Khóa học này giúp bạn học nâng cao hơn và có thể tự tin hơn trong cuộc sống',
     interests: [],
     price: 0,
+    duration: '',
     discount: 0,
     thumbnailFiles: [],
     documentFiles: [],
     videoFiles: [],
+    isFree: true,
   });
   const [allInterests, setAllInterests] = useState([]);
   const [showTagDropdown, setShowTagDropdown] = useState(false);
   const [dragActive, setDragActive] = useState(false);
   const [docDragActive, setDocDragActive] = useState(false);
-  const [videoDragActive, setVideoDragActive] = useState(false);
 
   const allowedDocTypes = {
     'application/pdf': '.pdf',
@@ -78,8 +80,9 @@ export default function CreateDocModel() {
       formData.append('title', documentData.title);
       formData.append('description', documentData.description);
       formData.append('price', documentData.price);
+      formData.append('duration', documentData.duration);
       formData.append('discount', documentData.discount);
-      formData.append('isPublic', false); // Tài liệu miễn phí
+      formData.append('isFree', true);
 
       // Append interests array
       const interestIds = documentData.interests.map(
@@ -107,8 +110,6 @@ export default function CreateDocModel() {
           formData.append('videoUrls', file);
         });
       }
-
-      console.log('FormData to Submit:', formData);
 
       const response = await documentServices.createDocument(formData);
       console.log('Response:', response);
@@ -209,31 +210,6 @@ export default function CreateDocModel() {
     }
   };
 
-  const handleVideoUpload = (files) => {
-    const validFiles = [];
-    const fileArray = Array.from(files);
-
-    fileArray.forEach((file) => {
-      if (file && file.type.startsWith('video/')) {
-        // Check file size (max 500MB for videos)
-        if (file.size > 500 * 1024 * 1024) {
-          alert(`Video ${file.name} quá lớn. Kích thước tối đa là 500MB`);
-          return;
-        }
-        validFiles.push(file);
-      } else {
-        alert(`${file.name} không phải là file video hợp lệ`);
-      }
-    });
-
-    if (validFiles.length > 0) {
-      setDocumentData({
-        ...documentData,
-        videoFiles: [...documentData.videoFiles, ...validFiles],
-      });
-    }
-  };
-
   const handleThumbnailDrop = (e) => {
     e.preventDefault();
     setDragActive(false);
@@ -246,13 +222,6 @@ export default function CreateDocModel() {
     setDocDragActive(false);
     const files = e.dataTransfer.files;
     handleDocumentUpload(files);
-  };
-
-  const handleVideoDrop = (e) => {
-    e.preventDefault();
-    setVideoDragActive(false);
-    const files = e.dataTransfer.files;
-    handleVideoUpload(files);
   };
 
   const handleThumbnailDragOver = (e) => {
@@ -273,16 +242,6 @@ export default function CreateDocModel() {
   const handleDocumentDragLeave = (e) => {
     e.preventDefault();
     setDocDragActive(false);
-  };
-
-  const handleVideoDragOver = (e) => {
-    e.preventDefault();
-    setVideoDragActive(true);
-  };
-
-  const handleVideoDragLeave = (e) => {
-    e.preventDefault();
-    setVideoDragActive(false);
   };
 
   const handleTagToggle = (interest) => {
@@ -329,15 +288,6 @@ export default function CreateDocModel() {
     });
   };
 
-  const removeVideo = (indexToRemove) => {
-    setDocumentData({
-      ...documentData,
-      videoFiles: documentData.videoFiles.filter(
-        (_, index) => index !== indexToRemove
-      ),
-    });
-  };
-
   const formatFileSize = (bytes) => {
     if (bytes === 0) return '0 Bytes';
     const k = 1024;
@@ -364,7 +314,7 @@ export default function CreateDocModel() {
         className='px-6 py-3 rounded-xl font-semibold transition-all duration-300 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white shadow-lg hover:shadow-xl transform hover:scale-105 flex items-center gap-2 cursor-pointer'
       >
         <BookOpenIcon className='w-5 h-5' />
-        Tải tài liệu
+        Chia sẻ tài liệu
       </button>
 
       <dialog id='create_modal' className='modal backdrop-blur-sm'>
@@ -374,7 +324,7 @@ export default function CreateDocModel() {
             <div>
               <h3 className='text-2xl font-bold text-gray-900 flex items-center gap-2'>
                 <BookOpenIcon className='w-6 h-6 text-blue-600' />
-                Tải tài liệu
+                Chia sẻ tài liệu
               </h3>
               <p className='text-gray-600 mt-1'>
                 Help others learn by sharing your knowledge for free
@@ -395,7 +345,7 @@ export default function CreateDocModel() {
               <div className='space-y-6'>
                 {/* Document Name */}
                 <div>
-                  <label className='block text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2'>
+                  <label className='text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2'>
                     <FileText className='w-4 h-4' />
                     Tiêu đề tài liệu *
                   </label>
@@ -409,10 +359,25 @@ export default function CreateDocModel() {
                     required
                   />
                 </div>
-
+                {/* Duration */}
+                <div>
+                  <label className='text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2'>
+                    <Clock className='w-4 h-4' />
+                    Thời lượng học *
+                  </label>
+                  <input
+                    type='text'
+                    name='duration'
+                    value={documentData.duration}
+                    onChange={handleChange}
+                    placeholder='Nhập thời lượng học...'
+                    className='w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200'
+                    required
+                  />
+                </div>
                 {/* Description */}
                 <div>
-                  <label className='block text-sm font-semibold text-gray-700 mb-2'>
+                  <label className='text-sm font-semibold text-gray-700 mb-2'>
                     Mô tả chi tiết *
                   </label>
                   <textarea
@@ -527,6 +492,67 @@ export default function CreateDocModel() {
 
               {/* Right Column */}
               <div className='space-y-6'>
+                {/* Image Upload */}
+                <div>
+                  <label className='text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2'>
+                    <Image className='w-4 h-4' />
+                    Hình ảnh ({documentData.thumbnailFiles.length} images)
+                  </label>
+
+                  {/* Image Preview Grid */}
+                  {documentData.thumbnailFiles.length > 0 && (
+                    <div className='mb-4 grid grid-cols-2 gap-2 max-h-40 overflow-y-auto'>
+                      {documentData.thumbnailFiles.map((file, index) => (
+                        <div key={index} className='relative group'>
+                          <img
+                            src={URL.createObjectURL(file)}
+                            alt={`Preview ${index + 1}`}
+                            className='w-full h-20 object-cover rounded-lg'
+                          />
+                          <button
+                            type='button'
+                            onClick={() => removeThumbnail(index)}
+                            className='absolute top-1 right-1 p-1 bg-red-500 text-white rounded-full hover:bg-red-600 transition-colors duration-200 opacity-0 group-hover:opacity-100'
+                          >
+                            <X className='w-3 h-3' />
+                          </button>
+                          <div className='absolute bottom-1 left-1 px-1 py-0.5 bg-black/50 text-white text-xs rounded'>
+                            {formatFileSize(file.size)}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+
+                  <div
+                    className={`relative border-2 border-dashed rounded-xl transition-all duration-200 ${
+                      dragActive
+                        ? 'border-blue-500 bg-blue-50'
+                        : 'border-gray-300 hover:border-gray-400'
+                    }`}
+                    onDrop={handleThumbnailDrop}
+                    onDragOver={handleThumbnailDragOver}
+                    onDragLeave={handleThumbnailDragLeave}
+                  >
+                    <label className='flex flex-col items-center justify-center h-32 cursor-pointer'>
+                      <Upload className='w-8 h-8 text-gray-400 mb-2' />
+                      <span className='text-sm text-gray-600 mb-1'>
+                        Thả nhiều hình ảnh vào đây hoặc nhấn để tải lên
+                      </span>
+                      <span className='text-xs text-gray-400'>
+                        PNG, JPG, GIF, WEBP up to 5MB each
+                      </span>
+                      <input
+                        type='file'
+                        accept='image/*'
+                        multiple
+                        onChange={(e) => handleThumbnailUpload(e.target.files)}
+                        className='hidden'
+                      />
+                    </label>
+                  </div>
+                </div>
+
                 {/* Document Files Upload */}
                 <div>
                   <label className='block text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2'>
@@ -591,135 +617,6 @@ export default function CreateDocModel() {
                         onChange={(e) => handleDocumentUpload(e.target.files)}
                         className='hidden'
                         required={documentData.documentFiles.length === 0}
-                      />
-                    </label>
-                  </div>
-                </div>
-
-                {/* Video Upload */}
-                <div>
-                  <label className='block text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2'>
-                    <Video className='w-4 h-4' />
-                    Video Files ({documentData.videoFiles.length} files)
-                  </label>
-
-                  {/* Video File List */}
-                  {documentData.videoFiles.length > 0 && (
-                    <div className='mb-4 max-h-32 overflow-y-auto space-y-2'>
-                      {documentData.videoFiles.map((file, index) => (
-                        <div
-                          key={index}
-                          className='flex items-center gap-3 p-2 bg-purple-50 rounded-lg border border-purple-200'
-                        >
-                          <div className='flex items-center justify-center w-10 h-10 bg-purple-100 rounded-lg'>
-                            <Play className='w-5 h-5 text-purple-600' />
-                          </div>
-                          <div className='flex-1 min-w-0'>
-                            <p className='font-medium text-gray-900 truncate text-sm'>
-                              {file.name}
-                            </p>
-                            <p className='text-xs text-gray-500'>
-                              {formatFileSize(file.size)}
-                            </p>
-                          </div>
-                          <button
-                            type='button'
-                            onClick={() => removeVideo(index)}
-                            className='p-1 hover:bg-red-100 rounded-full transition-colors duration-200'
-                          >
-                            <X className='w-3 h-3 text-red-500' />
-                          </button>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-
-                  <div
-                    className={`relative border-2 border-dashed rounded-xl transition-all duration-200 ${
-                      videoDragActive
-                        ? 'border-purple-500 bg-purple-50'
-                        : 'border-gray-300 hover:border-gray-400'
-                    }`}
-                    onDrop={handleVideoDrop}
-                    onDragOver={handleVideoDragOver}
-                    onDragLeave={handleVideoDragLeave}
-                  >
-                    <label className='flex flex-col items-center justify-center h-28 cursor-pointer p-4'>
-                      <Video className='w-8 h-8 text-gray-400 mb-2' />
-                      <span className='text-sm text-gray-600 mb-1 text-center'>
-                        Thả nhiều video vào đây hoặc nhấn để tải lên
-                      </span>
-                      <span className='text-xs text-gray-400 text-center'>
-                        MP4, AVI, MOV, WEBM, OGV (Max 500MB each)
-                      </span>
-                      <input
-                        type='file'
-                        accept='video/*'
-                        multiple
-                        onChange={(e) => handleVideoUpload(e.target.files)}
-                        className='hidden'
-                      />
-                    </label>
-                  </div>
-                </div>
-
-                {/* Image Upload */}
-                <div>
-                  <label className='block text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2'>
-                    <Image className='w-4 h-4' />
-                    Hình ảnh minh họa ({documentData.thumbnailFiles.length}{' '}
-                    images)
-                  </label>
-
-                  {/* Image Preview Grid */}
-                  {documentData.thumbnailFiles.length > 0 && (
-                    <div className='mb-4 grid grid-cols-2 gap-2 max-h-40 overflow-y-auto'>
-                      {documentData.thumbnailFiles.map((file, index) => (
-                        <div key={index} className='relative group'>
-                          <img
-                            src={URL.createObjectURL(file)}
-                            alt={`Preview ${index + 1}`}
-                            className='w-full h-20 object-cover rounded-lg'
-                          />
-                          <button
-                            type='button'
-                            onClick={() => removeThumbnail(index)}
-                            className='absolute top-1 right-1 p-1 bg-red-500 text-white rounded-full hover:bg-red-600 transition-colors duration-200 opacity-0 group-hover:opacity-100'
-                          >
-                            <X className='w-3 h-3' />
-                          </button>
-                          <div className='absolute bottom-1 left-1 px-1 py-0.5 bg-black/50 text-white text-xs rounded'>
-                            {formatFileSize(file.size)}
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-
-                  <div
-                    className={`relative border-2 border-dashed rounded-xl transition-all duration-200 ${
-                      dragActive
-                        ? 'border-blue-500 bg-blue-50'
-                        : 'border-gray-300 hover:border-gray-400'
-                    }`}
-                    onDrop={handleThumbnailDrop}
-                    onDragOver={handleThumbnailDragOver}
-                    onDragLeave={handleThumbnailDragLeave}
-                  >
-                    <label className='flex flex-col items-center justify-center h-32 cursor-pointer'>
-                      <Upload className='w-8 h-8 text-gray-400 mb-2' />
-                      <span className='text-sm text-gray-600 mb-1'>
-                        Thả nhiều hình ảnh vào đây hoặc nhấn để tải lên
-                      </span>
-                      <span className='text-xs text-gray-400'>
-                        PNG, JPG, GIF, WEBP up to 5MB each
-                      </span>
-                      <input
-                        type='file'
-                        accept='image/*'
-                        multiple
-                        onChange={(e) => handleThumbnailUpload(e.target.files)}
-                        className='hidden'
                       />
                     </label>
                   </div>

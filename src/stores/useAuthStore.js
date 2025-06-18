@@ -2,7 +2,6 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import authServices from '../services/authServices';
 import envConfig from '../configs/envConfig';
-import interestServices from '../services/interestServices';
 
 const AUTH_STORE_KEY = envConfig.AUTH_STORE_KEY;
 const ACCESS_TOKEN_KEY = envConfig.ACCESS_TOKEN_KEY;
@@ -27,15 +26,14 @@ const useAuthStore = create(
 
           const response = await authServices.login(credentials);
           const { status, message, statusCode, data } = response;
-          if (status === true) {
+          if (status && data) {
             localStorage.setItem(ACCESS_TOKEN_KEY, data.accessToken);
-            const userInterests = await interestServices.getUserInterests();
             const { user, accessToken } = data;
             set({
               user,
               accessToken,
               isAuthenticated: true,
-              userInterests: userInterests.data,
+              userInterests: user.interest,
             });
             return { status, message, statusCode, data };
           } else {

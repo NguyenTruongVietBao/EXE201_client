@@ -1,3 +1,4 @@
+import axios from 'axios';
 import axiosInstance from '../configs/axios';
 
 const authServices = {
@@ -47,6 +48,15 @@ const authServices = {
         `/auth/resendemailverification?email=${data.email}`
       );
       return response;
+    } catch (error) {
+      return error;
+    }
+  },
+  // Get banks info
+  getBanksInfo: async () => {
+    try {
+      const response = await axios.get(`https://api.vietqr.io/v2/banks`);
+      return response.data;
     } catch (error) {
       return error;
     }

@@ -1,6 +1,6 @@
 import React from 'react';
 import useAuthStore from '../../stores/useAuthStore';
-import { LogOut, User, Lock, BookOpen } from 'lucide-react';
+import { LogOut, User, Lock, BookOpen, LayoutDashboard } from 'lucide-react';
 import { Link, useNavigate } from 'react-router';
 import { USER_ROLE } from '../../constants';
 
@@ -14,14 +14,14 @@ export default function HeaderAvatar({ className }) {
   const customerLinks = [
     {
       href: '/customer/my-documents',
-      label: 'My Documents',
+      label: 'Tài liệu của tôi',
       icon: <BookOpen size={16} />,
     },
   ];
   const sellerLinks = [
     {
       href: '/seller/my-documents',
-      label: 'My Documents',
+      label: 'Tài liệu của tôi',
       icon: <BookOpen size={16} />,
     },
     { href: '/seller/billing', label: 'Billing', icon: <BookOpen size={16} /> },
@@ -29,14 +29,13 @@ export default function HeaderAvatar({ className }) {
 
   const managerLinks = [
     {
-      href: '/manager/dashboard',
-      label: 'Dashboard',
-      icon: <BookOpen size={16} />,
+      href: '/manager',
+      label: 'Bảng điều khiển',
+      icon: <LayoutDashboard size={16} />,
     },
-    { href: '/manager/users', label: 'Users', icon: <BookOpen size={16} /> },
     {
       href: '/manager/documents',
-      label: 'Documents',
+      label: 'Tài liệu',
       icon: <BookOpen size={16} />,
     },
   ];
@@ -44,13 +43,13 @@ export default function HeaderAvatar({ className }) {
   const adminLinks = [
     {
       href: '/admin/dashboard',
-      label: 'Dashboard',
-      icon: <BookOpen size={16} />,
+      label: 'Bảng điều khiển',
+      icon: <LayoutDashboard size={16} />,
     },
-    { href: '/admin/users', label: 'Users', icon: <BookOpen size={16} /> },
+    { href: '/admin/users', label: 'Người dùng', icon: <BookOpen size={16} /> },
     {
       href: '/admin/documents',
-      label: 'Documents',
+      label: 'Tài liệu',
       icon: <BookOpen size={16} />,
     },
   ];
@@ -96,7 +95,7 @@ export default function HeaderAvatar({ className }) {
             <span>
               <User size={16} />
             </span>
-            Profile
+            Hồ sơ
           </Link>
         </li>
         {navLinks.map((link) => (
@@ -118,7 +117,7 @@ export default function HeaderAvatar({ className }) {
             <span>
               <Lock size={16} />
             </span>
-            Change Password
+            Thay đổi mật khẩu
           </Link>
         </li>
 
@@ -130,7 +129,7 @@ export default function HeaderAvatar({ className }) {
             <span>
               <LogOut size={16} className='mr-1' />
             </span>
-            Logout
+            Đăng xuất
           </button>
         </li>
       </ul>

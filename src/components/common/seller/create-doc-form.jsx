@@ -1,6 +1,5 @@
 import {
   Upload,
-  Star,
   X,
   Tag,
   FileText,
@@ -10,62 +9,37 @@ import {
   DollarSign,
   Percent,
   Video,
-  Shield,
-  Clock,
-  Truck,
   Save,
   ArrowLeft,
+  Loader2,
 } from 'lucide-react';
-import React, { useState } from 'react';
-import { INTERESTS } from '../../../constants';
+import React, { useState, useEffect } from 'react';
+import interestServices from '../../../services/interestServices';
+import documentServices from '../../../services/documentServices';
+import toast from 'react-hot-toast';
+import { useNavigate } from 'react-router';
 
 export default function CreateDocForm({ onCancel, onSubmit }) {
+  const [isLoading, setIsLoading] = useState(false);
+  const navigate = useNavigate();
   const [documentData, setDocumentData] = useState({
-    name: '',
-    description: '',
-    category: '',
-    rating: 0,
-    tags: [],
-    level: '',
-    duration: '',
+    title: `Seller's Document A`,
+    description:
+      'Tài liệu này cung cấp kiến thức chuyên sâu, dễ hiểu, được biên soạn kỹ lưỡng và cập nhật theo xu hướng mới nhất.',
+    interests: [],
+    price: 0,
+    discount: 0,
     thumbnailFiles: [],
     documentFiles: [],
-    videoFile: null,
-    price: '',
-    originalPrice: '',
-    discount: '',
-    license: '',
-    previewPages: '',
-    deliveryMethod: '',
-    returnPolicy: '',
-    commission: '',
+    isFree: false,
+    duration: '',
+    videoFiles: [],
   });
-
-  const [hoveredStar, setHoveredStar] = useState(0);
+  const [allInterests, setAllInterests] = useState([]);
   const [showTagDropdown, setShowTagDropdown] = useState(false);
   const [dragActive, setDragActive] = useState(false);
   const [docDragActive, setDocDragActive] = useState(false);
   const [videoDragActive, setVideoDragActive] = useState(false);
-
-  const levels = ['Beginner', 'Intermediate', 'Advanced'];
-  const licenses = [
-    'Standard License - Personal Use',
-    'Extended License - Commercial Use',
-    'Educational License - Academic Use',
-    'Full Rights - Resale Allowed',
-  ];
-  const deliveryMethods = [
-    'Instant Download',
-    'Email Delivery',
-    'Cloud Storage Link',
-    'Physical Mail',
-  ];
-  const returnPolicies = [
-    '7 Days Money Back',
-    '14 Days Money Back',
-    '30 Days Money Back',
-    'No Refund',
-  ];
 
   const allowedDocTypes = {
     'application/pdf': '.pdf',
@@ -83,45 +57,101 @@ export default function CreateDocForm({ onCancel, onSubmit }) {
     'application/x-7z-compressed': '.7z',
   };
 
-  const allowedVideoTypes = {
-    'video/mp4': '.mp4',
-    'video/avi': '.avi',
-    'video/mov': '.mov',
-    'video/wmv': '.wmv',
-    'video/webm': '.webm',
-  };
+  useEffect(() => {
+    const fetchAllInterests = async () => {
+      const response = await interestServices.getAllInterests();
+      setAllInterests(response.data);
+    };
+    fetchAllInterests();
+  }, []);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log('Document Data:', documentData);
-    // Call parent's onSubmit function if provided
-    if (onSubmit) {
-      onSubmit(documentData);
+    if (documentData.interests.length === 0) {
+      toast.error('Vui lòng chọn ít nhất một danh mục cho tài liệu');
+      return;
+    }
+
+    try {
+      setIsLoading(true);
+      // Tạo FormData để gửi files
+      const formData = new FormData();
+
+      // Append text data
+      formData.append('title', documentData.title);
+      formData.append('description', documentData.description);
+      formData.append('price', documentData.price);
+      formData.append('discount', documentData.discount);
+      formData.append('isFree', false);
+      formData.append('duration', documentData.duration);
+
+      // Append interests array
+      const interestIds = documentData.interests.map(
+        (interest) => interest._id
+      );
+      formData.append('interests', JSON.stringify(interestIds));
+
+      // Append image files (thumbnailFiles -> imageUrls)
+      if (documentData.thumbnailFiles.length > 0) {
+        documentData.thumbnailFiles.forEach((file) => {
+          formData.append('imageUrls', file);
+        });
+      }
+
+      // Append document files (documentFiles -> documentUrls)
+      if (documentData.documentFiles.length > 0) {
+        documentData.documentFiles.forEach((file) => {
+          formData.append('documentUrls', file);
+        });
+      }
+
+      // Append video files (videoFiles -> videoUrls)
+      if (documentData.videoFiles.length > 0) {
+        documentData.videoFiles.forEach((file) => {
+          formData.append('videoUrls', file);
+        });
+      }
+
+      // Set default commission
+      formData.append('commission', '15');
+
+      console.log('FormData to Submit:', formData);
+
+      const response = await documentServices.createDocument(formData);
+      console.log('Response:', response);
+
+      if (response.statusCode === 201) {
+        toast.success('Tạo tài liệu thành công');
+        if (onSubmit) {
+          onSubmit(documentData);
+        }
+        navigate('/seller/my-documents');
+      } else {
+        toast.error(response.message || 'Tạo tài liệu thất bại');
+      }
+    } catch (error) {
+      console.error('Error creating document:', error);
+      toast.error('Có lỗi xảy ra khi tạo tài liệu');
+    } finally {
+      setIsLoading(false);
     }
   };
 
   const handleCancel = () => {
     // Reset form data
     setDocumentData({
-      name: '',
-      description: '',
-      category: '',
-      rating: 0,
-      tags: [],
-      level: '',
-      duration: '',
+      title: '',
+      description:
+        'Khóa học này giúp bạn học nâng cao hơn và có thể tự tin hơn trong cuộc sống',
+      interests: [],
+      price: 0,
+      discount: 0,
       thumbnailFiles: [],
       documentFiles: [],
-      videoFile: null,
-      price: '',
-      originalPrice: '',
-      discount: '',
-      license: '',
-      previewPages: '',
-
-      commission: '',
+      isFree: false,
+      duration: '',
+      videoFiles: [],
     });
-    setHoveredStar(0);
     setShowTagDropdown(false);
 
     // Call parent's onCancel function if provided
@@ -197,18 +227,28 @@ export default function CreateDocForm({ onCancel, onSubmit }) {
     }
   };
 
-  const handleVideoUpload = (file) => {
-    if (file && allowedVideoTypes[file.type]) {
-      if (file.size > 200 * 1024 * 1024) {
-        alert('Video file is too large. Max size is 200MB');
-        return;
+  const handleVideoUpload = (files) => {
+    const validFiles = [];
+    const fileArray = Array.from(files);
+
+    fileArray.forEach((file) => {
+      if (file && file.type.startsWith('video/')) {
+        // Check file size (max 500MB for videos)
+        if (file.size > 500 * 1024 * 1024) {
+          alert(`Video ${file.name} quá lớn. Kích thước tối đa là 500MB`);
+          return;
+        }
+        validFiles.push(file);
+      } else {
+        alert(`${file.name} không phải là file video hợp lệ`);
       }
+    });
+
+    if (validFiles.length > 0) {
       setDocumentData({
         ...documentData,
-        videoFile: file,
+        videoFiles: [...documentData.videoFiles, ...validFiles],
       });
-    } else {
-      alert('Please upload a valid video file (MP4, AVI, MOV, WMV, WEBM)');
     }
   };
 
@@ -229,8 +269,8 @@ export default function CreateDocForm({ onCancel, onSubmit }) {
   const handleVideoDrop = (e) => {
     e.preventDefault();
     setVideoDragActive(false);
-    const file = e.dataTransfer.files[0];
-    handleVideoUpload(file);
+    const files = e.dataTransfer.files;
+    handleVideoUpload(files);
   };
 
   const handleThumbnailDragOver = (e) => {
@@ -263,29 +303,29 @@ export default function CreateDocForm({ onCancel, onSubmit }) {
     setVideoDragActive(false);
   };
 
-  const handleStarClick = (rating) => {
-    setDocumentData({ ...documentData, rating });
-  };
-
-  const handleTagToggle = (tag) => {
-    const isSelected = documentData.tags.includes(tag.name);
+  const handleTagToggle = (interest) => {
+    const isSelected = documentData.interests.some(
+      (i) => i._id === interest._id
+    );
     if (isSelected) {
       setDocumentData({
         ...documentData,
-        tags: documentData.tags.filter((t) => t !== tag.name),
+        interests: documentData.interests.filter((i) => i._id !== interest._id),
       });
     } else {
       setDocumentData({
         ...documentData,
-        tags: [...documentData.tags, tag.name],
+        interests: [...documentData.interests, interest],
       });
     }
   };
 
-  const removeTag = (tagToRemove) => {
+  const removeTag = (interestToRemove) => {
     setDocumentData({
       ...documentData,
-      tags: documentData.tags.filter((tag) => tag !== tagToRemove),
+      interests: documentData.interests.filter(
+        (interest) => interest._id !== interestToRemove._id
+      ),
     });
   };
 
@@ -302,6 +342,15 @@ export default function CreateDocForm({ onCancel, onSubmit }) {
     setDocumentData({
       ...documentData,
       documentFiles: documentData.documentFiles.filter(
+        (_, index) => index !== indexToRemove
+      ),
+    });
+  };
+
+  const removeVideo = (indexToRemove) => {
+    setDocumentData({
+      ...documentData,
+      videoFiles: documentData.videoFiles.filter(
         (_, index) => index !== indexToRemove
       ),
     });
@@ -324,12 +373,6 @@ export default function CreateDocForm({ onCancel, onSubmit }) {
     if (fileName.endsWith('.rar')) return '📦';
     if (fileName.endsWith('.7z')) return '📦';
     return '📋';
-  };
-
-  const calculateSalePrice = () => {
-    const original = parseFloat(documentData.originalPrice) || 0;
-    const discount = parseFloat(documentData.discount) || 0;
-    return original - (original * discount) / 100;
   };
 
   return (
@@ -361,279 +404,214 @@ export default function CreateDocForm({ onCancel, onSubmit }) {
       {/* Form */}
       <form onSubmit={handleSubmit} className='space-y-8'>
         {/* Basic Information */}
-        <div className='bg-gray-50 rounded-2xl p-6'>
-          <h4 className='text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2'>
-            <FileText className='w-5 h-5 text-blue-600' />
-            Basic Information
-          </h4>
+        <div className='space-y-6'>
+          <div className='grid grid-cols-1 lg:grid-cols-2 gap-8'>
+            {/* Left Column */}
+            <div className='space-y-6'>
+              {/* Document Name */}
+              <div>
+                <label className='block text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2'>
+                  <FileText className='w-4 h-4' />
+                  Tiêu đề tài liệu *
+                </label>
+                <input
+                  type='text'
+                  name='title'
+                  value={documentData.title}
+                  onChange={handleChange}
+                  placeholder='Nhập tiêu đề tài liệu...'
+                  className='w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200'
+                  required
+                />
+              </div>
 
-          <div className='grid grid-cols-1 lg:grid-cols-2 gap-6'>
-            {/* Document Name */}
-            <div className='lg:col-span-2'>
-              <label className='block text-sm font-semibold text-gray-700 mb-2'>
-                Document Title *
-              </label>
-              <input
-                type='text'
-                name='name'
-                value={documentData.name}
-                onChange={handleChange}
-                placeholder='Enter document title...'
-                className='w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200'
-                required
-              />
-            </div>
+              {/* Description */}
+              <div>
+                <label className='block text-sm font-semibold text-gray-700 mb-2'>
+                  Mô tả chi tiết *
+                </label>
+                <textarea
+                  name='description'
+                  value={documentData.description}
+                  onChange={handleChange}
+                  placeholder='Mô tả chi tiết tài liệu của bạn bao gồm nội dung, cấp độ (Beginner/Intermediate/Advanced), thời lượng học, và các thông tin khác...'
+                  rows={6}
+                  className='w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 resize-none'
+                  required
+                />
+              </div>
+              {/* Duration */}
+              <div>
+                <label className='block text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2'>
+                  <FileText className='w-4 h-4' />
+                  Thời lượng học *
+                </label>
+                <input
+                  type='text'
+                  name='duration'
+                  value={documentData.duration}
+                  onChange={handleChange}
+                  placeholder='Nhập thời lượng học...'
+                  className='w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200'
+                  required
+                />
+              </div>
+              {/* Interests Selection */}
+              <div>
+                <label className='block text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2'>
+                  <Tag className='w-4 h-4' />
+                  Danh mục *
+                </label>
 
-            {/* Description */}
-            <div className='lg:col-span-2'>
-              <label className='block text-sm font-semibold text-gray-700 mb-2'>
-                Description *
-              </label>
-              <textarea
-                name='description'
-                value={documentData.description}
-                onChange={handleChange}
-                placeholder='Describe your document in detail...'
-                rows={4}
-                className='w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 resize-none'
-                required
-              />
-            </div>
+                {/* Selected interests */}
+                {documentData.interests.length > 0 && (
+                  <div className='flex flex-wrap gap-2 mb-3'>
+                    {documentData.interests.map((interest) => (
+                      <span
+                        key={interest._id}
+                        className='inline-flex items-center gap-1 px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-sm'
+                      >
+                        {interest.emoji} {interest.name}
+                        <button
+                          type='button'
+                          onClick={() => removeTag(interest)}
+                          className='p-0.5 hover:bg-blue-200 rounded-full transition-colors duration-200'
+                        >
+                          <X className='w-3 h-3' />
+                        </button>
+                      </span>
+                    ))}
+                  </div>
+                )}
 
-            {/* Category & Level */}
-            <div>
-              <label className='block text-sm font-semibold text-gray-700 mb-2'>
-                Category *
-              </label>
-              <input
-                type='text'
-                name='category'
-                value={documentData.category}
-                onChange={handleChange}
-                placeholder='e.g., Programming, Math, Science...'
-                className='w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200'
-                required
-              />
-            </div>
-
-            <div>
-              <label className='block text-sm font-semibold text-gray-700 mb-2'>
-                Level *
-              </label>
-              <select
-                name='level'
-                value={documentData.level}
-                onChange={handleChange}
-                className='w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200'
-                required
-              >
-                <option value=''>Select level</option>
-                {levels.map((level) => (
-                  <option key={level} value={level}>
-                    {level}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            {/* Duration & Preview Pages */}
-            <div>
-              <label className='block text-sm font-semibold text-gray-700 mb-2'>
-                Duration
-              </label>
-              <input
-                type='text'
-                name='duration'
-                value={documentData.duration}
-                onChange={handleChange}
-                placeholder='e.g., 2 hours, 30 minutes...'
-                className='w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200'
-              />
-            </div>
-
-            <div>
-              <label className='block text-sm font-semibold text-gray-700 mb-2'>
-                Preview Pages
-              </label>
-              <input
-                type='text'
-                name='previewPages'
-                value={documentData.previewPages}
-                onChange={handleChange}
-                placeholder='e.g., First 5 pages, Table of contents...'
-                className='w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200'
-              />
-            </div>
-
-            {/* Rating */}
-            <div className='lg:col-span-2'>
-              <label className='block text-sm font-semibold text-gray-700 mb-2'>
-                Quality Rating
-              </label>
-              <div className='flex items-center gap-2'>
-                {[1, 2, 3, 4, 5].map((star) => (
+                {/* Tag Dropdown */}
+                <div className='relative'>
                   <button
-                    key={star}
                     type='button'
-                    onClick={() => handleStarClick(star)}
-                    onMouseEnter={() => setHoveredStar(star)}
-                    onMouseLeave={() => setHoveredStar(0)}
-                    className='p-1 transition-transform duration-200 hover:scale-110'
+                    onClick={() => setShowTagDropdown(!showTagDropdown)}
+                    className='w-full px-4 py-3 border border-gray-200 rounded-xl text-left focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 flex items-center justify-between'
                   >
-                    <Star
-                      className={`w-6 h-6 transition-colors duration-200 ${
-                        star <= (hoveredStar || documentData.rating)
-                          ? 'text-yellow-400 fill-current'
-                          : 'text-gray-300'
-                      }`}
-                    />
+                    <span className='text-gray-500'>
+                      {documentData.interests.length > 0
+                        ? `${documentData.interests.length} danh mục đã chọn`
+                        : 'Chọn danh mục...'}
+                    </span>
+                    <Tag className='w-4 h-4 text-gray-400' />
                   </button>
-                ))}
-                <span className='text-sm text-gray-600 ml-2'>
-                  {documentData.rating > 0
-                    ? `${documentData.rating}/5`
-                    : 'Not rated'}
-                </span>
-              </div>
-            </div>
-          </div>
-        </div>
 
-        {/* Pricing Information */}
-        <div className='bg-blue-50 rounded-2xl p-6'>
-          <h4 className='text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2'>
-            <DollarSign className='w-5 h-5 text-blue-600' />
-            Pricing & Sales
-          </h4>
-
-          <div className='grid grid-cols-1 lg:grid-cols-3 gap-6'>
-            {/* Original Price */}
-            <div>
-              <label className='block text-sm font-semibold text-gray-700 mb-2'>
-                Original Price * ($)
-              </label>
-              <input
-                type='number'
-                name='originalPrice'
-                value={documentData.originalPrice}
-                onChange={handleChange}
-                placeholder='99.99'
-                step='0.01'
-                min='0'
-                className='w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200'
-                required
-              />
-            </div>
-
-            {/* Discount */}
-            <div>
-              <label className='block text-sm font-semibold text-gray-700 mb-2 flex items-center gap-1'>
-                <Percent className='w-4 h-4' />
-                Discount (%)
-              </label>
-              <input
-                type='number'
-                name='discount'
-                value={documentData.discount}
-                onChange={handleChange}
-                placeholder='20'
-                min='0'
-                max='99'
-                className='w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200'
-              />
-            </div>
-
-            {/* Sale Price (Calculated) */}
-            <div>
-              <label className='block text-sm font-semibold text-gray-700 mb-2'>
-                Sale Price ($)
-              </label>
-              <div className='w-full px-4 py-3 bg-gray-100 border border-gray-200 rounded-xl text-gray-700 font-semibold'>
-                {documentData.originalPrice
-                  ? `$${calculateSalePrice().toFixed(2)}`
-                  : '$0.00'}
+                  {showTagDropdown && (
+                    <div className='absolute z-10 w-full mt-1 bg-white border border-gray-200 rounded-xl shadow-lg max-h-48 overflow-y-auto'>
+                      {allInterests.length > 0 ? (
+                        allInterests.map((interest) => (
+                          <button
+                            key={interest._id}
+                            type='button'
+                            onClick={() => handleTagToggle(interest)}
+                            className={`w-full px-4 py-2 text-left hover:bg-gray-50 transition-colors duration-200 flex items-center gap-2 ${
+                              documentData.interests.some(
+                                (i) => i._id === interest._id
+                              )
+                                ? 'bg-blue-50 text-blue-700'
+                                : ''
+                            }`}
+                          >
+                            <span>{interest.emoji}</span>
+                            <span>{interest.name}</span>
+                            {documentData.interests.some(
+                              (i) => i._id === interest._id
+                            ) && (
+                              <span className='ml-auto text-blue-500'>✓</span>
+                            )}
+                          </button>
+                        ))
+                      ) : (
+                        <div className='px-4 py-2 text-gray-500 text-center'>
+                          Đang tải danh mục...
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
 
-            {/* Commission */}
-            <div>
-              <label className='block text-sm font-semibold text-gray-700 mb-2'>
-                Platform Commission (%)
-              </label>
-              <select
-                name='commission'
-                value={documentData.commission}
-                onChange={handleChange}
-                className='w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200'
-              >
-                <option value=''>Select commission</option>
-                <option value='15'>15% - Standard</option>
-                <option value='20'>20% - Premium Support</option>
-                <option value='25'>25% - Full Marketing</option>
-              </select>
-            </div>
+            {/* Right Column - Pricing */}
+            <div className='space-y-6'>
+              {/* Pricing Information */}
+              <div className='bg-blue-50 rounded-2xl p-6'>
+                <h4 className='text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2'>
+                  <DollarSign className='w-5 h-5 text-blue-600' />
+                  Pricing & Sales
+                </h4>
 
-            {/* License Type */}
-            <div>
-              <label className='block text-sm font-semibold text-gray-700 mb-2 flex items-center gap-1'>
-                <Shield className='w-4 h-4' />
-                License Type
-              </label>
-              <select
-                name='license'
-                value={documentData.license}
-                onChange={handleChange}
-                className='w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200'
-              >
-                <option value=''>Select license</option>
-                {licenses.map((license) => (
-                  <option key={license} value={license}>
-                    {license}
-                  </option>
-                ))}
-              </select>
-            </div>
+                <div className='space-y-4'>
+                  {/* Price */}
+                  <div>
+                    <label className='block text-sm font-semibold text-gray-700 mb-2'>
+                      Giá (VND) *
+                    </label>
+                    <input
+                      type='number'
+                      name='price'
+                      value={documentData.price}
+                      onChange={handleChange}
+                      placeholder='500000'
+                      className='w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200'
+                      required
+                    />
+                  </div>
 
-            {/* Delivery Method */}
-            <div>
-              <label className='block text-sm font-semibold text-gray-700 mb-2 flex items-center gap-1'>
-                <Truck className='w-4 h-4' />
-                Delivery Method
-              </label>
-              <select
-                name='deliveryMethod'
-                value={documentData.deliveryMethod}
-                onChange={handleChange}
-                className='w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200'
-              >
-                <option value=''>Select delivery</option>
-                {deliveryMethods.map((method) => (
-                  <option key={method} value={method}>
-                    {method}
-                  </option>
-                ))}
-              </select>
-            </div>
+                  {/* Discount */}
+                  <div>
+                    <label className='text-sm font-semibold text-gray-700 mb-2 flex items-center gap-1'>
+                      <Percent className='w-4 h-4' />
+                      Giảm giá (%)
+                    </label>
+                    <input
+                      type='number'
+                      name='discount'
+                      value={documentData.discount}
+                      onChange={handleChange}
+                      placeholder='20'
+                      min='0'
+                      max='99'
+                      className='w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200'
+                    />
+                  </div>
 
-            {/* Return Policy */}
-            <div className='lg:col-span-3'>
-              <label className='block text-sm font-semibold text-gray-700 mb-2 flex items-center gap-1'>
-                <Clock className='w-4 h-4' />
-                Return Policy
-              </label>
-              <select
-                name='returnPolicy'
-                value={documentData.returnPolicy}
-                onChange={handleChange}
-                className='w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200'
-              >
-                <option value=''>Select return policy</option>
-                {returnPolicies.map((policy) => (
-                  <option key={policy} value={policy}>
-                    {policy}
-                  </option>
-                ))}
-              </select>
+                  {/* Final Price (Calculated) */}
+                  <div>
+                    <label className='block text-sm font-semibold text-gray-700 mb-2'>
+                      Giá cuối (VND)
+                    </label>
+                    <div className='w-full px-4 py-3 bg-gray-100 border border-gray-200 rounded-xl text-gray-700 font-semibold'>
+                      {documentData.price
+                        ? `${(
+                            documentData.price -
+                            (documentData.price * documentData.discount) / 100
+                          ).toLocaleString('vi-VN')} VND`
+                        : '0 VND'}
+                    </div>
+                  </div>
+
+                  {/* Commission Info */}
+                  <div className='bg-green-50 border border-green-200 rounded-xl p-4'>
+                    <div className='flex items-center gap-3'>
+                      <div className='w-8 h-8 bg-green-500 rounded-full flex items-center justify-center'>
+                        <Percent className='w-4 h-4 text-white' />
+                      </div>
+                      <div>
+                        <h5 className='font-semibold text-green-700'>
+                          Platform Commission: 15%
+                        </h5>
+                        <p className='text-sm text-green-600'>
+                          Standard commission rate for all sellers
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -693,7 +671,7 @@ export default function CreateDocForm({ onCancel, onSubmit }) {
                 <label className='flex flex-col items-center justify-center h-28 cursor-pointer p-4'>
                   <Archive className='w-8 h-8 text-gray-400 mb-2' />
                   <span className='text-sm text-gray-600 mb-1 text-center'>
-                    Drop multiple documents here or click to upload
+                    Thả nhiều tài liệu vào đây hoặc nhấn để tải lên
                   </span>
                   <span className='text-xs text-gray-400 text-center'>
                     PDF, DOC, DOCX, PPT, PPTX, TXT, RTF, ZIP, RAR, 7Z (Max 100MB
@@ -711,35 +689,41 @@ export default function CreateDocForm({ onCancel, onSubmit }) {
               </div>
             </div>
 
-            {/* Video Preview Upload */}
+            {/* Video Upload */}
             <div>
-              <label className='block text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2'>
+              <label className=' text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2'>
                 <Video className='w-4 h-4' />
-                Preview Video (Optional)
+                Video Files ({documentData.videoFiles.length} files)
               </label>
 
-              {documentData.videoFile && (
-                <div className='mb-4 p-3 bg-purple-50 rounded-lg border border-purple-200'>
-                  <div className='flex items-center gap-3'>
-                    <Video className='w-8 h-8 text-purple-600' />
-                    <div className='flex-1 min-w-0'>
-                      <p className='font-medium text-gray-900 truncate'>
-                        {documentData.videoFile.name}
-                      </p>
-                      <p className='text-sm text-gray-500'>
-                        {formatFileSize(documentData.videoFile.size)}
-                      </p>
-                    </div>
-                    <button
-                      type='button'
-                      onClick={() =>
-                        setDocumentData({ ...documentData, videoFile: null })
-                      }
-                      className='p-1 hover:bg-red-100 rounded-full transition-colors duration-200'
+              {/* Video File List */}
+              {documentData.videoFiles.length > 0 && (
+                <div className='mb-4 max-h-32 overflow-y-auto space-y-2'>
+                  {documentData.videoFiles.map((file, index) => (
+                    <div
+                      key={index}
+                      className='flex items-center gap-3 p-2 bg-purple-50 rounded-lg border border-purple-200'
                     >
-                      <X className='w-4 h-4 text-red-500' />
-                    </button>
-                  </div>
+                      <div className='flex items-center justify-center w-10 h-10 bg-purple-100 rounded-lg'>
+                        <Video className='w-5 h-5 text-purple-600' />
+                      </div>
+                      <div className='flex-1 min-w-0'>
+                        <p className='font-medium text-gray-900 truncate text-sm'>
+                          {file.name}
+                        </p>
+                        <p className='text-xs text-gray-500'>
+                          {formatFileSize(file.size)}
+                        </p>
+                      </div>
+                      <button
+                        type='button'
+                        onClick={() => removeVideo(index)}
+                        className='p-1 hover:bg-red-100 rounded-full transition-colors duration-200'
+                      >
+                        <X className='w-3 h-3 text-red-500' />
+                      </button>
+                    </div>
+                  ))}
                 </div>
               )}
 
@@ -756,15 +740,16 @@ export default function CreateDocForm({ onCancel, onSubmit }) {
                 <label className='flex flex-col items-center justify-center h-28 cursor-pointer p-4'>
                   <Video className='w-8 h-8 text-gray-400 mb-2' />
                   <span className='text-sm text-gray-600 mb-1 text-center'>
-                    Drop video preview here or click to upload
+                    Thả nhiều video vào đây hoặc nhấn để tải lên
                   </span>
                   <span className='text-xs text-gray-400 text-center'>
-                    MP4, AVI, MOV, WMV, WEBM (Max 200MB)
+                    MP4, AVI, MOV, WEBM, OGV (Max 500MB each)
                   </span>
                   <input
                     type='file'
                     accept='video/*'
-                    onChange={(e) => handleVideoUpload(e.target.files[0])}
+                    multiple
+                    onChange={(e) => handleVideoUpload(e.target.files)}
                     className='hidden'
                   />
                 </label>
@@ -778,7 +763,7 @@ export default function CreateDocForm({ onCancel, onSubmit }) {
             <div>
               <label className='block text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2'>
                 <Image className='w-4 h-4' />
-                Product Images ({documentData.thumbnailFiles.length} images)
+                Hình ảnh ({documentData.thumbnailFiles.length} images)
               </label>
 
               {/* Image Preview Grid */}
@@ -819,7 +804,7 @@ export default function CreateDocForm({ onCancel, onSubmit }) {
                 <label className='flex flex-col items-center justify-center h-32 cursor-pointer'>
                   <Upload className='w-8 h-8 text-gray-400 mb-2' />
                   <span className='text-sm text-gray-600 mb-1'>
-                    Drop multiple images here or click to upload
+                    Thả nhiều hình ảnh vào đây hoặc nhấn để tải lên
                   </span>
                   <span className='text-xs text-gray-400'>
                     PNG, JPG, GIF, WEBP up to 5MB each
@@ -832,74 +817,6 @@ export default function CreateDocForm({ onCancel, onSubmit }) {
                     className='hidden'
                   />
                 </label>
-              </div>
-            </div>
-
-            {/* Tags Selection */}
-            <div>
-              <label className='block text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2'>
-                <Tag className='w-4 h-4' />
-                Tags
-              </label>
-
-              {/* Selected Tags */}
-              {documentData.tags.length > 0 && (
-                <div className='flex flex-wrap gap-2 mb-3'>
-                  {documentData.tags.map((tag) => (
-                    <span
-                      key={tag}
-                      className='inline-flex items-center gap-1 px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-sm'
-                    >
-                      {INTERESTS.find((i) => i.name === tag)?.emoji} {tag}
-                      <button
-                        type='button'
-                        onClick={() => removeTag(tag)}
-                        className='p-0.5 hover:bg-blue-200 rounded-full transition-colors duration-200'
-                      >
-                        <X className='w-3 h-3' />
-                      </button>
-                    </span>
-                  ))}
-                </div>
-              )}
-
-              {/* Tag Dropdown */}
-              <div className='relative'>
-                <button
-                  type='button'
-                  onClick={() => setShowTagDropdown(!showTagDropdown)}
-                  className='w-full px-4 py-3 border border-gray-200 rounded-xl text-left focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 flex items-center justify-between'
-                >
-                  <span className='text-gray-500'>
-                    {documentData.tags.length > 0
-                      ? `${documentData.tags.length} tags selected`
-                      : 'Select tags...'}
-                  </span>
-                  <Tag className='w-4 h-4 text-gray-400' />
-                </button>
-
-                {showTagDropdown && (
-                  <div className='absolute z-10 w-full mt-1 bg-white border border-gray-200 rounded-xl shadow-lg max-h-48 overflow-y-auto'>
-                    {INTERESTS.map((interest) => (
-                      <button
-                        key={interest.id}
-                        type='button'
-                        onClick={() => handleTagToggle(interest)}
-                        className={`w-full px-4 py-2 text-left hover:bg-gray-50 transition-colors duration-200 flex items-center gap-2 ${
-                          documentData.tags.includes(interest.name)
-                            ? 'bg-blue-50 text-blue-700'
-                            : ''
-                        }`}
-                      >
-                        <span>{interest.emoji}</span>
-                        <span>{interest.name}</span>
-                        {documentData.tags.includes(interest.name) && (
-                          <span className='ml-auto text-blue-500'>✓</span>
-                        )}
-                      </button>
-                    ))}
-                  </div>
-                )}
               </div>
             </div>
 
@@ -930,14 +847,24 @@ export default function CreateDocForm({ onCancel, onSubmit }) {
             className='px-8 py-3 border border-gray-300 text-gray-700 rounded-xl hover:bg-gray-50 transition-all duration-200 font-medium flex items-center gap-2'
           >
             <X className='w-4 h-4' />
-            Cancel
+            Hủy
           </button>
           <button
             type='submit'
+            disabled={isLoading}
             className='px-10 py-3 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white rounded-xl font-semibold transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl flex items-center gap-2'
           >
-            <Save className='w-4 h-4' />
-            Create Document Listing
+            {isLoading ? (
+              <div className='flex items-center gap-2'>
+                <Loader2 className='w-4 h-4 animate-spin' />
+                Đang tạo...
+              </div>
+            ) : (
+              <>
+                <Save className='w-4 h-4' />
+                Tải tài liệu
+              </>
+            )}
           </button>
         </div>
       </form>

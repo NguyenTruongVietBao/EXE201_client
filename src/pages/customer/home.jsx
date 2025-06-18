@@ -13,7 +13,6 @@ import {
   Sparkles,
   TrendingUp,
   MessageSquare,
-  Target,
   Brain,
   Bookmark,
   Search,
@@ -22,27 +21,35 @@ import {
 } from 'lucide-react';
 import interestServices from '../../services/interestServices';
 import { Link } from 'react-router';
+import useAuthStore from '../../stores/useAuthStore';
 
 export default function CustomerHome() {
   const [recommendDocuments, setRecommendDocuments] = useState([]);
   const [recommendStudyPartners, setRecommendStudyPartners] = useState([]);
-  const [userInfo, setUserInfo] = useState(null);
+  const [recommendStudyGroups, setRecommendStudyGroups] = useState([]);
+  const { user } = useAuthStore();
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchRecommendDocuments = async () => {
+    const fetchRecommendData = async () => {
       try {
         const response = await interestServices.getRecommendData();
-        setRecommendDocuments(response.data.recommendedDocuments.items);
-        setRecommendStudyPartners(response.data.recommendedUsers.items);
-        setUserInfo(response.data.userInfo);
+        setRecommendDocuments(
+          response.data.recommendedDocuments.items.slice(0, 5)
+        );
+        setRecommendStudyPartners(
+          response.data.recommendedUsers.items.slice(0, 5)
+        );
+        setRecommendStudyGroups(
+          response.data.recommendedGroups.items.slice(0, 5)
+        );
       } catch (error) {
         console.error('Error fetching recommendations:', error);
       } finally {
         setLoading(false);
       }
     };
-    fetchRecommendDocuments();
+    fetchRecommendData();
   }, []);
 
   // Mock data không liên quan đến gợi ý - giữ nguyên
@@ -141,13 +148,6 @@ export default function CustomerHome() {
     },
   ];
 
-  // Hàm helper để định dạng giá
-  const formatPrice = (price, discount) => {
-    if (price === 0) return 'Miễn phí';
-    const discountedPrice = price * (1 - discount / 100);
-    return `${discountedPrice.toLocaleString('vi-VN')} VNĐ`;
-  };
-
   // Hàm helper để định dạng ngày
   const formatDate = (dateString) => {
     return new Date(dateString).toLocaleDateString('vi-VN');
@@ -165,7 +165,7 @@ export default function CustomerHome() {
   }
 
   return (
-    <div className='min-h-screen'>
+    <div className='min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50'>
       <div className='container mx-auto px-4 md:px-8 py-6'>
         {/* Header Welcome */}
         <section className='mb-8'>
@@ -173,19 +173,19 @@ export default function CustomerHome() {
             <div className='flex flex-col md:flex-row items-center justify-around mb-6'>
               <div>
                 <h1 className='text-3xl md:text-5xl md:mb-3 font-bold py-2 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent'>
-                  Chào mừng trở lại {userInfo?.name || 'bạn'}! 👋
+                  Chào mừng trở lại {user?.name || 'bạn'}! 👋
                 </h1>
                 <p className='text-lg text-gray-600 max-w-2xl'>
                   Hành trình học tập của bạn tiếp tục với những gợi ý thông minh
                   từ AI
                 </p>
-                {userInfo?.interests && (
+                {user?.interests && (
                   <div className='flex items-center gap-2 mt-3'>
                     <span className='text-sm text-gray-600'>
                       Sở thích của bạn:
                     </span>
                     <div className='flex gap-2'>
-                      {userInfo.interests.map((interest) => (
+                      {user.interests.map((interest) => (
                         <span
                           key={interest._id}
                           className='px-2 py-1 bg-blue-100 text-blue-700 rounded-lg text-sm font-medium flex items-center gap-1'
@@ -209,9 +209,12 @@ export default function CustomerHome() {
                     >
                       <div className='text-white'>{action.icon}</div>
                     </div>
-                    <h3 className='text-sm font-bold text-gray-900 mb-1'>
+                    <Link
+                      to={action.href}
+                      className='text-sm font-bold text-gray-900 mb-1'
+                    >
                       {action.title}
-                    </h3>
+                    </Link>
                     <p className='text-xs text-gray-600'>
                       {action.description}
                     </p>
@@ -251,71 +254,104 @@ export default function CustomerHome() {
                 </Link>
               </div>
               <div className='space-y-4'>
-                {recommendDocuments.slice(0, 3).map((doc) => (
-                  <div
-                    key={doc._id}
-                    className=' h-36 group relative bg-white/80 backdrop-blur-sm rounded-2xl p-4 shadow-lg border border-white/20 hover:shadow-xl transition-all duration-300'
-                  >
-                    <div className='flex items-center gap-3'>
-                      <div className='flex flex-col items-center gap-2'>
-                        <img
-                          src={
-                            doc.imageUrl[0] ||
-                            'https://api.dicebear.com/9.x/shapes/svg?seed=default'
-                          }
-                          alt={doc.title}
-                          className='w-20 h-20 rounded-lg object-cover'
-                        />
-                        <p className='text-xs text-gray-600 mb-2'>
-                          bởi {doc.author.name}
-                        </p>
-                      </div>
-                      <div className='flex-1 ml-4 justify-between'>
-                        <div className='flex items-start justify-between'>
-                          <h4 className='font-semibold text-gray-900 text-sm leading-tight'>
-                            {doc.title}
-                          </h4>
-                          <div className='flex items-center gap-1'>
-                            <span className='px-2 py-1 bg-green-100 text-green-700 rounded-full text-xs font-medium'>
-                              {Math.round(doc.matchPercentage)}% phù hợp
+                {recommendDocuments.length > 0 ? (
+                  recommendDocuments.slice(0, 5).map((doc) => (
+                    <div
+                      key={doc._id}
+                      className=' h-36 group relative bg-white/80 backdrop-blur-sm rounded-2xl p-4 shadow-lg border border-white/20 hover:shadow-xl transition-all duration-300'
+                    >
+                      <div className='flex items-center gap-3'>
+                        <div className='flex flex-col items-center gap-2'>
+                          <img
+                            src={
+                              doc.author.avatar ||
+                              'https://api.dicebear.com/9.x/shapes/svg?seed=default'
+                            }
+                            alt={doc.title}
+                            className='w-20 h-20 rounded-lg object-cover'
+                          />
+                          <p className='text-xs text-gray-600 mb-2'>
+                            bởi{' '}
+                            <Link
+                              to={`/customer/documents/author/${doc.author._id}`}
+                              className='text-blue-600 font-semibold'
+                            >
+                              {doc.author.name}
+                            </Link>
+                          </p>
+                        </div>
+                        <div className='flex-1 ml-4 justify-between'>
+                          <div className='flex items-start justify-between'>
+                            <Link
+                              to={`/customer/documents/${doc._id}`}
+                              className='font-semibold text-gray-900 text-sm leading-tight'
+                            >
+                              {doc.title}
+                            </Link>
+                            <div className='flex items-center gap-1'>
+                              <span className='px-2 py-1 bg-green-100 text-green-700 rounded-full text-xs font-medium'>
+                                {Math.round(doc.matchPercentage)}% phù hợp
+                              </span>
+                            </div>
+                          </div>
+                          <div className='flex items-center gap-2 text-xs text-purple-600 my-1'>
+                            <Brain className='w-3 h-3' />
+                            <span>
+                              {doc.sharedInterestsCount} /{' '}
+                              {user?.interests?.length || 0} sở thích
                             </span>
                           </div>
-                        </div>
-                        <div className='flex items-center gap-2 text-xs text-purple-600 my-1'>
-                          <Brain className='w-3 h-3' />
-                          <span>
-                            {doc.sharedInterestsCount} /{' '}
-                            {userInfo?.interests.length} sở thích
-                          </span>
-                        </div>
-                        <div className='mt-2 mb-1'>
-                          {doc.discount > 0 ? (
-                            <span className='px-2 py-1 bg-red-100 text-red-700 rounded-md text-sm font-medium'>
-                              -{doc.discount}%
-                            </span>
-                          ) : (
-                            <span className='px-2 py-1 bg-green-100 text-green-700 rounded-md text-sm font-medium'>
-                              Miễn phí
-                            </span>
-                          )}
-                        </div>
-                        <div className='flex items-center justify-between'>
-                          <span className='font-bold text-md text-blue-600'>
-                            {formatPrice(doc.price, doc.discount)}
-                            {doc.discount > 0 && doc.price > 0 && (
-                              <span className='ml-1 text-xs text-gray-400 line-through font-semibold'>
-                                {doc.price.toLocaleString('vi-VN')} VNĐ
+                          <div className='mt-2 mb-1'>
+                            {doc.discount > 0 ? (
+                              <span className='px-2 py-1 bg-red-100 text-red-700 rounded-md text-sm font-medium'>
+                                -{doc.discount}%
+                              </span>
+                            ) : doc.price === 0 ? (
+                              <span className='px-2 py-1 bg-green-100 text-green-700 rounded-md text-sm font-medium'>
+                                Miễn phí
+                              </span>
+                            ) : (
+                              <span className='px-2 py-1 bg-blue-100 text-blue-700 rounded-md text-sm font-medium'>
+                                Có phí
                               </span>
                             )}
-                          </span>
-                          <button className='px-4 py-1 bg-gradient-to-r from-blue-500 to-purple-500 text-white rounded-lg hover:from-blue-600 hover:to-purple-600 transition-all duration-300 text-sm font-medium'>
-                            Chi tiết
-                          </button>
+                          </div>
+                          <div className='flex items-center justify-between'>
+                            <span className='font-bold text-md text-blue-600'>
+                              {doc.price === 0
+                                ? '0 VNĐ'
+                                : doc.discount > 0
+                                ? `${(
+                                    doc.price *
+                                    (1 - doc.discount / 100)
+                                  ).toLocaleString('vi-VN')} VNĐ`
+                                : `${doc.price.toLocaleString('vi-VN')} VNĐ`}
+                              {doc.discount > 0 && doc.price > 0 && (
+                                <span className='ml-1 text-xs text-gray-400 line-through font-semibold'>
+                                  {doc.price.toLocaleString('vi-VN')} VNĐ
+                                </span>
+                              )}
+                            </span>
+                            <Link
+                              to={`/customer/documents/${doc._id}`}
+                              className='px-4 py-1 bg-gradient-to-r from-blue-500 to-purple-500 text-white rounded-lg hover:from-blue-600 hover:to-purple-600 transition-all duration-300 text-sm font-medium'
+                            >
+                              Chi tiết
+                            </Link>
+                          </div>
                         </div>
                       </div>
                     </div>
+                  ))
+                ) : (
+                  <div className='text-center py-8 text-gray-500'>
+                    <BookOpen className='w-12 h-12 mx-auto mb-3 opacity-50' />
+                    <p>Chưa có gợi ý tài liệu phù hợp</p>
+                    <p className='text-xs mt-1'>
+                      Hệ thống sẽ cập nhật khi có tài liệu mới
+                    </p>
                   </div>
-                ))}
+                )}
               </div>
             </div>
 
@@ -334,60 +370,62 @@ export default function CustomerHome() {
                 </Link>
               </div>
               <div className='space-y-4'>
-                {recommendStudyPartners.map((partner) => (
-                  <div
-                    key={partner._id}
-                    className='group relative h-36 bg-white/80 backdrop-blur-sm rounded-2xl p-4 shadow-lg border border-white/20 hover:shadow-xl transition-all duration-300'
-                  >
-                    <div className='flex items-center gap-3 mb-3'>
-                      <div className='relative'>
-                        <img
-                          src={partner.avatar}
-                          alt={partner.name}
-                          className='w-10 h-10 rounded-xl'
-                        />
-                        <div className='absolute -bottom-1 -right-1 w-3 h-3 bg-green-400 border-2 border-white rounded-full' />
-                      </div>
-                      <div className='flex-1'>
-                        <h3 className='font-bold text-gray-900 text-sm'>
-                          {partner.name}
-                        </h3>
-                        <p className='text-xs text-gray-600'>
-                          Tham gia từ {formatDate(partner.createdAt)}
-                        </p>
-                      </div>
-                      <div className='text-right'>
-                        <div
-                          className={`text-xs font-bold px-2 py-1 rounded-full ${
-                            partner.matchPercentage >= 90
-                              ? 'bg-green-100 text-green-700'
-                              : 'bg-blue-100 text-blue-700'
-                          }`}
-                        >
-                          {Math.round(partner.matchPercentage)}% phù hợp
+                {recommendStudyPartners.length > 0 ? (
+                  recommendStudyPartners.map((partner) => (
+                    <div
+                      key={partner._id}
+                      className='group relative h-36 bg-white/80 backdrop-blur-sm rounded-2xl p-4 shadow-lg border border-white/20 hover:shadow-xl transition-all duration-300'
+                    >
+                      <div className='flex items-center gap-3 mb-3'>
+                        <div className='relative'>
+                          <img
+                            src={partner.avatar}
+                            alt={partner.name}
+                            className='w-10 h-10 rounded-xl'
+                          />
+                          <div className='absolute -bottom-1 -right-1 w-3 h-3 bg-green-400 border-2 border-white rounded-full' />
+                        </div>
+                        <div className='flex-1'>
+                          <h3 className='font-bold text-gray-900 text-sm'>
+                            {partner.name}
+                          </h3>
+                          <p className='text-xs text-gray-600'>
+                            Tham gia từ {formatDate(partner.createdAt)}
+                          </p>
+                        </div>
+                        <div className='text-right'>
+                          <div
+                            className={`text-xs font-bold px-2 py-1 rounded-full ${
+                              partner.matchPercentage >= 90
+                                ? 'bg-green-100 text-green-700'
+                                : 'bg-blue-100 text-blue-700'
+                            }`}
+                          >
+                            {Math.round(partner.matchPercentage)}% phù hợp
+                          </div>
                         </div>
                       </div>
-                    </div>
-                    <div className='flex items-center gap-2 mb-3'>
-                      <span className='text-xs text-gray-500'>
-                        {partner.sharedInterestsCount} sở thích chung
-                      </span>
-                      <div className='flex items-center gap-1'>
-                        <Brain className='w-3 h-3 text-purple-500' />
-                        <span className='text-xs text-purple-600'>
-                          AI gợi ý
-                        </span>
+                      <div className='flex items-center gap-2 mb-3'>
+                        <div className='flex items-center gap-1'>
+                          <Brain className='w-3 h-3 text-purple-500' />
+                          <span className='text-xs text-purple-600'>
+                            {partner.sharedInterestsCount} /{' '}
+                            {partner.sharedInterestsCount} sở thích
+                          </span>
+                        </div>
                       </div>
+                      <button className='w-full py-2 bg-gradient-to-r from-emerald-500 to-teal-500 text-white rounded-xl hover:from-emerald-600 hover:to-teal-600 transition-all duration-300 text-sm font-medium'>
+                        Kết nối
+                      </button>
                     </div>
-                    <button className='w-full py-2 bg-gradient-to-r from-emerald-500 to-teal-500 text-white rounded-xl hover:from-emerald-600 hover:to-teal-600 transition-all duration-300 text-sm font-medium'>
-                      Kết nối
-                    </button>
-                  </div>
-                ))}
-                {recommendStudyPartners.length === 0 && (
+                  ))
+                ) : (
                   <div className='text-center py-8 text-gray-500'>
                     <Users className='w-12 h-12 mx-auto mb-3 opacity-50' />
                     <p>Chưa có gợi ý bạn học phù hợp</p>
+                    <p className='text-xs mt-1'>
+                      Hệ thống sẽ tìm kiếm bạn học phù hợp
+                    </p>
                   </div>
                 )}
               </div>
@@ -408,71 +446,59 @@ export default function CustomerHome() {
                 </Link>
               </div>
               <div className='space-y-4'>
-                <div className='bg-gray-50/50 rounded-xl p-4 hover:bg-white transition-all duration-300'>
-                  <div className='flex items-start gap-3'>
-                    <img
-                      src='https://api.dicebear.com/9.x/initials/svg?seed=RVN'
-                      alt='Cộng đồng React Việt Nam'
-                      className='w-12 h-12 rounded-lg'
-                    />
-                    <div className='flex-1'>
-                      <div className='flex items-center gap-2 mb-1'>
-                        <h4 className='font-semibold text-gray-900 text-sm'>
-                          Cộng đồng React Việt Nam
-                        </h4>
-                        <div className='w-2 h-2 bg-green-400 rounded-full' />
-                        <Sparkles className='w-3 h-3 text-purple-500' />
-                      </div>
-                      <p className='text-xs text-gray-600 mb-2 line-clamp-2'>
-                        Chia sẻ kiến thức React, thảo luận dự án và tìm việc làm
-                      </p>
-                      <div className='flex items-center justify-between text-xs'>
-                        <div className='flex items-center gap-3'>
-                          <span className='text-gray-500'>1247 thành viên</span>
-                          <span className='flex items-center gap-1 text-blue-600'>
-                            <MessageSquare className='w-3 h-3' />
-                            12 tin mới
-                          </span>
+                {recommendStudyGroups.length > 0 ? (
+                  recommendStudyGroups.map((group) => (
+                    <div
+                      key={group._id}
+                      className='bg-gray-50/50 rounded-xl p-4 hover:bg-white transition-all duration-300'
+                    >
+                      <div className='flex items-start gap-3'>
+                        <img
+                          src={
+                            group.imageUrl ||
+                            'https://api.dicebear.com/9.x/initials/svg?seed=default'
+                          }
+                          alt={group.name}
+                          className='w-12 h-12 rounded-lg'
+                        />
+                        <div className='flex-1'>
+                          <div className='flex items-center gap-2 mb-1'>
+                            <h4 className='font-semibold text-gray-900 text-sm'>
+                              {group.name}
+                            </h4>
+                            <div className='w-2 h-2 bg-green-400 rounded-full' />
+                            <Sparkles className='w-3 h-3 text-purple-500' />
+                          </div>
+                          <p className='text-xs text-gray-600 mb-2 line-clamp-2'>
+                            {group.description}
+                          </p>
+                          <div className='flex items-center justify-between text-xs'>
+                            <div className='flex items-center gap-3'>
+                              <span className='text-gray-500'>
+                                {group.memberCount || 0} thành viên
+                              </span>
+                              <span className='flex items-center gap-1 text-blue-600'>
+                                <MessageSquare className='w-3 h-3' />
+                                {group.newMessages || 0} tin mới
+                              </span>
+                            </div>
+                            <button className='px-3 py-1 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-lg hover:from-purple-600 hover:to-pink-600 transition-all duration-300 font-medium'>
+                              Tham gia
+                            </button>
+                          </div>
                         </div>
-                        <button className='px-3 py-1 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-lg hover:from-purple-600 hover:to-pink-600 transition-all duration-300 font-medium'>
-                          Tham gia
-                        </button>
                       </div>
                     </div>
+                  ))
+                ) : (
+                  <div className='text-center py-8 text-gray-500'>
+                    <Users className='w-12 h-12 mx-auto mb-3 opacity-50' />
+                    <p>Chưa có gợi ý nhóm học phù hợp</p>
+                    <p className='text-xs mt-1'>
+                      Hệ thống sẽ cập nhật khi có nhóm mới
+                    </p>
                   </div>
-                </div>
-                <div className='bg-gray-50/50 rounded-xl p-4 hover:bg-white transition-all duration-300'>
-                  <div className='flex items-start gap-3'>
-                    <img
-                      src='https://api.dicebear.com/9.x/initials/svg?seed=AIVN'
-                      alt='AI & Machine Learning VN'
-                      className='w-12 h-12 rounded-lg'
-                    />
-                    <div className='flex-1'>
-                      <div className='flex items-center gap-2 mb-1'>
-                        <h4 className='font-semibold text-gray-900 text-sm'>
-                          AI & Machine Learning VN
-                        </h4>
-                        <div className='w-2 h-2 bg-green-400 rounded-full' />
-                        <Sparkles className='w-3 h-3 text-purple-500' />
-                      </div>
-                      <p className='text-xs text-gray-600 mb-2 line-clamp-2'>
-                        Học tập và nghiên cứu AI, ML cùng cộng đồng Việt Nam
-                      </p>
-                      <div className='flex items-center justify-between text-xs'>
-                        <div className='flex items-center gap-3'>
-                          <span className='text-gray-500'>892 thành viên</span>
-                          <span className='flex items-center gap-1 text-blue-600'>
-                            <MessageSquare className='w-3 h-3' />5 tin mới
-                          </span>
-                        </div>
-                        <button className='px-3 py-1 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-lg hover:from-purple-600 hover:to-pink-600 transition-all duration-300 font-medium'>
-                          Tham gia
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                </div>
+                )}
               </div>
             </div>
           </div>
@@ -601,7 +627,7 @@ export default function CustomerHome() {
                         </div>
                         <div className='flex items-center justify-between'>
                           <div className='flex gap-2'>
-                            {doc.tags.slice(0, 3).map((tag, idx) => (
+                            {doc.tags.slice(0, 5).map((tag, idx) => (
                               <span
                                 key={idx}
                                 className='px-2 py-1 bg-gray-100 text-gray-700 rounded-lg text-xs'

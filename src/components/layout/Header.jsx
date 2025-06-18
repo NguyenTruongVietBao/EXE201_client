@@ -30,34 +30,32 @@ const Header = () => {
   }, []);
 
   const guestLinks = [
-    { href: '/', label: 'Home' },
-    { href: '/about', label: 'About' },
-    { href: '/contact', label: 'Contact' },
-    { href: '/register-seller', label: 'Become a Seller' },
+    { href: '/', label: 'Trang chủ' },
+    { href: '/about', label: 'Giới thiệu' },
+    { href: '/register-seller', label: 'Trở thành nhà bán hàng' },
   ];
   const customerLinks = [
-    { href: '/customer', label: 'Home' },
-    { href: '/customer/documents', label: 'Documents' },
-    { href: '/customer/partners', label: 'Partners' },
-    { href: '/customer/study-plan', label: 'Study Plans' },
+    { href: '/customer', label: 'Trang chủ' },
+    { href: '/customer/documents', label: 'Tài liệu' },
+    { href: '/customer/partners', label: 'Bạn học' },
+    { href: '/customer/chat', label: 'Tin nhắn' },
+    { href: '/customer/study-plan', label: 'Kế hoạch học tập' },
   ];
 
   const managerLinks = [
-    { href: '/manager/dashboard', label: 'Dashboard' },
-    { href: '/manager/users', label: 'Users' },
-    { href: '/manager/documents', label: 'Documents' },
+    { href: '/manager', label: 'Bảng điều khiển' },
+    { href: '/manager/documents', label: 'Tài liệu' },
   ];
 
   const sellerLinks = [
-    { href: '/seller/dashboard', label: 'Dashboard' },
-    { href: '/seller/users', label: 'Users' },
-    { href: '/seller/documents', label: 'Documents' },
+    { href: '/seller', label: 'Bảng điều khiển' },
+    { href: '/seller/my-documents', label: 'Tài liệu của tôi' },
   ];
 
   const adminLinks = [
-    { href: '/admin/dashboard', label: 'Dashboard' },
-    { href: '/admin/users', label: 'Users' },
-    { href: '/admin/documents', label: 'Documents' },
+    { href: '/admin', label: 'Bảng điều khiển' },
+    { href: '/admin/users', label: 'Người dùng' },
+    { href: '/admin/documents', label: 'Tài liệu' },
   ];
 
   const navLinks =
@@ -137,14 +135,14 @@ const Header = () => {
                     to='/login'
                     className='px-4 py-2 text-md font-semibold text-gray-700 hover:text-blue-600 rounded-xl transition-colors duration-200'
                   >
-                    Login
+                    Đăng nhập
                   </Link>
                   <Link
                     to='/register'
                     className='px-6 py-2.5 bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white text-md font-semibold rounded-xl transition-all duration-300 transform hover:scale-105 hover:shadow-lg flex items-center space-x-2'
                   >
                     <UserPlus className='w-4 h-4' />
-                    <span>Sign Up</span>
+                    <span>Đăng ký</span>
                   </Link>
                 </div>
               )}

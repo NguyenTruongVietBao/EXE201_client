@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   Search,
   Filter,
@@ -30,36 +30,37 @@ import {
   Video,
   Phone,
   Mail,
+  PlusCircle,
 } from 'lucide-react';
+import interestServices from '../../services/interestServices';
+import { Link } from 'react-router';
 
 export default function CustomerPartner() {
   const [activeTab, setActiveTab] = useState('partners'); // partners, groups
   const [searchQuery, setSearchQuery] = useState('');
-  const [viewMode, setViewMode] = useState('grid'); // grid, list
   const [showFilters, setShowFilters] = useState(false);
   const [selectedInterests, setSelectedInterests] = useState([]);
-  const [selectedLevel, setSelectedLevel] = useState('all');
-  const [selectedLocation, setSelectedLocation] = useState('all');
-  const [onlineOnly, setOnlineOnly] = useState(false);
+  const [minMatchPercentage, setMinMatchPercentage] = useState(0);
+  const [dateFilter, setDateFilter] = useState('all'); // all, week, month, 3months
+  const [priorityUsers, setPriorityUsers] = useState([]);
 
-  // Mock data for AI suggestions
+  useEffect(() => {
+    const fetchPriorityUsers = async () => {
+      const response = await interestServices.getPrioriryUsers();
+      setPriorityUsers(response.data.users || []);
+    };
+    fetchPriorityUsers();
+  }, []);
+  // AI suggestions được tạo từ users thật
   const aiSuggestions = {
-    partners: [
-      {
-        id: 'ai-p1',
-        name: 'Lê Minh Hoàng',
-        reason: '94% phù hợp - Cùng sở thích React và JavaScript',
-        avatar: 'https://api.dicebear.com/9.x/avataaars/svg?seed=hoang-ai',
-        matchScore: 94,
-      },
-      {
-        id: 'ai-p2',
-        name: 'Phạm Thu Hà',
-        reason: '89% phù hợp - Cùng học Machine Learning',
-        avatar: 'https://api.dicebear.com/9.x/avataaars/svg?seed=ha-ai',
-        matchScore: 89,
-      },
-    ],
+    partners: priorityUsers.slice(0, 2).map((user, index) => ({
+      id: `ai-p${index + 1}`,
+      name: user.name,
+      email: user.email,
+      reason: `${user.matchPercentage}% phù hợp - Cùng ${user.sharedInterestsCount} sở thích`,
+      avatar: user.avatar,
+      matchScore: 85 + user.sharedInterestsCount * 5,
+    })),
     groups: [
       {
         id: 'ai-g1',
@@ -77,85 +78,6 @@ export default function CustomerPartner() {
       },
     ],
   };
-
-  // Mock data for study partners
-  const studyPartners = [
-    {
-      id: 1,
-      name: 'Nguyễn Minh Anh',
-      avatar: 'https://api.dicebear.com/9.x/avataaars/svg?seed=anh',
-      major: 'Khoa học máy tính',
-      year: 'Năm 3',
-      university: 'ĐH Bách Khoa TP.HCM',
-      location: 'TP. Hồ Chí Minh',
-      isOnline: true,
-      lastSeen: 'Đang hoạt động',
-      interests: ['React', 'Node.js', 'MongoDB', 'AI'],
-      studyGoals: ['Làm dự án web', 'Học AI/ML', 'Chuẩn bị phỏng vấn'],
-      level: 'Trung cấp',
-      matchScore: 95,
-      commonInterests: 4,
-      studyHours: 'Tối 19:00-22:00',
-      rating: 4.8,
-      reviewCount: 23,
-      completedProjects: 12,
-      description:
-        'Đam mê lập trình web và AI. Thích học nhóm và chia sẻ kiến thức.',
-      languages: ['Tiếng Việt', 'English'],
-      timezone: 'GMT+7',
-      preferredContact: 'Discord',
-    },
-    {
-      id: 2,
-      name: 'Trần Thị Bình',
-      avatar: 'https://api.dicebear.com/9.x/avataaars/svg?seed=binh',
-      major: 'Khoa học dữ liệu',
-      year: 'Năm 2',
-      university: 'ĐH Quốc gia Hà Nội',
-      location: 'Hà Nội',
-      isOnline: false,
-      lastSeen: '2 giờ trước',
-      interests: ['Python', 'Machine Learning', 'Data Analysis', 'Statistics'],
-      studyGoals: ['Học Deep Learning', 'Làm dự án ML', 'Thi chứng chỉ'],
-      level: 'Nâng cao',
-      matchScore: 87,
-      commonInterests: 3,
-      studyHours: 'Sáng 8:00-11:00',
-      rating: 4.9,
-      reviewCount: 31,
-      completedProjects: 8,
-      description:
-        'Nghiên cứu về ML và Data Science. Sẵn sàng hỗ trợ người mới bắt đầu.',
-      languages: ['Tiếng Việt', 'English'],
-      timezone: 'GMT+7',
-      preferredContact: 'Telegram',
-    },
-    {
-      id: 3,
-      name: 'Lê Văn Cường',
-      avatar: 'https://api.dicebear.com/9.x/avataaars/svg?seed=cuong',
-      major: 'Thiết kế đồ họa',
-      year: 'Năm 4',
-      university: 'ĐH Kiến trúc TP.HCM',
-      location: 'TP. Hồ Chí Minh',
-      isOnline: true,
-      lastSeen: 'Đang hoạt động',
-      interests: ['UI/UX', 'Figma', 'Adobe', 'Design Systems'],
-      studyGoals: ['Học UX Research', 'Làm portfolio', 'Tìm internship'],
-      level: 'Trung cấp',
-      matchScore: 82,
-      commonInterests: 2,
-      studyHours: 'Chiều 14:00-17:00',
-      rating: 4.7,
-      reviewCount: 18,
-      completedProjects: 15,
-      description:
-        'Đam mê thiết kế UI/UX và trải nghiệm người dùng. Thích thảo luận về design trends.',
-      languages: ['Tiếng Việt'],
-      timezone: 'GMT+7',
-      preferredContact: 'Slack',
-    },
-  ];
 
   // Mock data for study groups
   const studyGroups = [
@@ -230,37 +152,13 @@ export default function CustomerPartner() {
     },
   ];
 
+  // Tạo danh sách interests từ users thật
   const interests = [
-    'React',
-    'Vue.js',
-    'Angular',
-    'Node.js',
-    'Python',
-    'Java',
-    'JavaScript',
-    'TypeScript',
-    'Machine Learning',
-    'AI',
-    'Data Science',
-    'UI/UX',
-    'Figma',
-    'Adobe',
-    'Mobile Development',
-    'iOS',
-    'Android',
-    'DevOps',
-    'AWS',
-    'Docker',
-  ];
-
-  const levels = ['Cơ bản', 'Trung cấp', 'Nâng cao', 'Chuyên gia'];
-  const locations = [
-    'TP. Hồ Chí Minh',
-    'Hà Nội',
-    'Đà Nẵng',
-    'Cần Thơ',
-    'Online',
-    'Khác',
+    ...new Set(
+      priorityUsers.flatMap(
+        (user) => user.interests?.map((interest) => interest.name) || []
+      )
+    ),
   ];
 
   const handleInterestToggle = (interest) => {
@@ -271,32 +169,45 @@ export default function CustomerPartner() {
     );
   };
 
-  const filteredPartners = studyPartners.filter((partner) => {
+  const getDateFilterValue = (createdAt) => {
+    const now = new Date();
+    const createdDate = new Date(createdAt);
+    const diffTime = Math.abs(now - createdDate);
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+    switch (dateFilter) {
+      case 'week':
+        return diffDays <= 7;
+      case 'month':
+        return diffDays <= 30;
+      case '3months':
+        return diffDays <= 90;
+      case 'all':
+      default:
+        return true;
+    }
+  };
+
+  const filteredPartners = priorityUsers.filter((user) => {
     const matchesSearch =
-      partner.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      partner.major.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      partner.interests.some((interest) =>
-        interest.toLowerCase().includes(searchQuery.toLowerCase())
+      user.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      user.email?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      user.interests?.some((interest) =>
+        interest.name?.toLowerCase().includes(searchQuery.toLowerCase())
       );
 
     const matchesInterests =
       selectedInterests.length === 0 ||
       selectedInterests.some((interest) =>
-        partner.interests.includes(interest)
+        user.interests?.some((userInterest) => userInterest.name === interest)
       );
 
-    const matchesLevel =
-      selectedLevel === 'all' || partner.level === selectedLevel;
-    const matchesLocation =
-      selectedLocation === 'all' || partner.location === selectedLocation;
-    const matchesOnline = !onlineOnly || partner.isOnline;
+    const matchesPercentage = user.matchPercentage >= minMatchPercentage;
+
+    const matchesDate = getDateFilterValue(user.createdAt);
 
     return (
-      matchesSearch &&
-      matchesInterests &&
-      matchesLevel &&
-      matchesLocation &&
-      matchesOnline
+      matchesSearch && matchesInterests && matchesPercentage && matchesDate
     );
   });
 
@@ -313,126 +224,118 @@ export default function CustomerPartner() {
       selectedInterests.length === 0 ||
       selectedInterests.some((interest) => group.tags.includes(interest));
 
-    return matchesSearch && matchesInterests;
+    const matchesDate = getDateFilterValue(group.createdAt);
+
+    return matchesSearch && matchesInterests && matchesDate;
   });
 
-  const PartnerCard = ({ partner }) => (
-    <div className='bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-100 group'>
-      <div className='p-6'>
-        {/* Header */}
-        <div className='flex items-center gap-4 mb-4'>
-          <div className='relative'>
-            <img
-              src={partner.avatar}
-              alt={partner.name}
-              className='w-16 h-16 rounded-xl object-cover'
-            />
-            {partner.isOnline && (
+  const PartnerCard = ({ partner }) => {
+    const matchScore = partner.matchPercentage;
+
+    return (
+      <div className='bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-100 group'>
+        <div className='p-6'>
+          {/* Header */}
+          <div className='flex items-center gap-4 mb-4'>
+            <div className='relative'>
+              <img
+                src={
+                  partner.avatar ||
+                  'https://api.dicebear.com/9.x/avataaars/svg?seed=default'
+                }
+                alt={partner.name}
+                className='w-16 h-16 rounded-xl object-cover'
+              />
               <div className='absolute -bottom-1 -right-1 w-5 h-5 bg-green-400 border-2 border-white rounded-full'></div>
-            )}
-          </div>
-          <div className='flex-1'>
-            <h3 className='text-lg font-bold text-gray-900 group-hover:text-blue-600 transition-colors'>
-              {partner.name}
-            </h3>
-            <p className='text-sm text-gray-600'>
-              {partner.major} • {partner.year}
-            </p>
-            <p className='text-xs text-gray-500'>{partner.university}</p>
-          </div>
-          <div className='text-center'>
-            <div
-              className={`text-lg font-bold px-3 py-1 rounded-full ${
-                partner.matchScore >= 90
-                  ? 'bg-green-100 text-green-700'
-                  : partner.matchScore >= 80
-                  ? 'bg-blue-100 text-blue-700'
-                  : 'bg-gray-100 text-gray-700'
-              }`}
-            >
-              {partner.matchScore}%
             </div>
-            <p className='text-xs text-gray-500 mt-1'>Phù hợp</p>
-          </div>
-        </div>
-
-        {/* Description */}
-        <p className='text-gray-600 text-sm mb-4 line-clamp-2'>
-          {partner.description}
-        </p>
-
-        {/* Stats Row */}
-        <div className='flex items-center justify-between text-sm text-gray-500 mb-4'>
-          <div className='flex items-center gap-4'>
-            <div className='flex items-center gap-1'>
-              <Star className='w-4 h-4 text-yellow-400 fill-current' />
-              <span>{partner.rating}</span>
-              <span>({partner.reviewCount})</span>
-            </div>
-            <div className='flex items-center gap-1'>
-              <Target className='w-4 h-4' />
-              <span>{partner.completedProjects} dự án</span>
-            </div>
-          </div>
-          <div className='flex items-center gap-1 text-xs'>
-            <Clock className='w-3 h-3' />
-            <span>{partner.lastSeen}</span>
-          </div>
-        </div>
-
-        {/* Interests */}
-        <div className='mb-4'>
-          <p className='text-xs text-gray-500 mb-2'>
-            {partner.commonInterests} sở thích chung:
-          </p>
-          <div className='flex flex-wrap gap-1'>
-            {partner.interests.slice(0, 4).map((interest, idx) => (
-              <span
-                key={idx}
-                className='px-2 py-1 bg-blue-50 text-blue-700 rounded-lg text-xs font-medium'
+            <div className='flex-1'>
+              <Link
+                to={`/customer/documents/author/${partner._id}`}
+                className='text-lg font-bold text-gray-900 group-hover:text-blue-600 transition-colors'
               >
-                {interest}
-              </span>
-            ))}
-            {partner.interests.length > 4 && (
-              <span className='px-2 py-1 bg-gray-100 text-gray-600 rounded-lg text-xs'>
-                +{partner.interests.length - 4}
-              </span>
-            )}
+                {partner.name}
+              </Link>
+              <p className='text-sm text-gray-600'>{partner.email}</p>
+              <p className='text-xs text-gray-500'>
+                Tham gia:{' '}
+                {new Date(partner.createdAt).toLocaleDateString('vi-VN')}
+              </p>
+            </div>
+            <div className='text-center'>
+              <div
+                className={`text-lg font-bold px-3 py-1 rounded-full ${
+                  matchScore >= 90
+                    ? 'bg-green-100 text-green-700'
+                    : matchScore >= 80
+                    ? 'bg-blue-100 text-blue-700'
+                    : 'bg-gray-100 text-gray-700'
+                }`}
+              >
+                {matchScore}%
+              </div>
+              <p className='text-xs text-gray-500 mt-1'>Phù hợp</p>
+            </div>
           </div>
-        </div>
 
-        {/* Study Info */}
-        <div className='space-y-2 mb-4 text-sm'>
-          <div className='flex items-center gap-2'>
-            <MapPin className='w-4 h-4 text-gray-400' />
-            <span className='text-gray-600'>{partner.location}</span>
-          </div>
-          <div className='flex items-center gap-2'>
-            <Clock className='w-4 h-4 text-gray-400' />
-            <span className='text-gray-600'>Học: {partner.studyHours}</span>
-          </div>
-          <div className='flex items-center gap-2'>
-            <MessageSquare className='w-4 h-4 text-gray-400' />
-            <span className='text-gray-600'>{partner.preferredContact}</span>
-          </div>
-        </div>
+          {/* Description - placeholder */}
+          <p className='text-gray-600 text-sm mb-4 line-clamp-2'>
+            Thành viên tích cực với {partner.sharedInterestsCount || 0} sở thích
+            chung. Sẵn sàng chia sẻ kiến thức và học hỏi cùng nhau.
+          </p>
 
-        {/* Action Buttons */}
-        <div className='flex items-center gap-2'>
-          <button className='flex-1 py-2 bg-gradient-to-r from-blue-500 to-purple-500 text-white rounded-xl hover:from-blue-600 hover:to-purple-600 transition-all duration-300 text-sm font-medium'>
-            Kết nối
-          </button>
-          <button className='p-2 bg-gray-100 hover:bg-gray-200 rounded-xl transition-colors'>
-            <MessageSquare className='w-4 h-4 text-gray-600' />
-          </button>
-          <button className='p-2 bg-gray-100 hover:bg-red-100 rounded-xl transition-colors group'>
-            <Heart className='w-4 h-4 text-gray-600 group-hover:text-red-500' />
-          </button>
+          {/* Stats Row */}
+          <div className='flex items-center justify-between text-sm text-gray-500 mb-4'>
+            <div className='flex items-center gap-4'>
+              <div className='flex items-center gap-1'>
+                <Target className='w-4 h-4' />
+                <span>{partner.sharedInterestsCount || 0} sở thích chung</span>
+              </div>
+            </div>
+            <div className='flex items-center gap-1 text-xs'>
+              <Clock className='w-3 h-3' />
+              <span>Đang hoạt động</span>
+            </div>
+          </div>
+
+          {/* Interests */}
+          <div className='mb-4'>
+            <p className='text-xs text-gray-500 mb-2'>
+              {partner.sharedInterestsCount || 0} sở thích:
+            </p>
+            <div className='flex flex-wrap gap-1'>
+              {partner.interests?.slice(0, 4).map((interest) => (
+                <span
+                  key={interest._id}
+                  className='px-2 py-1 bg-blue-50 text-blue-700 rounded-lg text-xs font-medium flex items-center gap-1'
+                >
+                  <span>{interest.emoji}</span>
+                  <span>{interest.name}</span>
+                </span>
+              ))}
+              {partner.interests?.length > 4 && (
+                <span className='px-2 py-1 bg-gray-100 text-gray-600 rounded-lg text-xs'>
+                  +{partner.interests.length - 4}
+                </span>
+              )}
+            </div>
+          </div>
+
+          {/* Action Buttons */}
+          <div className='flex items-center gap-2'>
+            <button className='flex-1 py-2 bg-gradient-to-r from-blue-500 to-purple-500 text-white rounded-xl hover:from-blue-600 hover:to-purple-600 transition-all duration-300 text-sm font-medium'>
+              Kết nối
+            </button>
+            <button className='p-2 bg-gray-100 hover:bg-gray-200 rounded-xl transition-colors'>
+              <MessageSquare className='w-4 h-4 text-gray-600' />
+            </button>
+            <button className='p-2 bg-gray-100 hover:bg-red-100 rounded-xl transition-colors group'>
+              <Heart className='w-4 h-4 text-gray-600 group-hover:text-red-500' />
+            </button>
+          </div>
         </div>
       </div>
-    </div>
-  );
+    );
+  };
 
   const GroupCard = ({ group }) => (
     <div className='bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-100 group'>
@@ -585,10 +488,15 @@ export default function CustomerPartner() {
                             <h3 className='font-semibold text-gray-900 text-sm'>
                               {suggestion.name}
                             </h3>
-                            <p className='text-xs text-purple-600 flex items-center gap-1'>
-                              <Sparkles className='w-3 h-3' />
-                              {suggestion.reason}
+                            <p className='text-xs text-gray-600'>
+                              {suggestion.email}
                             </p>
+                            <div className='flex items-center gap-2 mt-1'>
+                              <p className='text-xs text-purple-600 flex items-center gap-1'>
+                                <Sparkles className='w-3 h-3' />
+                                {suggestion.reason}
+                              </p>
+                            </div>
                           </div>
                           <button className='px-3 py-1 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-lg text-xs font-medium hover:from-purple-600 hover:to-pink-600 transition-all duration-300'>
                             Kết nối
@@ -638,47 +546,57 @@ export default function CustomerPartner() {
         {/* Tabs */}
         <div className='mb-8'>
           <div className='bg-white/80 backdrop-blur-sm rounded-2xl p-2 shadow-lg border border-white/20'>
-            <div className='flex gap-1'>
-              <button
-                onClick={() => setActiveTab('partners')}
-                className={`flex items-center gap-2 px-6 py-3 rounded-xl font-medium transition-all duration-300 ${
-                  activeTab === 'partners'
-                    ? 'bg-white shadow-lg text-blue-600 border-blue-600 scale-105'
-                    : 'text-gray-600 hover:bg-white/50'
-                }`}
-              >
-                <UserPlus className='w-4 h-4' />
-                <span>Bạn học</span>
-                <span
-                  className={`px-2 py-0.5 rounded-full text-xs font-bold ${
+            <div className='flex justify-between items-center'>
+              <div className='flex items-center gap-2'>
+                <button
+                  onClick={() => setActiveTab('partners')}
+                  className={`ml-4 flex items-center gap-2 px-6 py-3 rounded-xl font-medium transition-all duration-300 ${
                     activeTab === 'partners'
-                      ? 'bg-blue-100 text-blue-700'
-                      : 'bg-gray-200 text-gray-600'
+                      ? 'bg-white shadow-lg text-blue-600 border-blue-600 scale-105'
+                      : 'text-gray-600 hover:bg-white/50'
                   }`}
                 >
-                  {filteredPartners.length}
-                </span>
-              </button>
-              <button
-                onClick={() => setActiveTab('groups')}
-                className={`flex items-center gap-2 px-6 py-3 rounded-xl font-medium transition-all duration-300 ${
-                  activeTab === 'groups'
-                    ? 'bg-white shadow-lg text-purple-600 border-purple-600 scale-105'
-                    : 'text-gray-600 hover:bg-white/50'
-                }`}
-              >
-                <Users className='w-4 h-4' />
-                <span>Nhóm học</span>
-                <span
-                  className={`px-2 py-0.5 rounded-full text-xs font-bold ${
+                  <UserPlus className='w-4 h-4' />
+                  <span>Bạn học</span>
+                  <span
+                    className={`px-2 py-0.5 rounded-full text-xs font-bold ${
+                      activeTab === 'partners'
+                        ? 'bg-blue-100 text-blue-700'
+                        : 'bg-gray-200 text-gray-600'
+                    }`}
+                  >
+                    {filteredPartners.length}
+                  </span>
+                </button>
+                <button
+                  onClick={() => setActiveTab('groups')}
+                  className={`flex items-center gap-2 px-6 py-3 rounded-xl font-medium transition-all duration-300 ${
                     activeTab === 'groups'
-                      ? 'bg-purple-100 text-purple-700'
-                      : 'bg-gray-200 text-gray-600'
+                      ? 'bg-white shadow-lg text-purple-600 border-purple-600 scale-105'
+                      : 'text-gray-600 hover:bg-white/50'
                   }`}
                 >
-                  {filteredGroups.length}
-                </span>
-              </button>
+                  <Users className='w-4 h-4' />
+                  <span>Nhóm học</span>
+                  <span
+                    className={`px-2 py-0.5 rounded-full text-xs font-bold ${
+                      activeTab === 'groups'
+                        ? 'bg-purple-100 text-purple-700'
+                        : 'bg-gray-200 text-gray-600'
+                    }`}
+                  >
+                    {filteredGroups.length}
+                  </span>
+                </button>
+              </div>
+              <div className='flex items-center gap-2'>
+                <button
+                  className={`ml-4 flex items-center gap-2 px-6 py-3 rounded-xl font-medium transition-all duration-300`}
+                >
+                  <PlusCircle className='w-4 h-4' />
+                  <span>Tạo nhóm mới</span>
+                </button>
+              </div>
             </div>
           </div>
         </div>
@@ -712,30 +630,6 @@ export default function CustomerPartner() {
                 Bộ lọc
                 {showFilters && <X className='w-4 h-4' />}
               </button>
-
-              {/* View Mode */}
-              <div className='flex items-center gap-2 bg-gray-100 rounded-xl p-1'>
-                <button
-                  onClick={() => setViewMode('grid')}
-                  className={`p-2 rounded-lg transition-all duration-200 ${
-                    viewMode === 'grid'
-                      ? 'bg-white shadow-sm text-blue-600'
-                      : 'text-gray-600 hover:text-gray-900'
-                  }`}
-                >
-                  <Grid3X3 className='w-4 h-4' />
-                </button>
-                <button
-                  onClick={() => setViewMode('list')}
-                  className={`p-2 rounded-lg transition-all duration-200 ${
-                    viewMode === 'list'
-                      ? 'bg-white shadow-sm text-blue-600'
-                      : 'text-gray-600 hover:text-gray-900'
-                  }`}
-                >
-                  <List className='w-4 h-4' />
-                </button>
-              </div>
             </div>
 
             {/* Filters */}
@@ -765,62 +659,44 @@ export default function CustomerPartner() {
                     </div>
                   </div>
 
-                  {/* Level */}
+                  {/* Match Percentage */}
                   {activeTab === 'partners' && (
                     <div>
                       <label className='block text-sm font-medium text-gray-700 mb-2'>
-                        Trình độ
+                        Mức độ phù hợp tối thiểu
                       </label>
                       <select
-                        value={selectedLevel}
-                        onChange={(e) => setSelectedLevel(e.target.value)}
+                        value={minMatchPercentage}
+                        onChange={(e) =>
+                          setMinMatchPercentage(Number(e.target.value))
+                        }
                         className='w-full p-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500'
                       >
-                        <option value='all'>Tất cả</option>
-                        {levels.map((level) => (
-                          <option key={level} value={level}>
-                            {level}
-                          </option>
-                        ))}
+                        <option value={0}>Tất cả</option>
+                        <option value={50}>≥ 50%</option>
+                        <option value={70}>≥ 70%</option>
+                        <option value={80}>≥ 80%</option>
+                        <option value={90}>≥ 90%</option>
                       </select>
                     </div>
                   )}
 
-                  {/* Location */}
-                  {activeTab === 'partners' && (
-                    <div>
-                      <label className='block text-sm font-medium text-gray-700 mb-2'>
-                        Khu vực
-                      </label>
-                      <select
-                        value={selectedLocation}
-                        onChange={(e) => setSelectedLocation(e.target.value)}
-                        className='w-full p-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500'
-                      >
-                        <option value='all'>Tất cả</option>
-                        {locations.map((location) => (
-                          <option key={location} value={location}>
-                            {location}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
-                  )}
-
-                  {/* Online Status */}
-                  {activeTab === 'partners' && (
-                    <div>
-                      <label className='flex items-center gap-2 text-sm font-medium text-gray-700'>
-                        <input
-                          type='checkbox'
-                          checked={onlineOnly}
-                          onChange={(e) => setOnlineOnly(e.target.checked)}
-                          className='rounded border-gray-300 text-blue-600 focus:ring-blue-500'
-                        />
-                        Chỉ hiển thị online
-                      </label>
-                    </div>
-                  )}
+                  {/* Date Filter */}
+                  <div>
+                    <label className='block text-sm font-medium text-gray-700 mb-2'>
+                      Thời gian tham gia
+                    </label>
+                    <select
+                      value={dateFilter}
+                      onChange={(e) => setDateFilter(e.target.value)}
+                      className='w-full p-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500'
+                    >
+                      <option value='all'>Tất cả</option>
+                      <option value='week'>7 ngày qua</option>
+                      <option value='month'>30 ngày qua</option>
+                      <option value='3months'>3 tháng qua</option>
+                    </select>
+                  </div>
                 </div>
               </div>
             )}
@@ -843,9 +719,8 @@ export default function CustomerPartner() {
                   onClick={() => {
                     setSearchQuery('');
                     setSelectedInterests([]);
-                    setSelectedLevel('all');
-                    setSelectedLocation('all');
-                    setOnlineOnly(false);
+                    setMinMatchPercentage(0);
+                    setDateFilter('all');
                   }}
                   className='px-6 py-3 bg-gradient-to-r from-blue-500 to-purple-500 text-white rounded-xl hover:from-blue-600 hover:to-purple-600 transition-all duration-300 font-medium'
                 >
@@ -853,15 +728,9 @@ export default function CustomerPartner() {
                 </button>
               </div>
             ) : (
-              <div
-                className={`grid gap-6 ${
-                  viewMode === 'grid'
-                    ? 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3'
-                    : 'grid-cols-1'
-                }`}
-              >
+              <div className='grid gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-3'>
                 {filteredPartners.map((partner) => (
-                  <PartnerCard key={partner.id} partner={partner} />
+                  <PartnerCard key={partner._id} partner={partner} />
                 ))}
               </div>
             )
@@ -879,6 +748,7 @@ export default function CustomerPartner() {
                   onClick={() => {
                     setSearchQuery('');
                     setSelectedInterests([]);
+                    setDateFilter('all');
                   }}
                   className='px-6 py-3 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-xl hover:from-purple-600 hover:to-pink-600 transition-all duration-300 font-medium'
                 >
@@ -891,13 +761,7 @@ export default function CustomerPartner() {
               </div>
             </div>
           ) : (
-            <div
-              className={`grid gap-6 ${
-                viewMode === 'grid'
-                  ? 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3'
-                  : 'grid-cols-1'
-              }`}
-            >
+            <div className='grid gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-3'>
               {filteredGroups.map((group) => (
                 <GroupCard key={group.id} group={group} />
               ))}

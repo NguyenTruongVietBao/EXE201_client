@@ -21,6 +21,7 @@ import {
   Heart,
   UserPlus,
 } from 'lucide-react';
+import { Link } from 'react-router';
 
 export default function LandingPage() {
   const features = [
@@ -110,7 +111,7 @@ export default function LandingPage() {
       name: 'Nguyễn Minh Anh',
       role: 'Sinh viên Đại học Bách Khoa',
       content:
-        'EduShare đã giúp tôi tìm được rất nhiều tài liệu chất lượng cho môn học khó. AI hỗ trợ rất thông minh và chính xác.',
+        'Prilab đã giúp tôi tìm được rất nhiều tài liệu chất lượng cho môn học khó. AI hỗ trợ rất thông minh và chính xác.',
       avatar: 'https://api.dicebear.com/9.x/micah/svg?seed=Minh-Anh',
       rating: 5,
     },
@@ -126,7 +127,7 @@ export default function LandingPage() {
       name: 'Lê Thị Hường',
       role: 'Sinh viên Đại học Y Hà Nội',
       content:
-        'Nhóm học tập trên EduShare giúp tôi kết nối với bạn cùng ngành và cùng nhau tiến bộ.',
+        'Nhóm học tập trên Prilab giúp tôi kết nối với bạn cùng ngành và cùng nhau tiến bộ.',
       avatar: 'https://api.dicebear.com/9.x/micah/svg?seed=Le-Huong',
       rating: 5,
     },
@@ -162,10 +163,10 @@ export default function LandingPage() {
   return (
     <main className='min-h-screen'>
       {/* Hero Section */}
-      <section className='py-20 md:py-28 bg-gradient-to-r from-emerald-50/90 via-white/95 to-cyan-50/90  relative overflow-hidden'>
+      <section className='py-20 md:py-28 bg-gradient-to-r from-emerald-50/90 via-white/95 to-cyan-50/90 relative overflow-hidden'>
         {/* Background decorations */}
         <div className='container flex justify-center mx-auto'>
-          <div className='grid lg:grid-cols-2 gap-12 items-center'>
+          <div className='grid lg:grid-cols-2 gap-10 items-center'>
             {/* Text Content */}
             <div className='text-center lg:text-left'>
               <div className='inline-flex items-center rounded-full px-4 py-2 mb-6'>
@@ -190,13 +191,19 @@ export default function LandingPage() {
               </p>
 
               <div className='flex flex-col sm:flex-row gap-4 mb-12 justify-center lg:justify-start'>
-                <button className='cursor-pointer bg-gradient-to-r from-indigo-600 to-cyan-600 hover:from-indigo-700 hover:to-cyan-700 text-white font-semibold px-8 py-4 rounded-2xl transition-all duration-300 transform hover:scale-105 hover:shadow-xl flex items-center justify-center group'>
+                <Link
+                  to={'/login'}
+                  className='cursor-pointer bg-gradient-to-r from-indigo-600 to-cyan-600 hover:from-indigo-700 hover:to-cyan-700 text-white font-semibold px-8 py-4 rounded-2xl transition-all duration-300 transform hover:scale-105 hover:shadow-xl flex items-center justify-center group'
+                >
                   Bắt đầu ngay
                   <ArrowRight className='w-5 h-5 ml-2 transform transition-transform duration-300 group-hover:translate-x-1' />
-                </button>
-                <button className=' cursor-pointer bg-white hover:bg-gray-50 text-gray-700 font-semibold border-2 border-gray-200 hover:border-gray-300 px-8 py-4 rounded-2xl transition-all duration-300'>
+                </Link>
+                <Link
+                  to={'/about'}
+                  className=' cursor-pointer bg-white hover:bg-gray-50 text-gray-700 font-semibold border-2 border-gray-200 hover:border-gray-300 px-8 py-4 rounded-2xl transition-all duration-300'
+                >
                   Tìm hiểu thêm
-                </button>
+                </Link>
               </div>
 
               {/* Stats */}
@@ -223,9 +230,9 @@ export default function LandingPage() {
                 <div className='absolute -inset-2 bg-gradient-to-r from-indigo-300 to-cyan-300 rounded-2xl blur-xl opacity-40'></div>
 
                 {/* Main image */}
-                <div className='relative bg-white rounded-2xl p-4 shadow-2xl'>
+                <div className='relative bg-white rounded-2xl shadow-2xl'>
                   <img
-                    src='https://api.dicebear.com/9.x/lorelei/svg?seed=Christopher'
+                    src='/hero-image3.gif'
                     alt='Học tập với AI'
                     className='rounded-xl w-full h-auto object-cover'
                     style={{ aspectRatio: '4/5' }}
@@ -320,8 +327,8 @@ export default function LandingPage() {
               </span>
             </h2>
             <p className='text-xl text-gray-600 max-w-2xl mx-auto'>
-              Tham gia và sử dụng EduShare rất đơn giản. Làm theo các bước dễ
-              dàng này.
+              Tham gia và sử dụng Prilab rất đơn giản. Làm theo các bước dễ dàng
+              này.
             </p>
           </div>
 
@@ -490,12 +497,12 @@ export default function LandingPage() {
               Sinh viên nói gì về
               <span className='bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent'>
                 {' '}
-                EduShare
+                Prilab
               </span>
             </h2>
             <p className='text-xl text-gray-600 max-w-2xl mx-auto'>
-              Hàng ngàn sinh viên đã tin tưởng và sử dụng EduShare để nâng cao
-              kết quả học tập.
+              Hàng ngàn sinh viên đã tin tưởng và sử dụng Prilab để nâng cao kết
+              quả học tập.
             </p>
           </div>
 
@@ -552,7 +559,7 @@ export default function LandingPage() {
             </h2>
 
             <p className='text-xl md:text-2xl text-blue-100 mb-12 leading-relaxed max-w-2xl mx-auto'>
-              Tham gia cùng hàng ngàn sinh viên đã được hưởng lợi từ EduShare.
+              Tham gia cùng hàng ngàn sinh viên đã được hưởng lợi từ Prilab.
               Đăng ký ngay hôm nay và thay đổi cách bạn học tập.
             </p>
 
