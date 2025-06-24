@@ -173,9 +173,13 @@ export default function RegisterSeller() {
               </Link>
               <Link
                 to='/'
-                className='btn btn-ghost normal-case text-3xl font-bold text-primary mb-2 justify-self-center'
+                className='normal-case text-3xl font-bold text-primary mb-2 justify-self-center'
               >
-                Prilab
+                <img
+                  src='./exe201-logo.png'
+                  alt='Prilab'
+                  className='w-auto h-15'
+                />
               </Link>
               <div></div>
             </div>

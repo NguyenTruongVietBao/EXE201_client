@@ -65,12 +65,15 @@ function Login() {
                 <ArrowLeftIcon className='w-6 h-6 text-primary' />
               </Link>
               <Link
-                href='/'
-                className='btn btn-ghost normal-case text-3xl font-bold text-primary mb-2 justify-self-center'
+                to='/'
+                className='normal-case text-3xl font-bold text-primary mb-2 justify-self-center'
               >
-                Prilab
+                <img
+                  src='./exe201-logo.png'
+                  alt='Prilab'
+                  className='w-auto h-15'
+                />
               </Link>
-              <div></div>
             </div>
             <h2 className='text-2xl font-semibold'>Chào mừng trở lại !</h2>
             <p className='text-base-content/70'>

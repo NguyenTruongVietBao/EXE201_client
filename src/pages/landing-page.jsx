@@ -232,7 +232,7 @@ export default function LandingPage() {
                 {/* Main image */}
                 <div className='relative bg-white rounded-2xl shadow-2xl'>
                   <img
-                    src='/hero-image3.gif'
+                    src='./hero-image3.gif'
                     alt='Học tập với AI'
                     className='rounded-xl w-full h-auto object-cover'
                     style={{ aspectRatio: '4/5' }}
