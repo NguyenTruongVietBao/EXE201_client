@@ -9,13 +9,30 @@ export default defineConfig({
   build: {
     outDir: 'dist',
     sourcemap: false, // Tắt sourcemap cho production
+    chunkSizeWarningLimit: 1000, // Tăng limit warning lên 1000KB
     rollupOptions: {
       output: {
         manualChunks: {
+          // React core
           vendor: ['react', 'react-dom'],
+          // Routing
           router: ['react-router'],
-          ui: ['lucide-react', 'react-hot-toast', 'react-hook-form'],
+          // UI libraries
+          ui: [
+            'lucide-react',
+            'react-hot-toast',
+            'react-hook-form',
+            'react-otp-input',
+          ],
+          // Editor
+          editor: ['react-quill'],
+          // Charts
+          charts: ['recharts'],
+          // Socket & HTTP
           socket: ['socket.io-client'],
+          http: ['axios'],
+          // Form & validation
+          store: ['zustand'],
         },
       },
     },
