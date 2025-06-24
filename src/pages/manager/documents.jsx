@@ -74,7 +74,6 @@ export default function ManagerDocuments() {
         toast.success('Công khai bài viết thành công');
       }
 
-      // Cập nhật state local
       setDocuments((prev) =>
         prev.map((doc) =>
           doc._id === documentId

@@ -156,7 +156,6 @@ export default function CustomerMyGroup() {
         rejectionReason: action === 'REJECT' ? rejectionReason : undefined,
       });
 
-      // Update local state
       setJoinGroupRequests((prev) =>
         prev.map((req) =>
           req._id === requestId

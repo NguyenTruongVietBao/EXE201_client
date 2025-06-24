@@ -1,5 +1,6 @@
 import { io } from 'socket.io-client';
 import { getToken } from '../utils';
+import envConfig from './envConfig';
 
 class SocketManager {
   constructor() {
@@ -25,7 +26,7 @@ class SocketManager {
 
     try {
       this.socket = io(
-        import.meta.env.VITE_API_URL || 'http://localhost:8080',
+        envConfig.BACKEND_URL || 'https://exe201-server.onrender.com',
         {
           auth: { token },
           transports: ['websocket'],
