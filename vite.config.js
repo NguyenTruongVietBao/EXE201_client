@@ -5,5 +5,21 @@ import tailwindcss from '@tailwindcss/vite';
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [react(), tailwindcss()],
-  base: '/EXE201_client',
+  build: {
+    outDir: 'dist',
+    sourcemap: false,
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          vendor: ['react', 'react-dom'],
+          router: ['react-router'],
+          ui: ['lucide-react', 'react-hot-toast'],
+        },
+      },
+    },
+  },
+  server: {
+    port: 5173,
+    host: true,
+  },
 });
