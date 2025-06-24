@@ -9,6 +9,8 @@
       }
     }
   ],
+  "installCommand": "npm install --legacy-peer-deps",
+  "buildCommand": "npm run build",
   "routes": [
     {
       "src": "/(.*)",
@@ -16,10 +18,10 @@
     }
   ],
   "env": {
-    "VITE_BACKEND_URL": "https://exe201-server.onrender.com/api",
-    "VITE_FRONTEND_URL": "http://localhost:5173",
-    "VITE_ACCESS_TOKEN_KEY": "accessToken",
-    "VITE_USER_KEY": "user",
-    "VITE_AUTH_STORE_KEY": "user-storage"
+    "VITE_BACKEND_URL": "@backend_url",
+    "VITE_FRONTEND_URL": "@frontend_url",
+    "VITE_ACCESS_TOKEN_KEY": "@access_token_key",
+    "VITE_USER_KEY": "@user_key",
+    "VITE_AUTH_STORE_KEY": "@auth_store_key"
   }
 }
