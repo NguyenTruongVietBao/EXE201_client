@@ -88,6 +88,58 @@ const managerServices = {
       throw error;
     }
   },
+  // Refunds Requests ------------------------------------------------------------
+  getAllRefundsRequests: async () => {
+    try {
+      const response = await axiosInstance.get(`/refunds`);
+      return response;
+    } catch (error) {
+      console.error('Error fetching all refunds requests:', error);
+      throw error;
+    }
+  },
+  getRefundRequestStats: async () => {
+    try {
+      const response = await axiosInstance.get(`/refunds/stats/overview`);
+      return response;
+    } catch (error) {
+      console.error('Error fetching refund request stats:', error);
+      throw error;
+    }
+  },
+  getRefundRequestDetail: async (id) => {
+    try {
+      const response = await axiosInstance.get(`/refunds/${id}`);
+      return response;
+    } catch (error) {
+      console.error('Error fetching refund request detail:', error);
+      throw error;
+    }
+  },
+  approveRefundRequest: async (id, adminResponse) => {
+    try {
+      const response = await axiosInstance.put(`/refunds/${id}/process`, {
+        status: 'APPROVED',
+        adminResponse,
+      });
+      return response;
+    } catch (error) {
+      console.error('Error handling refund request:', error);
+      throw error;
+    }
+  },
+  rejectRefundRequest: async (id, adminResponse) => {
+    try {
+      const response = await axiosInstance.put(`/refunds/${id}/process`, {
+        status: 'REJECTED',
+        adminResponse,
+      });
+      return response;
+    } catch (error) {
+      console.error('Error handling refund request:', error);
+      throw error;
+    }
+  },
 };
 
 export default managerServices;

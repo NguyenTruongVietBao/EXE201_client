@@ -1,34 +1,24 @@
 import React, { useEffect, useState } from 'react';
 import {
-  BookOpen,
   Search,
-  Filter,
   Download,
   Eye,
   Star,
-  Calendar,
-  Bookmark,
   Share2,
   MoreVertical,
   Clock,
   CheckCircle,
-  XCircle,
-  AlertCircle,
   Plus,
-  SortAsc,
-  SortDesc,
   Edit,
-  Trash2,
-  ExternalLink,
-  Heart,
   TrendingUp,
   FileText,
-  Users,
-  ShoppingCart,
   DollarSign,
 } from 'lucide-react';
 import documentServices from '../../services/documentServices';
 import { Link } from 'react-router';
+import { formatCurrency } from '../../utils';
+import { formatDate } from '../../utils';
+import CreateDocModel from '../../components/common/customer/create-doc-model';
 
 export default function SellerMyDocuments() {
   const [searchTerm, setSearchTerm] = useState('');
@@ -46,9 +36,7 @@ export default function SellerMyDocuments() {
             id: doc._id,
             title: doc.title,
             description: doc.description,
-            price: doc.isFree
-              ? 'Miễn phí'
-              : `${doc.price.toLocaleString('vi-VN')} VND`,
+            price: doc.isFree ? 'Miễn phí' : formatCurrency(doc.price),
             originalPrice: doc.price,
             discount: doc.discount || 0,
             finalPrice: doc.price - (doc.price * (doc.discount || 0)) / 100,
@@ -63,8 +51,8 @@ export default function SellerMyDocuments() {
             author: doc.author,
             isFree: doc.isFree,
             feedback: doc.feedback || [],
-            createdAt: new Date(doc.createdAt).toLocaleDateString('vi-VN'),
-            updatedAt: new Date(doc.updatedAt).toLocaleDateString('vi-VN'),
+            createdAt: formatDate(doc.createdAt),
+            updatedAt: formatDate(doc.updatedAt),
             status: doc.status === 'APPROVED' ? 'approved' : 'pending',
             downloads: doc.download || 0,
             views: doc.views || 0,
@@ -82,24 +70,6 @@ export default function SellerMyDocuments() {
     };
     fetchMyDocuments();
   }, []);
-
-  console.log('myDocuments', myDocuments);
-
-  const stats = {
-    total: myDocuments?.length || 0,
-    approved:
-      myDocuments?.filter((doc) => doc.status === 'approved').length || 0,
-    pending: myDocuments?.filter((doc) => doc.status === 'pending').length || 0,
-    totalDownloads:
-      myDocuments?.reduce((sum, doc) => sum + (doc.downloads || 0), 0) || 0,
-    totalRevenue:
-      myDocuments?.reduce((sum, doc) => {
-        if (doc.status === 'approved' && !doc.isFree) {
-          return sum + (doc.downloads || 0) * doc.finalPrice;
-        }
-        return sum;
-      }, 0) || 0,
-  };
 
   const getStatusBadge = (status) => {
     const statusConfig = {
@@ -141,10 +111,10 @@ export default function SellerMyDocuments() {
         {/* Price Badge */}
         <div className='absolute top-3 left-3'>
           <span
-            className={`px-3 py-1 rounded-full text-xs font-medium ${
+            className={`px-3 py-1 rounded-lg text-sm font-medium ${
               document.isFree
                 ? 'bg-green-100 text-green-700 border border-green-200'
-                : 'bg-blue-100 text-blue-700 border border-blue-200'
+                : 'bg-blue-200 text-blue-700 border border-blue-300'
             }`}
           >
             {document.price}
@@ -154,7 +124,7 @@ export default function SellerMyDocuments() {
         {/* Discount Badge */}
         {document.discount > 0 && (
           <div className='absolute bottom-3 left-3'>
-            <span className='px-2 py-1 bg-red-100 text-red-700 rounded-full text-xs font-medium border border-red-200'>
+            <span className='px-2 py-1 bg-red-200 text-red-700 rounded-lg text-md font-medium border border-red-300'>
               -{document.discount}%
             </span>
           </div>
@@ -185,15 +155,15 @@ export default function SellerMyDocuments() {
                   {document.discount > 0 ? (
                     <>
                       <span className='text-lg font-bold text-blue-600'>
-                        {document.finalPrice.toLocaleString('vi-VN')} VND
+                        {formatCurrency(document.finalPrice)}
                       </span>
                       <span className='text-sm text-gray-500 line-through'>
-                        {document.originalPrice.toLocaleString('vi-VN')} VND
+                        {formatCurrency(document.originalPrice)}
                       </span>
                     </>
                   ) : (
                     <span className='text-lg font-bold text-blue-600'>
-                      {document.originalPrice.toLocaleString('vi-VN')} VND
+                      {formatCurrency(document.originalPrice)}
                     </span>
                   )}
                 </div>
@@ -260,10 +230,9 @@ export default function SellerMyDocuments() {
               <div className='flex items-center gap-1 text-green-600 font-medium'>
                 <TrendingUp className='w-3 h-3' />
                 <span>
-                  {(
+                  {formatCurrency(
                     (document.downloads || 0) * document.finalPrice
-                  ).toLocaleString('vi-VN')}{' '}
-                  VND
+                  )}
                 </span>
               </div>
             )}
@@ -315,6 +284,7 @@ export default function SellerMyDocuments() {
           liệu
         </p>
         <div className='flex justify-center'>
+          <CreateDocModel />
           <Link
             to={'/seller/create-documents'}
             className='px-6 py-3 bg-gradient-to-r from-blue-500 to-purple-500 text-white rounded-xl hover:from-blue-600 hover:to-purple-600 transition-all duration-300 font-medium'
@@ -352,7 +322,8 @@ export default function SellerMyDocuments() {
                 </p>
               </div>
 
-              <div className='flex justify-center'>
+              <div className='flex justify-center gap-2'>
+                <CreateDocModel />
                 <Link
                   to={'/seller/create-documents'}
                   className='flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-500 to-purple-500 text-white rounded-xl hover:from-blue-600 hover:to-purple-600 transition-all duration-300 font-medium'
@@ -360,40 +331,6 @@ export default function SellerMyDocuments() {
                   <Plus className='w-4 h-4' />
                   Bán tài liệu
                 </Link>
-              </div>
-            </div>
-
-            {/* Stats Grid */}
-            <div className='grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 mt-8'>
-              <div className='bg-white/70 rounded-xl p-4 text-center'>
-                <div className='text-2xl font-bold text-blue-600'>
-                  {stats.total}
-                </div>
-                <div className='text-sm text-gray-600'>Tổng tài liệu</div>
-              </div>
-              <div className='bg-white/70 rounded-xl p-4 text-center'>
-                <div className='text-2xl font-bold text-green-600'>
-                  {stats.approved}
-                </div>
-                <div className='text-sm text-gray-600'>Đã duyệt</div>
-              </div>
-              <div className='bg-white/70 rounded-xl p-4 text-center'>
-                <div className='text-2xl font-bold text-yellow-600'>
-                  {stats.pending}
-                </div>
-                <div className='text-sm text-gray-600'>Chờ duyệt</div>
-              </div>
-              <div className='bg-white/70 rounded-xl p-4 text-center'>
-                <div className='text-2xl font-bold text-purple-600'>
-                  {stats.totalDownloads}
-                </div>
-                <div className='text-sm text-gray-600'>Lượt tải</div>
-              </div>
-              <div className='bg-white/70 rounded-xl p-4 text-center'>
-                <div className='text-2xl font-bold text-orange-600'>
-                  {stats.totalRevenue.toLocaleString('vi-VN')}
-                </div>
-                <div className='text-sm text-gray-600'>Doanh thu (VND)</div>
               </div>
             </div>
           </div>

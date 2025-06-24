@@ -2,6 +2,7 @@ import React, { useEffect } from 'react';
 import { Navigate } from 'react-router';
 import useAuthStore from '../stores/useAuthStore';
 import { USER_ROLE } from '../constants';
+import LoadingPage from '../components/common/LoadingPage';
 
 const { ADMIN, MANAGER, SELLER, CUSTOMER } = USER_ROLE;
 
@@ -20,12 +21,7 @@ const ProtectedRoute = ({
   // Hiển thị loading khi đang check auth
   if (isLoading) {
     return (
-      fallback || (
-        <div className='flex items-center justify-center min-h-screen'>
-          <div className='animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600'></div>
-          <span className='ml-2'>Đang kiểm tra quyền truy cập...</span>
-        </div>
-      )
+      fallback || <LoadingPage message='Đang kiểm tra quyền truy cập...' />
     );
   }
 

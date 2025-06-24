@@ -2,6 +2,7 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import authServices from '../services/authServices';
 import envConfig from '../configs/envConfig';
+import { socketManager } from '../configs/socket';
 
 const AUTH_STORE_KEY = envConfig.AUTH_STORE_KEY;
 const ACCESS_TOKEN_KEY = envConfig.ACCESS_TOKEN_KEY;
@@ -35,6 +36,12 @@ const useAuthStore = create(
               isAuthenticated: true,
               userInterests: user.interest,
             });
+
+            // Connect socket sau khi đăng nhập thành công
+            if (!socketManager.isConnected()) {
+              socketManager.connect();
+            }
+
             return { status, message, statusCode, data };
           } else {
             return { status, message, statusCode, data };
@@ -87,6 +94,10 @@ const useAuthStore = create(
       // Logout action
       logout: () => {
         localStorage.removeItem(ACCESS_TOKEN_KEY);
+
+        // Disconnect socket khi logout
+        socketManager.disconnect();
+
         set({
           user: null,
           accessToken: null,
@@ -133,6 +144,12 @@ const useAuthStore = create(
               isAuthenticated: true,
               userInterests: data.interests,
             });
+
+            // Connect socket sau khi khởi tạo user data thành công
+            if (!socketManager.isConnected()) {
+              socketManager.connect();
+            }
+
             return { status, message, statusCode, data };
           } else {
             return { status, message, statusCode, data };

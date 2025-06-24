@@ -51,7 +51,7 @@ const InterestModel = ({ onConfirm }) => {
   };
 
   return (
-    <div className='fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm'>
+    <div className='fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm'>
       <div className='relative bg-white rounded-2xl shadow-2xl p-10 w-full max-w-4xl mx-4 animate-slideIn max-h-[80vh] overflow-y-auto'>
         {/* Nút đóng */}
         <button

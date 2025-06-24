@@ -7,7 +7,9 @@
     "dev": "vite",
     "build": "vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "build:prod": "vite build --mode production",
+    "serve": "vite preview --port 4173 --host"
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.1.8",
@@ -21,6 +23,7 @@
     "react-quill": "^2.0.0",
     "react-router": "^7.6.1",
     "recharts": "^2.15.3",
+    "socket.io-client": "^4.8.1",
     "tailwindcss": "^4.1.8",
     "zod": "^3.25.47",
     "zustand": "^5.0.5"

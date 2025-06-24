@@ -38,18 +38,21 @@ const Header = () => {
     { href: '/customer', label: 'Trang chủ' },
     { href: '/customer/documents', label: 'Tài liệu' },
     { href: '/customer/partners', label: 'Bạn học' },
+    { href: '/customer/groups', label: 'Nhóm học tập' },
     { href: '/customer/chat', label: 'Tin nhắn' },
-    { href: '/customer/study-plan', label: 'Kế hoạch học tập' },
   ];
 
   const managerLinks = [
     { href: '/manager', label: 'Bảng điều khiển' },
     { href: '/manager/documents', label: 'Tài liệu' },
+    { href: '/manager/refunds-requests', label: 'Yêu cầu hoàn trả' },
   ];
 
   const sellerLinks = [
     { href: '/seller', label: 'Bảng điều khiển' },
     { href: '/seller/my-documents', label: 'Tài liệu của tôi' },
+    { href: '/seller/refunds-requests', label: 'Yêu cầu hoàn trả' },
+    { href: '/seller/withdrawals', label: 'Rút tiền' },
   ];
 
   const adminLinks = [

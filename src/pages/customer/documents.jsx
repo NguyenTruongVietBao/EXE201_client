@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react';
 import {
   Search,
   Filter,
-  Star,
   Download,
   Heart,
   BookOpen,
@@ -13,21 +12,13 @@ import {
   Clock,
   Award,
   Eye,
-  Bookmark,
   Sparkles,
-  TrendingUp,
   Brain,
   Users,
-  Tag,
-  Share2,
-  ExternalLink,
-  Play,
   DollarSign,
-  Gift,
   Edit,
   Trash2,
   MoreVertical,
-  Percent,
   Target,
   AwardIcon,
   CheckCircle,
@@ -36,6 +27,7 @@ import CreateDocModel from '../../components/common/customer/create-doc-model';
 import interestServices from '../../services/interestServices';
 import { Link } from 'react-router';
 import customerService from '../../services/customerService';
+import { formatCurrency, formatDate } from '../../utils';
 
 export default function CustomerDocuments() {
   const [activeTab, setActiveTab] = useState('all');
@@ -54,14 +46,11 @@ export default function CustomerDocuments() {
       const response = await interestServices.getPrioriryDocuments();
       setPriorityDocuments(response.data || []);
     };
-    fetchPriorityDocuments();
-  }, []);
-
-  useEffect(() => {
     const fetchEnrolledDocuments = async () => {
       const response = await customerService.getMyEnrolledDocuments();
       setEnrolledDocuments(response.data || []);
     };
+    fetchPriorityDocuments();
     fetchEnrolledDocuments();
   }, []);
 
@@ -410,7 +399,7 @@ export default function CustomerDocuments() {
             {/* Documents Display */}
             {viewMode === 'grid' ? (
               // Grid View
-              <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10'>
+              <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8'>
                 {sortedDocuments.map((doc) => {
                   const finalPrice =
                     doc.discount > 0
@@ -490,11 +479,11 @@ export default function CustomerDocuments() {
                               <div className='flex flex-col items-end'>
                                 {doc.discount > 0 && (
                                   <span className='text-gray-400 line-through text-xs'>
-                                    {doc.price.toLocaleString('vi-VN')} VNĐ
+                                    {formatCurrency(doc.price)}
                                   </span>
                                 )}
                                 <span className='text-blue-600 font-bold text-sm'>
-                                  {finalPrice.toLocaleString('vi-VN')} VNĐ
+                                  {formatCurrency(finalPrice)}
                                 </span>
                               </div>
                             )}
@@ -543,11 +532,7 @@ export default function CustomerDocuments() {
                           </div>
                           <div className='flex items-center gap-1'>
                             <Clock className='w-4 h-4' />
-                            <span>
-                              {new Date(doc.createdAt).toLocaleDateString(
-                                'vi-VN'
-                              )}
-                            </span>
+                            <span>{formatDate(doc.createdAt)}</span>
                           </div>
                         </div>
 
@@ -557,7 +542,7 @@ export default function CustomerDocuments() {
                             // Đã đăng ký - hiển thị nút xem chi tiết
                             <>
                               <Link
-                                to={`/customer/documents/${document._id}`}
+                                to={`/customer/documents/${doc._id}`}
                                 className='flex-1 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white py-2 px-4 rounded-xl font-medium transition-all duration-300 transform hover:scale-105 flex items-center justify-center gap-2'
                               >
                                 <CheckCircle className='w-4 h-4' />
@@ -661,11 +646,11 @@ export default function CustomerDocuments() {
                                   <div className='flex items-center gap-2'>
                                     {doc.discount > 0 && (
                                       <span className='text-gray-400 line-through text-sm'>
-                                        {doc.price.toLocaleString('vi-VN')} VNĐ
+                                        {formatCurrency(doc.price)}
                                       </span>
                                     )}
                                     <span className='text-blue-600 font-bold text-lg'>
-                                      {finalPrice.toLocaleString('vi-VN')} VNĐ
+                                      {formatCurrency(finalPrice)}
                                     </span>
                                   </div>
                                 )}

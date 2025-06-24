@@ -23,12 +23,12 @@ import documentServices from '../../../services/documentServices';
 export default function CreateDocModel() {
   const [isLoading, setIsLoading] = useState(false);
   const [documentData, setDocumentData] = useState({
-    title: '',
+    title: '(Free) ',
     description:
       'Khóa học này giúp bạn học nâng cao hơn và có thể tự tin hơn trong cuộc sống',
     interests: [],
     price: 0,
-    duration: '',
+    duration: '1 Giờ',
     discount: 0,
     thumbnailFiles: [],
     documentFiles: [],

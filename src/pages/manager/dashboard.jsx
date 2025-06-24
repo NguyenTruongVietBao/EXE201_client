@@ -10,11 +10,8 @@ import {
   PieChart,
   Pie,
   Cell,
-  LineChart,
-  Line,
   AreaChart,
   Area,
-  Legend,
 } from 'recharts';
 import {
   DollarSign,
@@ -25,20 +22,19 @@ import {
   AlertCircle,
   FileText,
   Award,
-  Download,
   Activity,
-  BookOpen,
-  UserCheck,
-  ShoppingCart,
   Clock,
   CheckCircle,
   XCircle,
-  PauseCircle,
 } from 'lucide-react';
 import managerServices from '../../services/managerServices';
+import LoadingPage from '../../components/common/LoadingPage';
+import ErrorStats from '../../components/common/ErrorStats';
+import { formatCurrency, formatDate } from '../../utils';
 
 export default function ManagerDashboard() {
   const [stats, setStats] = useState(null);
+  const [platformWallet, setPlatformWallet] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -46,8 +42,9 @@ export default function ManagerDashboard() {
       try {
         setLoading(true);
         const statsRes = await managerServices.managerStatistics();
-        console.log('🚀 ~ fetchStats ~ statsRes:', statsRes);
         setStats(statsRes.data);
+        const platformWalletRes = await managerServices.platformWallet();
+        setPlatformWallet(platformWalletRes.data);
       } catch (error) {
         console.error('Lỗi khi tải dữ liệu:', error);
       } finally {
@@ -58,41 +55,12 @@ export default function ManagerDashboard() {
   }, []);
 
   if (loading) {
-    return (
-      <div className='min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 flex items-center justify-center'>
-        <div className='text-center'>
-          <div className='relative'>
-            <div className='animate-spin rounded-full h-32 w-32 border-4 border-blue-200'></div>
-            <div className='animate-spin rounded-full h-32 w-32 border-t-4 border-blue-600 absolute top-0'></div>
-          </div>
-          <p className='mt-6 text-gray-600 font-medium'>
-            Đang tải dữ liệu dashboard...
-          </p>
-        </div>
-      </div>
-    );
+    return <LoadingPage message='Đang tải dữ liệu cho Manager...' />;
   }
 
-  if (!stats) {
-    return (
-      <div className='min-h-screen bg-gradient-to-br from-red-50 to-pink-50 flex items-center justify-center'>
-        <div className='text-center bg-white p-8 rounded-2xl shadow-xl'>
-          <AlertCircle size={64} className='mx-auto mb-4 text-red-500' />
-          <p className='text-red-600 font-semibold text-lg'>
-            Không thể tải dữ liệu dashboard
-          </p>
-          <p className='text-gray-500 mt-2'>Vui lòng thử lại sau</p>
-        </div>
-      </div>
-    );
+  if (!stats || !platformWallet) {
+    return <ErrorStats message='Không thể tải dữ liệu thống kê' />;
   }
-
-  const formatCurrency = (amount) => {
-    return new Intl.NumberFormat('vi-VN', {
-      style: 'currency',
-      currency: 'VND',
-    }).format(amount);
-  };
 
   const StatCard = ({
     title,
@@ -106,28 +74,32 @@ export default function ManagerDashboard() {
     trend,
   }) => (
     <div
-      className={`${bgGradient} rounded-2xl shadow-xl p-6 transform hover:scale-105 transition-all duration-300 hover:shadow-2xl border border-white/20 backdrop-blur-sm`}
+      className={`${bgGradient} rounded-xl shadow-lg p-5 transform hover:scale-105 transition-all duration-300 hover:shadow-xl border border-gray-100/20 backdrop-blur-sm`}
+      role='region'
+      aria-label={title}
     >
       <div className='flex items-center justify-between'>
         <div className='flex-1'>
-          <p className='text-white/80 font-medium mb-2 text-sm uppercase tracking-wide'>
+          <p className='text-gray-100 font-medium mb-2 text-xs uppercase tracking-wide'>
             {title}
           </p>
-          <p className={`text-3xl font-bold ${textColor} mb-1`}>{value}</p>
-          {subtitle && <p className='text-white/70 text-xs'>{subtitle}</p>}
+          <p className={`text-2xl sm:text-3xl font-bold ${textColor} mb-1`}>
+            {value}
+          </p>
+          {subtitle && <p className='text-gray-200 text-xs'>{subtitle}</p>}
           {trend && (
             <div className='flex items-center mt-2'>
-              <TrendingUp className='h-3 w-3 text-green-300 mr-1' />
-              <span className='text-green-300 text-xs font-medium'>
+              <TrendingUp className='h-3 w-3 text-green-400 mr-1' />
+              <span className='text-green-400 text-xs font-medium'>
                 {trend}
               </span>
             </div>
           )}
         </div>
         <div
-          className={`p-4 rounded-2xl ${iconBg} backdrop-blur-sm border border-white/20`}
+          className={`p-3 rounded-xl ${iconBg} backdrop-blur-sm border border-gray-100/20`}
         >
-          <IconComponent className='h-8 w-8 text-white' />
+          <IconComponent className='h-6 w-6 text-white' />
         </div>
       </div>
     </div>
@@ -148,27 +120,12 @@ export default function ManagerDashboard() {
       color: '#3B82F6',
     },
     {
-      name: 'Đã duyệt',
-      value: stats.overview.documents.approved,
-      color: '#10B981',
-    },
-    {
-      name: 'Chờ duyệt',
-      value: stats.overview.documents.pending,
-      color: '#F59E0B',
-    },
-    {
-      name: 'Từ chối',
-      value: stats.overview.documents.rejected,
-      color: '#EF4444',
-    },
-    {
       name: 'Miễn phí',
       value: stats.overview.documents.free,
       color: '#8B5CF6',
     },
     { name: 'Trả phí', value: stats.overview.documents.paid, color: '#EC4899' },
-  ];
+  ].filter((item) => item.value > 0); // Chỉ hiển thị nếu có dữ liệu
 
   // Dữ liệu cho biểu đồ payments
   const paymentData = [
@@ -187,19 +144,13 @@ export default function ManagerDashboard() {
       value: stats.overview.payments.failed,
       color: '#EF4444',
     },
-  ];
+  ].filter((item) => item.value > 0);
 
   // Dữ liệu cho daily revenue chart
   const dailyRevenueData = stats.dailyRevenueStats.map((day) => ({
-    date: new Date(day.date).toLocaleDateString('vi-VN'),
+    date: formatDate(day.date),
     revenue: day.revenue,
     sales: day.sales,
-  }));
-
-  // Top categories data
-  const topCategoriesData = stats.topCategories.slice(0, 8).map((cat) => ({
-    name: `${cat.emoji} ${cat.name}`,
-    value: cat.count,
   }));
 
   // Commission colors
@@ -213,59 +164,55 @@ export default function ManagerDashboard() {
 
   return (
     <div className='min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100'>
-      <div className='container mx-auto px-6 py-8'>
+      <div className='container mx-auto px-4 sm:px-6 py-8'>
         {/* Header */}
-        <div className='mb-12 text-center'>
+        <div className='mb-10 text-center animate-fade-in'>
           <div className='inline-block'>
-            <h1 className='text-5xl font-bold bg-gradient-to-r from-blue-600 via-purple-600 to-blue-800 bg-clip-text text-transparent mb-4'>
-              Dashboard Quản lý nền tảng
+            <h1 className='text-4xl sm:text-5xl py-2 font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent mb-3'>
+              Manager Dashboard
             </h1>
-            <div className='h-1 w-full bg-gradient-to-r from-blue-400 to-purple-500 rounded-full'></div>
+            <div className='h-1 w-full bg-gradient-to-r from-blue-400 to-indigo-400 rounded-full'></div>
           </div>
-          <p className='text-gray-600 text-lg mt-4 max-w-3xl mx-auto'>
-            Tổng quan toàn diện về hoạt động nền tảng với dữ liệu thời gian thực
-            và phân tích chi tiết
+          <p className='text-gray-600 text-base sm:text-lg mt-3 max-w-2xl mx-auto'>
+            Tổng quan hoạt động nền tảng với dữ liệu thời gian thực
           </p>
         </div>
 
         {/* Main Stats Cards */}
-        <div className='grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 mb-12'>
+        <div className='grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 sm:gap-6 mb-10'>
           <StatCard
             title='Tổng người dùng'
             value={stats.overview.users.total}
             IconComponent={Users}
-            bgGradient='bg-gradient-to-br from-blue-500 to-blue-700'
+            bgGradient='bg-gradient-to-br from-blue-500 to-blue-600'
             iconBg='bg-blue-400/30'
             textColor='text-white'
             subtitle={`${stats.overview.users.active} đang hoạt động`}
-            trend='+100% mới'
+            trend={`${stats.overview.users.new} mới`}
           />
-
           <StatCard
             title='Tài liệu'
             value={stats.overview.documents.total}
             IconComponent={FileText}
-            bgGradient='bg-gradient-to-br from-emerald-500 to-green-700'
+            bgGradient='bg-gradient-to-br from-emerald-500 to-emerald-600'
             iconBg='bg-emerald-400/30'
             textColor='text-white'
             subtitle={`${stats.overview.documents.paid} trả phí, ${stats.overview.documents.free} miễn phí`}
           />
-
           <StatCard
             title='Thanh toán'
             value={stats.overview.payments.total}
             IconComponent={CreditCard}
-            bgGradient='bg-gradient-to-br from-purple-500 to-indigo-700'
+            bgGradient='bg-gradient-to-br from-purple-500 to-purple-600'
             iconBg='bg-purple-400/30'
             textColor='text-white'
             subtitle={`${stats.overview.payments.completed} thành công`}
           />
-
           <StatCard
             title='Tổng doanh thu'
             value={formatCurrency(stats.revenue.totalRevenue)}
             IconComponent={DollarSign}
-            bgGradient='bg-gradient-to-br from-orange-500 to-red-600'
+            bgGradient='bg-gradient-to-br from-orange-500 to-orange-600'
             iconBg='bg-orange-400/30'
             textColor='text-white'
             subtitle='Tất cả giao dịch'
@@ -273,495 +220,575 @@ export default function ManagerDashboard() {
         </div>
 
         {/* Revenue & Wallet Section */}
-        <div className='grid grid-cols-1 xl:grid-cols-3 gap-8 mb-12'>
+        <div className='grid grid-cols-1 xl:grid-cols-3 gap-6 mb-10'>
           {/* Platform Wallet */}
-          <div className='bg-white/80 backdrop-blur-sm rounded-3xl shadow-2xl p-8 border border-white/50'>
-            <div className='flex items-center mb-6'>
-              <div className='w-2 h-8 bg-gradient-to-b from-emerald-500 to-emerald-700 rounded-full mr-4'></div>
-              <h3 className='text-2xl font-bold text-gray-800'>Ví nền tảng</h3>
+          <div className='bg-white/90 rounded-2xl shadow-lg p-6 border border-gray-100 animate-fade-in'>
+            <div className='flex items-center mb-4'>
+              <div className='w-2 h-6 bg-gradient-to-b from-emerald-500 to-emerald-600 rounded-full mr-3'></div>
+              <h3 className='text-xl font-bold text-gray-800'>Ví nền tảng</h3>
             </div>
 
-            <div className='space-y-4'>
-              <div className='p-4 bg-gradient-to-r from-emerald-50 to-green-100 rounded-xl border border-emerald-200'>
+            {/* Main Balance Overview */}
+            <div className='grid grid-cols-1 sm:grid-cols-2 gap-3 mb-4'>
+              <div className='p-3 bg-gradient-to-r from-blue-50 to-blue-100 rounded-xl border border-blue-200'>
                 <div className='flex items-center justify-between'>
                   <div>
-                    <p className='text-sm font-semibold text-emerald-800'>
+                    <p className='text-sm font-medium text-blue-700'>
+                      Tổng số dư
+                    </p>
+                    <p className='text-lg font-bold text-blue-900'>
+                      {formatCurrency(platformWallet.totalBalance)}
+                    </p>
+                  </div>
+                  <Wallet className='h-6 w-6 text-blue-600' />
+                </div>
+              </div>
+
+              <div className='p-3 bg-gradient-to-r from-emerald-50 to-emerald-100 rounded-xl border border-emerald-200'>
+                <div className='flex items-center justify-between'>
+                  <div>
+                    <p className='text-sm font-medium text-emerald-700'>
                       Số dư khả dụng
                     </p>
-                    <p className='text-2xl font-bold text-emerald-600'>
-                      {formatCurrency(stats.platformWallet.availableBalance)}
+                    <p className='text-lg font-bold text-emerald-900'>
+                      {formatCurrency(platformWallet.availableBalance)}
                     </p>
                   </div>
-                  <Wallet className='h-8 w-8 text-emerald-500' />
+                  <CheckCircle className='h-6 w-6 text-emerald-600' />
                 </div>
               </div>
 
-              <div className='p-4 bg-gradient-to-r from-blue-50 to-indigo-100 rounded-xl border border-blue-200'>
+              <div className='p-3 bg-gradient-to-r from-orange-50 to-orange-100 rounded-xl border border-orange-200'>
                 <div className='flex items-center justify-between'>
                   <div>
-                    <p className='text-sm font-semibold text-blue-800'>
+                    <p className='text-sm font-medium text-orange-700'>
+                      Đang chờ xử lý
+                    </p>
+                    <p className='text-lg font-bold text-orange-900'>
+                      {formatCurrency(platformWallet.pendingBalance)}
+                    </p>
+                  </div>
+                  <Clock className='h-6 w-6 text-orange-600' />
+                </div>
+              </div>
+
+              <div className='p-3 bg-gradient-to-r from-yellow-50 to-yellow-100 rounded-xl border border-yellow-200'>
+                <div className='flex items-center justify-between'>
+                  <div>
+                    <p className='text-sm font-medium text-yellow-700'>
                       Tổng hoa hồng
                     </p>
-                    <p className='text-2xl font-bold text-blue-600'>
-                      {formatCurrency(
-                        stats.platformWallet.totalCommissionEarned
-                      )}
+                    <p className='text-lg font-bold text-yellow-900'>
+                      {formatCurrency(platformWallet.totalCommissionEarned)}
                     </p>
                   </div>
-                  <Award className='h-8 w-8 text-blue-500' />
+                  <Award className='h-6 w-6 text-yellow-600' />
+                </div>
+              </div>
+            </div>
+
+            {/* Financial Activities Section */}
+            <div className='border-t border-gray-200 pt-4'>
+              <h4 className='text-sm font-semibold text-gray-700 mb-3'>
+                Hoạt động tài chính
+              </h4>
+              <div className='grid grid-cols-1 sm:grid-cols-2 gap-3'>
+                <div className='p-3 bg-red-50 rounded-xl border border-red-100'>
+                  <div className='flex items-center justify-between mb-2'>
+                    <div>
+                      <p className='text-sm font-medium text-red-700'>
+                        Tổng hoàn tiền
+                      </p>
+                      <p className='text-lg font-bold text-red-900'>
+                        {formatCurrency(platformWallet.totalRefunded)}
+                      </p>
+                    </div>
+                    <XCircle className='h-5 w-5 text-red-600' />
+                  </div>
+                  <div className='flex items-center justify-between text-xs text-red-600'>
+                    <span>
+                      {platformWallet.statistics.totalRefundCount} giao dịch
+                    </span>
+                    <span>
+                      {platformWallet.statistics.pendingRefundCount} đang chờ
+                    </span>
+                  </div>
+                </div>
+
+                <div className='p-3 bg-indigo-50 rounded-xl border border-indigo-100'>
+                  <div className='flex items-center justify-between mb-2'>
+                    <div>
+                      <p className='text-sm font-medium text-indigo-700'>
+                        Tổng rút tiền
+                      </p>
+                      <p className='text-lg font-bold text-indigo-900'>
+                        {formatCurrency(platformWallet.totalWithdrawals)}
+                      </p>
+                    </div>
+                    <TrendingUp className='h-5 w-5 text-indigo-600' />
+                  </div>
+                  <div className='flex items-center justify-between text-xs text-indigo-600'>
+                    <span>
+                      {platformWallet.statistics.totalWithdrawalCount} giao dịch
+                    </span>
+                    <span>
+                      {platformWallet.statistics.pendingWithdrawalCount} đang
+                      chờ
+                    </span>
+                  </div>
                 </div>
               </div>
 
-              <div className='p-4 bg-gradient-to-r from-red-50 to-pink-100 rounded-xl border border-red-200'>
-                <div className='flex items-center justify-between'>
+              {/* Statistics Summary */}
+              <div className='mt-3 p-3 bg-gray-50 rounded-xl border border-gray-100'>
+                <div className='grid grid-cols-2 gap-4 text-center'>
                   <div>
-                    <p className='text-sm font-semibold text-red-800'>
-                      Đã hoàn trả
-                    </p>
-                    <p className='text-2xl font-bold text-red-600'>
-                      {formatCurrency(stats.platformWallet.totalRefunded)}
-                    </p>
+                    <p className='text-xs text-gray-600'>Tỷ lệ hoàn tiền</p>
+                    <p className='text-sm font-bold text-gray-900'>100%</p>
                   </div>
-                  <AlertCircle className='h-8 w-8 text-red-500' />
+                  <div>
+                    <p className='text-xs text-gray-600'>Tỷ lệ rút tiền</p>
+                    <p className='text-sm font-bold text-gray-900'>100%</p>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
 
           {/* Daily Revenue Chart */}
-          <div className='xl:col-span-2 bg-white/80 backdrop-blur-sm rounded-3xl shadow-2xl p-8 border border-white/50'>
-            <div className='flex items-center mb-6'>
-              <div className='w-2 h-8 bg-gradient-to-b from-green-500 to-green-700 rounded-full mr-4'></div>
-              <h3 className='text-2xl font-bold text-gray-800'>
+          <div className='xl:col-span-2 bg-white/90 rounded-2xl shadow-lg p-6 border border-gray-100 animate-fade-in'>
+            <div className='flex items-center mb-4'>
+              <div className='w-2 h-6 bg-gradient-to-b from-green-500 to-green-600 rounded-full mr-3'></div>
+              <h3 className='text-xl font-bold text-gray-800'>
                 Doanh thu theo ngày
               </h3>
             </div>
-            <ResponsiveContainer width='100%' height={300}>
-              <AreaChart data={dailyRevenueData}>
-                <CartesianGrid strokeDasharray='3 3' stroke='#e2e8f0' />
-                <XAxis
-                  dataKey='date'
-                  tick={{ fontSize: 12, fill: '#64748b' }}
-                  axisLine={{ stroke: '#cbd5e1' }}
-                />
-                <YAxis
-                  tick={{ fontSize: 12, fill: '#64748b' }}
-                  axisLine={{ stroke: '#cbd5e1' }}
-                />
-                <Tooltip
-                  formatter={(value, name) => [
-                    name === 'revenue' ? formatCurrency(value) : value,
-                    name === 'revenue' ? 'Doanh thu' : 'Số lượng bán',
-                  ]}
-                  contentStyle={{
-                    backgroundColor: 'white',
-                    border: 'none',
-                    borderRadius: '12px',
-                    boxShadow: '0 10px 25px rgba(0,0,0,0.1)',
-                  }}
-                />
-                <Area
-                  type='monotone'
-                  dataKey='revenue'
-                  stroke='#10B981'
-                  fill='url(#revenueGradient)'
-                  strokeWidth={3}
-                />
-                <defs>
-                  <linearGradient
-                    id='revenueGradient'
-                    x1='0'
-                    y1='0'
-                    x2='0'
-                    y2='1'
-                  >
-                    <stop offset='0%' stopColor='#10B981' stopOpacity={0.8} />
-                    <stop offset='100%' stopColor='#10B981' stopOpacity={0.1} />
-                  </linearGradient>
-                </defs>
-              </AreaChart>
-            </ResponsiveContainer>
+            {dailyRevenueData.length > 0 ? (
+              <ResponsiveContainer width='100%' height={280}>
+                <AreaChart data={dailyRevenueData}>
+                  <CartesianGrid strokeDasharray='3 3' stroke='#e5e7eb' />
+                  <XAxis
+                    dataKey='date'
+                    tick={{ fontSize: 12, fill: '#6b7280' }}
+                  />
+                  <YAxis tick={{ fontSize: 12, fill: '#6b7280' }} />
+                  <Tooltip
+                    formatter={(value, name) => [
+                      name === 'revenue' ? formatCurrency(value) : value,
+                      name === 'revenue' ? 'Doanh thu' : 'Số lượng bán',
+                    ]}
+                    contentStyle={{
+                      backgroundColor: 'white',
+                      border: 'none',
+                      borderRadius: '8px',
+                      boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+                    }}
+                  />
+                  <Area
+                    type='monotone'
+                    dataKey='revenue'
+                    stroke='#10B981'
+                    fill='url(#revenueGradient)'
+                    strokeWidth={2}
+                  />
+                  <defs>
+                    <linearGradient
+                      id='revenueGradient'
+                      x1='0'
+                      y1='0'
+                      x2='0'
+                      y2='1'
+                    >
+                      <stop offset='0%' stopColor='#10B981' stopOpacity={0.7} />
+                      <stop
+                        offset='100%'
+                        stopColor='#10B981'
+                        stopOpacity={0.1}
+                      />
+                    </linearGradient>
+                  </defs>
+                </AreaChart>
+              </ResponsiveContainer>
+            ) : (
+              <div className='flex items-center justify-center h-64 text-gray-500'>
+                Chưa có dữ liệu doanh thu
+              </div>
+            )}
           </div>
         </div>
 
         {/* Charts Section */}
-        <div className='grid grid-cols-1 xl:grid-cols-3 gap-8 mb-12'>
+        <div className='grid grid-cols-1 xl:grid-cols-3 gap-6 mb-10'>
           {/* User Roles Distribution */}
-          <div className='bg-white/80 backdrop-blur-sm rounded-3xl shadow-2xl p-8 border border-white/50'>
-            <div className='flex items-center mb-6'>
-              <div className='w-2 h-8 bg-gradient-to-b from-blue-500 to-blue-700 rounded-full mr-4'></div>
-              <h3 className='text-2xl font-bold text-gray-800'>
+          <div className='bg-white/90 rounded-2xl shadow-lg p-6 border border-gray-100 animate-fade-in'>
+            <div className='flex items-center mb-4'>
+              <div className='w-2 h-6 bg-gradient-to-b from-blue-500 to-blue-600 rounded-full mr-3'></div>
+              <h3 className='text-xl font-bold text-gray-800'>
                 Phân bố người dùng
               </h3>
             </div>
-            <ResponsiveContainer width='100%' height={300}>
-              <PieChart>
-                <Pie
-                  data={userRoleData}
-                  cx='50%'
-                  cy='50%'
-                  outerRadius={100}
-                  innerRadius={50}
-                  dataKey='value'
-                  label={({ name, percentage }) => `${name}: ${percentage}%`}
-                  labelLine={false}
-                >
-                  {userRoleData.map((entry, index) => (
-                    <Cell
-                      key={`cell-${index}`}
-                      fill={commissionColors[index % commissionColors.length]}
-                    />
-                  ))}
-                </Pie>
-                <Tooltip
-                  formatter={(value) => [value, 'Số lượng']}
-                  contentStyle={{
-                    backgroundColor: 'white',
-                    border: 'none',
-                    borderRadius: '12px',
-                    boxShadow: '0 10px 25px rgba(0,0,0,0.1)',
-                  }}
-                />
-              </PieChart>
-            </ResponsiveContainer>
+            {userRoleData.length > 0 ? (
+              <ResponsiveContainer width='100%' height={280}>
+                <PieChart>
+                  <Pie
+                    data={userRoleData}
+                    cx='50%'
+                    cy='50%'
+                    outerRadius={window.innerWidth < 640 ? 80 : 100}
+                    innerRadius={window.innerWidth < 640 ? 40 : 50}
+                    dataKey='value'
+                    label={({ name, percentage }) => `${name}: ${percentage}%`}
+                    labelLine={false}
+                  >
+                    {userRoleData.map((entry, index) => (
+                      <Cell
+                        key={`cell-${index}`}
+                        fill={commissionColors[index % commissionColors.length]}
+                      />
+                    ))}
+                  </Pie>
+                  <Tooltip
+                    formatter={(value) => [value, 'Số lượng']}
+                    contentStyle={{
+                      backgroundColor: 'white',
+                      border: 'none',
+                      borderRadius: '8px',
+                      boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+                    }}
+                  />
+                </PieChart>
+              </ResponsiveContainer>
+            ) : (
+              <div className='flex items-center justify-center h-64 text-gray-500'>
+                Chưa có dữ liệu người dùng
+              </div>
+            )}
           </div>
 
           {/* Documents Status */}
-          <div className='bg-white/80 backdrop-blur-sm rounded-3xl shadow-2xl p-8 border border-white/50'>
-            <div className='flex items-center mb-6'>
-              <div className='w-2 h-8 bg-gradient-to-b from-purple-500 to-purple-700 rounded-full mr-4'></div>
-              <h3 className='text-2xl font-bold text-gray-800'>
-                Trạng thái tài liệu
+          <div className='bg-white/90 rounded-2xl shadow-lg p-6 border border-gray-100 animate-fade-in'>
+            <div className='flex items-center mb-4'>
+              <div className='w-2 h-6 bg-gradient-to-b from-purple-500 to-purple-600 rounded-full mr-3'></div>
+              <h3 className='text-xl font-bold text-gray-800'>
+                Phân bố tài liệu
               </h3>
             </div>
-            <ResponsiveContainer width='100%' height={300}>
-              <BarChart data={documentData}>
-                <CartesianGrid strokeDasharray='3 3' stroke='#e2e8f0' />
-                <XAxis
-                  dataKey='name'
-                  tick={{ fontSize: 11, fill: '#64748b' }}
-                  axisLine={{ stroke: '#cbd5e1' }}
-                />
-                <YAxis
-                  tick={{ fontSize: 12, fill: '#64748b' }}
-                  axisLine={{ stroke: '#cbd5e1' }}
-                />
-                <Tooltip
-                  contentStyle={{
-                    backgroundColor: 'white',
-                    border: 'none',
-                    borderRadius: '12px',
-                    boxShadow: '0 10px 25px rgba(0,0,0,0.1)',
-                  }}
-                />
-                <Bar dataKey='value' fill='#8B5CF6' radius={[4, 4, 0, 0]} />
-              </BarChart>
-            </ResponsiveContainer>
+            {documentData.length > 0 ? (
+              <ResponsiveContainer width='100%' height={280}>
+                <BarChart data={documentData}>
+                  <CartesianGrid strokeDasharray='3 3' stroke='#e5e7eb' />
+                  <XAxis
+                    dataKey='name'
+                    tick={{ fontSize: 12, fill: '#6b7280' }}
+                  />
+                  <YAxis tick={{ fontSize: 12, fill: '#6b7280' }} />
+                  <Tooltip
+                    contentStyle={{
+                      backgroundColor: 'white',
+                      border: 'none',
+                      borderRadius: '8px',
+                      boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+                    }}
+                  />
+                  <Bar dataKey='value' radius={[4, 4, 0, 0]}>
+                    {documentData.map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={entry.color} />
+                    ))}
+                  </Bar>
+                </BarChart>
+              </ResponsiveContainer>
+            ) : (
+              <div className='flex items-center justify-center h-64 text-gray-500'>
+                Chưa có dữ liệu tài liệu
+              </div>
+            )}
           </div>
 
           {/* Payment Status */}
-          <div className='bg-white/80 backdrop-blur-sm rounded-3xl shadow-2xl p-8 border border-white/50'>
-            <div className='flex items-center mb-6'>
-              <div className='w-2 h-8 bg-gradient-to-b from-orange-500 to-orange-700 rounded-full mr-4'></div>
-              <h3 className='text-2xl font-bold text-gray-800'>Thanh toán</h3>
+          <div className='bg-white/90 rounded-2xl shadow-lg p-6 border border-gray-100 animate-fade-in'>
+            <div className='flex items-center mb-4'>
+              <div className='w-2 h-6 bg-gradient-to-b from-orange-500 to-orange-600 rounded-full mr-3'></div>
+              <h3 className='text-xl font-bold text-gray-800'>
+                Tình trạng thanh toán
+              </h3>
             </div>
-            <ResponsiveContainer width='100%' height={300}>
-              <PieChart>
-                <Pie
-                  data={paymentData}
-                  cx='50%'
-                  cy='50%'
-                  outerRadius={100}
-                  dataKey='value'
-                  label={({ name, value }) => `${name}: ${value}`}
-                >
-                  {paymentData.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={entry.color} />
-                  ))}
-                </Pie>
-                <Tooltip
-                  contentStyle={{
-                    backgroundColor: 'white',
-                    border: 'none',
-                    borderRadius: '12px',
-                    boxShadow: '0 10px 25px rgba(0,0,0,0.1)',
-                  }}
-                />
-              </PieChart>
-            </ResponsiveContainer>
+            {paymentData.length > 0 ? (
+              <ResponsiveContainer width='100%' height={280}>
+                <PieChart>
+                  <Pie
+                    data={paymentData}
+                    cx='50%'
+                    cy='50%'
+                    outerRadius={window.innerWidth < 640 ? 80 : 100}
+                    dataKey='value'
+                    label={({ name, value }) => `${name}: ${value}`}
+                  >
+                    {paymentData.map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={entry.color} />
+                    ))}
+                  </Pie>
+                  <Tooltip
+                    contentStyle={{
+                      backgroundColor: 'white',
+                      border: 'none',
+                      borderRadius: '8px',
+                      boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+                    }}
+                  />
+                </PieChart>
+              </ResponsiveContainer>
+            ) : (
+              <div className='flex items-center justify-center h-64 text-gray-500'>
+                Chưa có dữ liệu thanh toán
+              </div>
+            )}
           </div>
-        </div>
-
-        {/* Top Categories */}
-        <div className='bg-white/80 backdrop-blur-sm rounded-3xl shadow-2xl p-8 border border-white/50 mb-12'>
-          <div className='flex items-center mb-6'>
-            <div className='w-2 h-8 bg-gradient-to-b from-indigo-500 to-indigo-700 rounded-full mr-4'></div>
-            <h3 className='text-2xl font-bold text-gray-800'>
-              Danh mục phổ biến
-            </h3>
-          </div>
-          <ResponsiveContainer width='100%' height={350}>
-            <BarChart data={topCategoriesData} layout='horizontal'>
-              <CartesianGrid strokeDasharray='3 3' stroke='#e2e8f0' />
-              <XAxis type='number' tick={{ fontSize: 12, fill: '#64748b' }} />
-              <YAxis
-                type='category'
-                dataKey='name'
-                tick={{ fontSize: 12, fill: '#64748b' }}
-                width={120}
-              />
-              <Tooltip
-                formatter={(value) => [value, 'Số lượng tài liệu']}
-                contentStyle={{
-                  backgroundColor: 'white',
-                  border: 'none',
-                  borderRadius: '12px',
-                  boxShadow: '0 10px 25px rgba(0,0,0,0.1)',
-                }}
-              />
-              <Bar
-                dataKey='value'
-                fill='url(#categoryGradient)'
-                radius={[0, 8, 8, 0]}
-              />
-              <defs>
-                <linearGradient
-                  id='categoryGradient'
-                  x1='0'
-                  y1='0'
-                  x2='1'
-                  y2='0'
-                >
-                  <stop offset='0%' stopColor='#6366F1' />
-                  <stop offset='100%' stopColor='#8B5CF6' />
-                </linearGradient>
-              </defs>
-            </BarChart>
-          </ResponsiveContainer>
         </div>
 
         {/* Top Selling Documents & Top Sellers */}
-        <div className='grid grid-cols-1 xl:grid-cols-2 gap-8 mb-12'>
+        <div className='grid grid-cols-1 xl:grid-cols-2 gap-6 mb-10'>
           {/* Top Selling Documents */}
-          <div className='bg-white/80 backdrop-blur-sm rounded-3xl shadow-2xl p-8 border border-white/50'>
-            <div className='flex items-center mb-6'>
-              <div className='w-2 h-8 bg-gradient-to-b from-green-500 to-green-700 rounded-full mr-4'></div>
-              <h3 className='text-2xl font-bold text-gray-800'>
+          <div className='bg-white/90 rounded-2xl shadow-lg p-6 border border-gray-100 animate-fade-in'>
+            <div className='flex items-center mb-4'>
+              <div className='w-2 h-6 bg-gradient-to-b from-green-500 to-green-600 rounded-full mr-3'></div>
+              <h3 className='text-xl font-bold text-gray-800'>
                 Tài liệu bán chạy
               </h3>
             </div>
-            <div className='space-y-4'>
-              {stats.topSellingDocuments.slice(0, 5).map((doc, index) => (
-                <div
-                  key={doc._id}
-                  className='flex items-center justify-between p-4 bg-gradient-to-r from-gray-50 to-white rounded-xl border border-gray-200 hover:shadow-lg transition-shadow'
-                >
-                  <div className='flex items-center space-x-4'>
-                    <div className='w-8 h-8 bg-gradient-to-br from-green-400 to-green-600 rounded-full flex items-center justify-center text-white font-bold text-sm'>
-                      {index + 1}
+            {stats.topSellingDocuments.length > 0 ? (
+              <div className='space-y-3'>
+                {stats.topSellingDocuments.slice(0, 4).map((doc, index) => (
+                  <div
+                    key={doc._id}
+                    className='flex items-center justify-between p-3 bg-gray-50 rounded-xl border border-gray-100 hover:bg-gray-100 transition-colors'
+                  >
+                    <div className='flex items-center space-x-3'>
+                      <div className='w-6 h-6 bg-gradient-to-br from-green-400 to-green-500 rounded-full flex items-center justify-center text-white text-xs font-bold'>
+                        {index + 1}
+                      </div>
+                      <div>
+                        <p className='font-medium text-gray-800 truncate max-w-[180px] sm:max-w-[220px]'>
+                          {doc.title}
+                        </p>
+                        <p className='text-sm text-gray-600'>
+                          bởi {doc.authorName}
+                        </p>
+                      </div>
                     </div>
-                    <div>
-                      <p className='font-semibold text-gray-800 truncate max-w-[200px]'>
-                        {doc.title}
+                    <div className='text-right'>
+                      <p className='font-medium text-green-600'>
+                        {formatCurrency(doc.revenue)}
                       </p>
-                      <p className='text-sm text-gray-600'>
-                        bởi {doc.authorName}
+                      <p className='text-xs text-gray-500'>
+                        {doc.sales} lượt bán
                       </p>
                     </div>
                   </div>
-                  <div className='text-right'>
-                    <p className='font-bold text-green-600'>
-                      {formatCurrency(doc.revenue)}
-                    </p>
-                    <p className='text-sm text-gray-500'>
-                      {doc.sales} lượt bán
-                    </p>
-                  </div>
-                </div>
-              ))}
-            </div>
+                ))}
+              </div>
+            ) : (
+              <div className='flex items-center justify-center h-48 text-gray-500'>
+                Chưa có tài liệu bán chạy
+              </div>
+            )}
           </div>
 
           {/* Top Sellers */}
-          <div className='bg-white/80 backdrop-blur-sm rounded-3xl shadow-2xl p-8 border border-white/50'>
-            <div className='flex items-center mb-6'>
-              <div className='w-2 h-8 bg-gradient-to-b from-blue-500 to-blue-700 rounded-full mr-4'></div>
-              <h3 className='text-2xl font-bold text-gray-800'>
+          <div className='bg-white/90 rounded-2xl shadow-lg p-6 border border-gray-100 animate-fade-in'>
+            <div className='flex items-center mb-4'>
+              <div className='w-2 h-6 bg-gradient-to-b from-blue-500 to-blue-600 rounded-full mr-3'></div>
+              <h3 className='text-xl font-bold text-gray-800'>
                 Seller hàng đầu
               </h3>
             </div>
-            <div className='space-y-4'>
-              {stats.topSellers.map((seller, index) => (
-                <div
-                  key={seller._id}
-                  className='flex items-center justify-between p-4 bg-gradient-to-r from-gray-50 to-white rounded-xl border border-gray-200 hover:shadow-lg transition-shadow'
-                >
-                  <div className='flex items-center space-x-4'>
-                    <div className='w-8 h-8 bg-gradient-to-br from-blue-400 to-blue-600 rounded-full flex items-center justify-center text-white font-bold text-sm'>
-                      {index + 1}
+            {stats.topSellers.length > 0 ? (
+              <div className='space-y-3'>
+                {stats.topSellers
+                  .filter((seller) => seller.totalSales > 0)
+                  .sort((a, b) => b.totalSales - a.totalSales)
+                  .slice(0, 4)
+                  .map((seller, index) => (
+                    <div
+                      key={seller._id}
+                      className='flex items-center justify-between p-3 bg-gray-50 rounded-xl border border-gray-100 hover:bg-gray-100 transition-colors'
+                    >
+                      <div className='flex items-center space-x-3'>
+                        <div className='w-6 h-6 bg-gradient-to-br from-blue-400 to-blue-500 rounded-full flex items-center justify-center text-white text-xs font-bold'>
+                          {index + 1}
+                        </div>
+                        <img
+                          src={seller.avatar}
+                          alt={seller.name}
+                          className='w-8 h-8 rounded-full border border-gray-200'
+                        />
+                        <div>
+                          <p className='font-medium text-gray-800'>
+                            {seller.name}
+                          </p>
+                          <p className='text-sm text-gray-600 truncate max-w-[150px] sm:max-w-[200px]'>
+                            {seller.email}
+                          </p>
+                        </div>
+                      </div>
+                      <div className='text-right'>
+                        <p className='font-medium text-blue-600'>
+                          {seller.totalSales} lượt bán
+                        </p>
+                      </div>
                     </div>
-                    <img
-                      src={seller.avatar}
-                      alt={seller.name}
-                      className='w-10 h-10 rounded-full border-2 border-white shadow-md'
-                    />
-                    <div>
-                      <p className='font-semibold text-gray-800'>
-                        {seller.name}
-                      </p>
-                      <p className='text-sm text-gray-600'>{seller.email}</p>
-                    </div>
-                  </div>
-                  <div className='text-right'>
-                    <p className='font-bold text-blue-600'>
-                      {seller.totalSales} lượt bán
-                    </p>
-                    <p className='text-sm text-gray-500'>
-                      {formatCurrency(seller.totalRevenue)}
-                    </p>
-                  </div>
-                </div>
-              ))}
-            </div>
+                  ))}
+              </div>
+            ) : (
+              <div className='flex items-center justify-center h-48 text-gray-500'>
+                Chưa có seller hàng đầu
+              </div>
+            )}
           </div>
         </div>
 
         {/* Recent Activities */}
-        <div className='grid grid-cols-1 xl:grid-cols-2 gap-8 mb-12'>
+        <div className='grid grid-cols-1 xl:grid-cols-2 gap-6 mb-10'>
           {/* Recent Documents */}
-          <div className='bg-white/80 backdrop-blur-sm rounded-3xl shadow-2xl p-8 border border-white/50'>
-            <div className='flex items-center mb-6'>
-              <div className='w-2 h-8 bg-gradient-to-b from-purple-500 to-purple-700 rounded-full mr-4'></div>
-              <h3 className='text-2xl font-bold text-gray-800'>
+          <div className='bg-white/90 rounded-2xl shadow-lg p-6 border border-gray-100 animate-fade-in'>
+            <div className='flex items-center mb-4'>
+              <div className='w-2 h-6 bg-gradient-to-b from-purple-500 to-purple-600 rounded-full mr-3'></div>
+              <h3 className='text-xl font-bold text-gray-800'>
                 Tài liệu gần đây
               </h3>
             </div>
-            <div className='space-y-4'>
-              {stats.recentActivities.documents.slice(0, 5).map((doc) => (
-                <div
-                  key={doc._id}
-                  className='flex items-center justify-between p-4 bg-gradient-to-r from-gray-50 to-white rounded-xl border border-gray-200 hover:shadow-lg transition-shadow'
-                >
-                  <div className='flex items-center space-x-4'>
-                    <img
-                      src={doc.author.avatar}
-                      alt={doc.author.name}
-                      className='w-10 h-10 rounded-full border-2 border-white shadow-md'
-                    />
-                    <div>
-                      <p className='font-semibold text-gray-800 truncate max-w-[200px]'>
-                        {doc.title}
-                      </p>
-                      <p className='text-sm text-gray-600'>
-                        bởi {doc.author.name}
-                      </p>
-                      <p className='text-xs text-gray-500'>
-                        {new Date(doc.createdAt).toLocaleDateString('vi-VN')}
-                      </p>
+            {stats.recentActivities.documents.length > 0 ? (
+              <div className='space-y-3'>
+                {stats.recentActivities.documents.slice(0, 4).map((doc) => (
+                  <div
+                    key={doc._id}
+                    className='flex items-center justify-between p-3 bg-gray-50 rounded-xl border border-gray-100 hover:bg-gray-100 transition-colors'
+                  >
+                    <div className='flex items-center space-x-3'>
+                      <img
+                        src={doc.author.avatar}
+                        alt={doc.author.name}
+                        className='w-8 h-8 rounded-full border border-gray-200'
+                      />
+                      <div>
+                        <p className='font-medium text-gray-800 truncate max-w-[180px] sm:max-w-[220px]'>
+                          {doc.title}
+                        </p>
+                        <p className='text-sm text-gray-600'>
+                          bởi {doc.author.name}
+                        </p>
+                        <p className='text-xs text-gray-500'>
+                          {formatDate(doc.createdAt)}
+                        </p>
+                      </div>
+                    </div>
+                    <div className='flex items-center space-x-2'>
+                      {doc.status === 'APPROVED' && (
+                        <CheckCircle className='h-4 w-4 text-green-500' />
+                      )}
+                      {doc.status === 'PENDING' && (
+                        <Clock className='h-4 w-4 text-yellow-500' />
+                      )}
+                      {doc.status === 'REJECTED' && (
+                        <XCircle className='h-4 w-4 text-red-500' />
+                      )}
+                      <span
+                        className={`text-xs font-medium px-2 py-1 rounded-full ${
+                          doc.status === 'APPROVED'
+                            ? 'bg-green-100 text-green-800'
+                            : doc.status === 'PENDING'
+                            ? 'bg-yellow-100 text-yellow-800'
+                            : 'bg-red-100 text-red-800'
+                        }`}
+                      >
+                        {doc.status}
+                      </span>
                     </div>
                   </div>
-                  <div className='flex items-center space-x-2'>
-                    {doc.status === 'APPROVED' && (
-                      <CheckCircle className='h-5 w-5 text-green-500' />
-                    )}
-                    {doc.status === 'PENDING' && (
-                      <Clock className='h-5 w-5 text-yellow-500' />
-                    )}
-                    {doc.status === 'REJECTED' && (
-                      <XCircle className='h-5 w-5 text-red-500' />
-                    )}
-                    <span
-                      className={`text-xs font-semibold px-2 py-1 rounded-full ${
-                        doc.status === 'APPROVED'
-                          ? 'bg-green-100 text-green-800'
-                          : doc.status === 'PENDING'
-                          ? 'bg-yellow-100 text-yellow-800'
-                          : 'bg-red-100 text-red-800'
-                      }`}
-                    >
-                      {doc.status}
-                    </span>
-                  </div>
-                </div>
-              ))}
-            </div>
+                ))}
+              </div>
+            ) : (
+              <div className='flex items-center justify-center h-48 text-gray-500'>
+                Chưa có tài liệu gần đây
+              </div>
+            )}
           </div>
 
           {/* Recent Payments */}
-          <div className='bg-white/80 backdrop-blur-sm rounded-3xl shadow-2xl p-8 border border-white/50'>
-            <div className='flex items-center mb-6'>
-              <div className='w-2 h-8 bg-gradient-to-b from-emerald-500 to-emerald-700 rounded-full mr-4'></div>
-              <h3 className='text-2xl font-bold text-gray-800'>
+          <div className='bg-white/90 rounded-2xl shadow-lg p-6 border border-gray-100 animate-fade-in'>
+            <div className='flex items-center mb-4'>
+              <div className='w-2 h-6 bg-gradient-to-b from-emerald-500 to-emerald-600 rounded-full mr-3'></div>
+              <h3 className='text-xl font-bold text-gray-800'>
                 Thanh toán gần đây
               </h3>
             </div>
-            <div className='space-y-4'>
-              {stats.recentActivities.payments.slice(0, 5).map((payment) => (
-                <div
-                  key={payment._id}
-                  className='flex items-center justify-between p-4 bg-gradient-to-r from-gray-50 to-white rounded-xl border border-gray-200 hover:shadow-lg transition-shadow'
-                >
-                  <div className='flex items-center space-x-4'>
-                    <img
-                      src={payment.userId.avatar}
-                      alt={payment.userId.name}
-                      className='w-10 h-10 rounded-full border-2 border-white shadow-md'
-                    />
-                    <div>
-                      <p className='font-semibold text-gray-800'>
-                        {payment.userId.name}
+            {stats.recentActivities.payments.length > 0 ? (
+              <div className='space-y-3'>
+                {stats.recentActivities.payments.slice(0, 4).map((payment) => (
+                  <div
+                    key={payment._id}
+                    className='flex items-center justify-between p-3 bg-gray-50 rounded-xl border border-gray-100 hover:bg-gray-100 transition-colors'
+                  >
+                    <div className='flex items-center space-x-3'>
+                      <img
+                        src={payment.userId.avatar}
+                        alt={payment.userId.name}
+                        className='w-8 h-8 rounded-full border border-gray-200'
+                      />
+                      <div>
+                        <p className='font-medium text-gray-800'>
+                          {payment.userId.name}
+                        </p>
+                        <p className='text-sm text-gray-600 truncate max-w-[180px] sm:max-w-[220px]'>
+                          {payment.documentId.title}
+                        </p>
+                        <p className='text-xs text-gray-500'>
+                          {formatDate(payment.createdAt)}
+                        </p>
+                      </div>
+                    </div>
+                    <div className='text-right'>
+                      <p className='font-medium text-emerald-600'>
+                        {formatCurrency(payment.amount)}
                       </p>
-                      <p className='text-sm text-gray-600 truncate max-w-[200px]'>
-                        {payment.documentId.title}
-                      </p>
-                      <p className='text-xs text-gray-500'>
-                        {new Date(payment.createdAt).toLocaleDateString(
-                          'vi-VN'
-                        )}
-                      </p>
+                      <CheckCircle className='h-4 w-4 text-green-500 ml-auto mt-1' />
                     </div>
                   </div>
-                  <div className='text-right'>
-                    <p className='font-bold text-emerald-600'>
-                      {formatCurrency(payment.amount)}
-                    </p>
-                    <CheckCircle className='h-4 w-4 text-green-500 ml-auto mt-1' />
-                  </div>
-                </div>
-              ))}
-            </div>
+                ))}
+              </div>
+            ) : (
+              <div className='flex items-center justify-center h-48 text-gray-500'>
+                Chưa có thanh toán gần đây
+              </div>
+            )}
           </div>
         </div>
 
         {/* Footer */}
-        <div className='bg-gradient-to-r from-blue-50 to-indigo-50 rounded-2xl border border-blue-200 shadow-lg p-6'>
-          <div className='flex items-center justify-between'>
+        <div className='bg-gray-50 rounded-2xl border border-gray-100 shadow-sm p-5 animate-fade-in'>
+          <div className='flex flex-col sm:flex-row items-center justify-between gap-4'>
             <div>
-              <p className='text-blue-800 font-semibold'>
+              <p className='text-gray-700 font-medium'>
                 <span className='inline-block w-2 h-2 bg-green-500 rounded-full mr-2 animate-pulse'></span>
-                Cập nhật lần cuối:{' '}
-                {new Date(stats.platformWallet.updatedAt).toLocaleString(
-                  'vi-VN'
-                )}
+                Cập nhật lần cuối: {formatDate(platformWallet.updatedAt)}
               </p>
-              <p className='text-blue-600 text-sm mt-1'>
-                Dashboard được cập nhật tự động mỗi 30 giây • Hiển thị dữ liệu{' '}
-                {stats.period === 'all' ? 'tất cả thời gian' : stats.period}
+              <p className='text-gray-600 text-sm mt-1'>
+                Dashboard tự động cập nhật mỗi 30 giây • Hiển thị dữ liệu thời
+                gian thực
               </p>
             </div>
-            <div className='hidden md:flex items-center space-x-4'>
+            <div className='flex items-center space-x-3'>
               <div className='flex space-x-2'>
-                <div className='w-3 h-3 bg-blue-400 rounded-full animate-bounce'></div>
+                <div className='w-2 h-2 bg-blue-400 rounded-full animate-bounce'></div>
                 <div
-                  className='w-3 h-3 bg-purple-400 rounded-full animate-bounce'
+                  className='w-2 h-2 bg-purple-400 rounded-full animate-bounce'
                   style={{ animationDelay: '0.1s' }}
                 ></div>
                 <div
-                  className='w-3 h-3 bg-indigo-400 rounded-full animate-bounce'
+                  className='w-2 h-2 bg-indigo-400 rounded-full animate-bounce'
                   style={{ animationDelay: '0.2s' }}
                 ></div>
               </div>
-              <Activity className='h-5 w-5 text-blue-500' />
+              <Activity className='h-4 w-4 text-blue-500' />
             </div>
           </div>
         </div>

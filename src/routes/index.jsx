@@ -21,7 +21,6 @@ import ManagerDashboard from '../pages/manager/dashboard';
 import AdminDashboard from '../pages/admin/dashboard';
 import CustomerDocuments from '../pages/customer/documents';
 import CustomerStudyPlan from '../pages/customer/study-plan';
-import CustomerGroupChat from '../pages/customer/group-chat';
 import SellerMyDocuments from '../pages/seller/my-documents';
 import SellerBilling from '../pages/seller/billing';
 import ManagerDocuments from '../pages/manager/documents';
@@ -36,7 +35,13 @@ import ManagerDocumentDetail from '../pages/manager/document-detail';
 import AdminUsers from '../pages/admin/users';
 import PaymentProcess from '../pages/customer/payment-process';
 import Chat from '../pages/customer/chat';
-import ChatGroup from '../pages/customer/chat-group';
+import ManagerRefundRequests from '../pages/manager/refunds-requests';
+import CustomerRefundsRequests from '../pages/customer/refunds-request';
+import SellerRefundsRequest from '../pages/seller/refunds-request';
+import CustomerGroup from '../pages/customer/group';
+import CustomerMyGroup from '../pages/customer/my-group';
+import CustomerGroupDetail from '../pages/customer/group-detail';
+import SellerWithdrawals from '../pages/seller/withdrawals';
 
 const { ADMIN, CUSTOMER, SELLER, MANAGER } = USER_ROLE;
 
@@ -156,10 +161,26 @@ const router = createBrowserRouter([
         ),
       },
       {
-        path: 'group-chat',
+        path: 'groups',
         element: (
           <ProtectedRoute requiredRoles={[CUSTOMER]}>
-            <CustomerGroupChat />
+            <CustomerGroup />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: 'my-groups',
+        element: (
+          <ProtectedRoute requiredRoles={[CUSTOMER]}>
+            <CustomerMyGroup />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: 'group/:id',
+        element: (
+          <ProtectedRoute requiredRoles={[CUSTOMER]}>
+            <CustomerGroupDetail />
           </ProtectedRoute>
         ),
       },
@@ -192,6 +213,14 @@ const router = createBrowserRouter([
         element: (
           <ProtectedRoute requiredRoles={[CUSTOMER]}>
             <CustomerPartner />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: 'refunds-requests',
+        element: (
+          <ProtectedRoute requiredRoles={[CUSTOMER]}>
+            <CustomerRefundsRequests />
           </ProtectedRoute>
         ),
       },
@@ -261,6 +290,14 @@ const router = createBrowserRouter([
           </ProtectedRoute>
         ),
       },
+      {
+        path: 'refunds-requests',
+        element: (
+          <ProtectedRoute requiredRoles={[MANAGER]}>
+            <ManagerRefundRequests />
+          </ProtectedRoute>
+        ),
+      },
     ],
   },
   //Seller Routes
@@ -297,6 +334,22 @@ const router = createBrowserRouter([
         element: (
           <ProtectedRoute requiredRoles={[SELLER]}>
             <SellerCreateDocument />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: 'refunds-requests',
+        element: (
+          <ProtectedRoute requiredRoles={[SELLER]}>
+            <SellerRefundsRequest />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: 'withdrawals',
+        element: (
+          <ProtectedRoute requiredRoles={[SELLER]}>
+            <SellerWithdrawals />
           </ProtectedRoute>
         ),
       },

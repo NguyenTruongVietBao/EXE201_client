@@ -1,0 +1,25 @@
+{
+  "version": 2,
+  "builds": [
+    {
+      "src": "package.json",
+      "use": "@vercel/static-build",
+      "config": {
+        "distDir": "dist"
+      }
+    }
+  ],
+  "routes": [
+    {
+      "src": "/(.*)",
+      "dest": "/index.html"
+    }
+  ],
+  "env": {
+    "VITE_BACKEND_URL": "@backend_url",
+    "VITE_FRONTEND_URL": "@frontend_url",
+    "VITE_ACCESS_TOKEN_KEY": "@access_token_key",
+    "VITE_USER_KEY": "@user_key",
+    "VITE_AUTH_STORE_KEY": "@auth_store_key"
+  }
+}

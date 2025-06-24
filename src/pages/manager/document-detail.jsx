@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router';
 import managerServices from '../../services/managerServices';
 import toast from 'react-hot-toast';
+import { formatCurrency, formatDate } from '../../utils';
+import LoadingPage from '../../components/common/LoadingPage';
 
 export default function ManagerDocumentDetail() {
   const { id } = useParams();
@@ -61,23 +63,6 @@ export default function ManagerDocumentDetail() {
     return (sum / feedback.length).toFixed(1);
   };
 
-  const formatPrice = (price) => {
-    return new Intl.NumberFormat('vi-VN', {
-      style: 'currency',
-      currency: 'VND',
-    }).format(price);
-  };
-
-  const formatDate = (dateString) => {
-    return new Date(dateString).toLocaleDateString('vi-VN', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
-    });
-  };
-
   const renderStars = (rating) => {
     return Array.from({ length: 5 }, (_, index) => (
       <span
@@ -90,19 +75,7 @@ export default function ManagerDocumentDetail() {
   };
 
   if (loading) {
-    return (
-      <div className='container mx-auto p-6'>
-        <div className='animate-pulse'>
-          <div className='h-8 bg-gray-200 rounded w-1/4 mb-6'></div>
-          <div className='bg-gray-200 h-64 rounded mb-6'></div>
-          <div className='space-y-4'>
-            {[...Array(3)].map((_, i) => (
-              <div key={i} className='h-6 bg-gray-200 rounded'></div>
-            ))}
-          </div>
-        </div>
-      </div>
-    );
+    return <LoadingPage message='Đang tải dữ liệu...' />;
   }
 
   if (!document) {
@@ -224,7 +197,7 @@ export default function ManagerDocumentDetail() {
                 <div className='text-center p-4 bg-gray-50 rounded-lg'>
                   <div className='text-2xl font-bold text-blue-600'>
                     {document.price > 0
-                      ? formatPrice(document.price)
+                      ? formatCurrency(document.price)
                       : 'Miễn phí'}
                   </div>
                   <div className='text-sm text-gray-600'>Giá bán</div>

@@ -24,6 +24,8 @@ import documentServices from '../../services/documentServices';
 import toast from 'react-hot-toast';
 import customerService from '../../services/customerService';
 import ConfirmPurchaseModal from '../../components/common/customer/confirm-purchase-modal';
+import { formatCurrency, formatDate } from '../../utils';
+import LoadingPage from '../../components/common/LoadingPage';
 
 export default function CustomerDocumentDetail() {
   const [document, setDocument] = useState(null);
@@ -122,14 +124,7 @@ export default function CustomerDocumentDetail() {
   }, [id]);
 
   if (isLoading) {
-    return (
-      <div className='min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 flex items-center justify-center'>
-        <div className='text-center'>
-          <div className='w-16 h-16 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto mb-4'></div>
-          <p className='text-gray-600'>Đang tải tài liệu...</p>
-        </div>
-      </div>
-    );
+    return <LoadingPage message='Đang tải dữ liệu...' />;
   }
 
   if (error) {
@@ -244,7 +239,7 @@ export default function CustomerDocumentDetail() {
       await customerService.handleEnrollFreeDocument(id);
 
       setIsEnrolled(true);
-      toast.success('đăng ký tài liệu thành công!');
+      toast.success('Đăng ký tài liệu thành công!');
     } catch (error) {
       console.error('Error enrolling free document:', error);
       toast.error('Có lỗi xảy ra khi đăng ký tài liệu. Vui lòng thử lại.');
@@ -312,7 +307,7 @@ export default function CustomerDocumentDetail() {
         <>
           <button
             disabled
-            className='w-full py-3 border border-gray-200 text-green-700 rounded-xl font-semibold flex items-center justify-center gap-2 cursor-not-allowed'
+            className='w-full py-3 border border-gray-200 bg-green-50 text-green-700 rounded-xl font-semibold flex items-center justify-center gap-2 cursor-not-allowed'
           >
             <CheckCircle className='w-5 h-5' />
             {document.price === 0 ? 'Đã đăng ký' : 'Đã thanh toán'}
@@ -332,7 +327,7 @@ export default function CustomerDocumentDetail() {
             <button
               onClick={handleEnrollFreeDocument}
               disabled={isEnrolling}
-              className='w-full py-3 bg-gradient-to-r from-blue-500 to-indigo-500 text-white rounded-xl hover:from-blue-600 hover:to-indigo-600 transition-all duration-300 font-semibold flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed'
+              className='w-full py-3 cursor-pointer bg-gradient-to-r from-blue-500 to-indigo-500 text-white rounded-xl hover:from-blue-600 hover:to-indigo-600 transition-all duration-300 font-semibold flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed'
             >
               {isEnrolling ? (
                 <>
@@ -342,7 +337,7 @@ export default function CustomerDocumentDetail() {
               ) : (
                 <>
                   <UserPlus className='w-5 h-5' />
-                  Đăng ký để tải tài liệu
+                  Đăng ký để sử dụng tài liệu
                 </>
               )}
             </button>
@@ -627,11 +622,7 @@ export default function CustomerDocumentDetail() {
                       </div>
                       <div className='flex items-center gap-1'>
                         <Calendar className='w-4 h-4' />
-                        <span>
-                          {new Date(document.createdAt).toLocaleDateString(
-                            'vi-VN'
-                          )}
-                        </span>
+                        <span>{formatDate(document.createdAt)}</span>
                       </div>
                       <div className='flex items-center gap-1'>
                         <Eye className='w-4 h-4' />
@@ -806,9 +797,7 @@ export default function CustomerDocumentDetail() {
                                     ))}
                                   </div>
                                   <span className='text-xs text-gray-500'>
-                                    {new Date(
-                                      review.createdAt
-                                    ).toLocaleDateString('vi-VN')}
+                                    {formatDate(review.createdAt)}
                                   </span>
                                 </div>
                                 {review.comment && (
@@ -911,15 +900,15 @@ export default function CustomerDocumentDetail() {
                     {document.discount > 0 && (
                       <div className='flex items-center justify-center gap-2 mb-2'>
                         <span className='text-lg text-gray-400 line-through'>
-                          {document.price.toLocaleString('vi-VN')} VNĐ
+                          {formatCurrency(document.price)}
                         </span>
                         <span className='px-2 py-1 bg-red-100 text-red-700 rounded-full text-sm font-medium'>
-                          Tiết kiệm {savings.toLocaleString('vi-VN')} VNĐ
+                          Tiết kiệm {formatCurrency(savings)}
                         </span>
                       </div>
                     )}
                     <div className='text-3xl font-bold text-blue-600 mb-2'>
-                      {finalPrice.toLocaleString('vi-VN')} VNĐ
+                      {formatCurrency(finalPrice)}
                     </div>
                     <p className='text-gray-600 text-sm'>
                       Giá đã bao gồm thuế VAT
@@ -986,7 +975,7 @@ export default function CustomerDocumentDetail() {
             </div>
 
             {/* Author Info */}
-            <div className='bg-white rounded-3xl shadow-xl border border-white/20 p-6'>
+            <div className='bg-white rounded-3xl shadow-xl border border-white/20 p-6 cursor-pointer'>
               <h3 className='text-lg font-semibold text-gray-900 mb-4'>
                 Tác giả
               </h3>
@@ -1019,10 +1008,11 @@ export default function CustomerDocumentDetail() {
                   </div>
                 </div>
               </Link>
-              <Link to={`/customer/documents/author/${document.author?._id}`}>
-                <button className='w-full py-2 border border-blue-500 text-blue-600 rounded-xl hover:bg-blue-50 transition-colors font-medium'>
-                  Xem thêm tài liệu khác
-                </button>
+              <Link
+                to={`/customer/documents/author/${document.author?._id}`}
+                className='w-full py-2 border border-blue-500 text-blue-600 rounded-xl hover:bg-blue-50 transition-colors font-medium flex items-center justify-center gap-2'
+              >
+                Xem thêm tài liệu khác
               </Link>
             </div>
 

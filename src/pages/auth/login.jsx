@@ -20,14 +20,22 @@ function Login() {
     const result = await login(form);
     if (result.status === true) {
       toast.success('Đăng nhập thành công');
-      if (result.user.role === 'CUSTOMER') {
-        navigate('/customer');
-      } else if (result.user.role === 'ADMIN') {
-        navigate('/admin');
-      } else if (result.user.role === 'MANAGER') {
-        navigate('/manager');
-      } else if (result.user.role === 'SELLER') {
-        navigate('/seller');
+      switch (result.data.user.role) {
+        case 'CUSTOMER':
+          navigate('/customer');
+          break;
+        case 'ADMIN':
+          navigate('/admin');
+          break;
+        case 'MANAGER':
+          navigate('/manager');
+          break;
+        case 'SELLER':
+          navigate('/seller');
+          break;
+        default:
+          navigate('/');
+          break;
       }
     } else {
       if (result.statusCode === 403) {

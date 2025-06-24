@@ -50,6 +50,9 @@ import {
 } from 'lucide-react';
 import sellerServices from '../../services/sellerServices';
 import useAuthStore from '../../stores/useAuthStore';
+import LoadingPage from '../../components/common/LoadingPage';
+import ErrorStats from '../../components/common/ErrorStats';
+import { Link } from 'react-router';
 
 export default function SellerHome() {
   const [stats, setStats] = useState(null);
@@ -73,50 +76,11 @@ export default function SellerHome() {
   }, []);
 
   if (loading) {
-    return (
-      <div className='min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 flex items-center justify-center'>
-        <div className='text-center'>
-          <div className='relative'>
-            <div className='animate-spin rounded-full h-32 w-32 border-4 border-blue-200'></div>
-            <div className='animate-spin rounded-full h-32 w-32 border-t-4 border-blue-600 absolute top-0'></div>
-          </div>
-          <p className='mt-6 text-gray-600 font-medium text-lg'>
-            Đang tải dashboard...
-          </p>
-          <div className='flex justify-center mt-4 space-x-1'>
-            <div className='h-2 w-2 bg-blue-600 rounded-full animate-bounce'></div>
-            <div
-              className='h-2 w-2 bg-blue-600 rounded-full animate-bounce'
-              style={{ animationDelay: '0.1s' }}
-            ></div>
-            <div
-              className='h-2 w-2 bg-blue-600 rounded-full animate-bounce'
-              style={{ animationDelay: '0.2s' }}
-            ></div>
-          </div>
-        </div>
-      </div>
-    );
+    return <LoadingPage message='Đang tải dữ liệu cho Seller...' />;
   }
 
   if (!stats) {
-    return (
-      <div className='min-h-screen bg-gradient-to-br from-red-50 to-pink-50 flex items-center justify-center'>
-        <div className='text-center bg-white p-8 rounded-3xl shadow-2xl border border-red-100'>
-          <AlertCircle size={64} className='mx-auto mb-4 text-red-500' />
-          <p className='text-red-600 font-semibold text-xl mb-2'>
-            Không thể tải dữ liệu dashboard
-          </p>
-          <p className='text-gray-500'>Vui lòng thử lại sau</p>
-          <button
-            onClick={() => window.location.reload()}
-            className='mt-4 px-6 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors'
-          >
-            Thử lại
-          </button>
-        </div>
-      </div>
-    );
+    return <ErrorStats message='Không thể tải dữ liệu' />;
   }
 
   const formatCurrency = (amount) => {
@@ -331,7 +295,10 @@ export default function SellerHome() {
           </div>
 
           <div className='bg-gradient-to-br from-emerald-500 to-green-700 rounded-2xl shadow-xl p-6 text-white transform hover:scale-105 transition-all duration-300 cursor-pointer group'>
-            <div className='flex items-center justify-between'>
+            <Link
+              to='/seller/withdrawals'
+              className='flex items-center justify-between'
+            >
               <div>
                 <h3 className='text-xl font-bold mb-2'>Rút tiền</h3>
                 <p className='text-emerald-100 text-sm mb-4'>
@@ -344,7 +311,7 @@ export default function SellerHome() {
                 </div>
               </div>
               <Wallet className='h-12 w-12 opacity-80' />
-            </div>
+            </Link>
           </div>
 
           <div className='bg-gradient-to-br from-purple-500 to-indigo-700 rounded-2xl shadow-xl p-6 text-white transform hover:scale-105 transition-all duration-300 cursor-pointer group'>

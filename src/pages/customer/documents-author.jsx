@@ -19,6 +19,8 @@ import {
 } from 'lucide-react';
 import documentServices from '../../services/documentServices';
 import useAuthStore from '../../stores/useAuthStore';
+import { formatCurrency, formatDate } from '../../utils';
+import LoadingPage from '../../components/common/LoadingPage';
 
 export default function CustomerDocumentsAuthor() {
   const { id } = useParams();
@@ -149,14 +151,7 @@ export default function CustomerDocumentsAuthor() {
   };
 
   if (loading) {
-    return (
-      <div className='flex min-h-screen items-center justify-center bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50'>
-        <div className='text-center'>
-          <div className='mx-auto mb-4 h-12 w-12 animate-spin rounded-full border-b-2 border-blue-600'></div>
-          <p className='text-gray-600'>Đang tải thông tin tác giả...</p>
-        </div>
-      </div>
-    );
+    return <LoadingPage message='Đang tải dữ liệu...' />;
   }
 
   if (error || !author) {
@@ -221,8 +216,7 @@ export default function CustomerDocumentsAuthor() {
               </p>
               <p className='mb-4 flex items-center gap-2 text-gray-600'>
                 <Calendar className='h-4 w-4' />
-                Tham gia từ{' '}
-                {new Date(author.createdAt).toLocaleDateString('vi-VN')}
+                Tham gia từ {formatDate(author.createdAt)}
               </p>
 
               {/* Action Buttons */}
@@ -528,11 +522,11 @@ export default function CustomerDocumentsAuthor() {
                             <div className='flex flex-col items-end'>
                               {doc.discount > 0 && (
                                 <span className='text-xs text-gray-400 line-through'>
-                                  {doc.price.toLocaleString('vi-VN')} VNĐ
+                                  {formatCurrency(doc.price)}
                                 </span>
                               )}
                               <span className='text-sm font-bold text-blue-600'>
-                                {finalPrice.toLocaleString('vi-VN')} VNĐ
+                                {formatCurrency(finalPrice)}
                               </span>
                             </div>
                           )}
@@ -565,11 +559,7 @@ export default function CustomerDocumentsAuthor() {
                         </div>
                         <div className='flex items-center gap-1'>
                           <Clock className='h-4 w-4' />
-                          <span>
-                            {new Date(doc.createdAt).toLocaleDateString(
-                              'vi-VN'
-                            )}
-                          </span>
+                          <span>{formatDate(doc.createdAt)}</span>
                         </div>
                       </div>
 

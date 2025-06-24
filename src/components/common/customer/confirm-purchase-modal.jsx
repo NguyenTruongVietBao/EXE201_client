@@ -1,5 +1,6 @@
 import React from 'react';
 import { DollarSign, X } from 'lucide-react';
+import { formatCurrency } from '../../../utils';
 
 const ConfirmPurchaseModal = ({ isOpen, onClose, onConfirm, document }) => {
   if (!isOpen) return null;
@@ -11,7 +12,7 @@ const ConfirmPurchaseModal = ({ isOpen, onClose, onConfirm, document }) => {
 
   return (
     <div
-      className='fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 transition-opacity duration-300 ease-in-out'
+      className='fixed inset-0 bg-black/80 flex items-center justify-center z-50 transition-opacity duration-300 ease-in-out'
       role='dialog'
       aria-modal='true'
       aria-labelledby='modal-title'
@@ -40,6 +41,13 @@ const ConfirmPurchaseModal = ({ isOpen, onClose, onConfirm, document }) => {
             Bạn có chắc chắn muốn mua tài liệu này?
           </p>
           <div className='flex flex-col sm:flex-row items-start sm:items-center justify-between bg-gray-50 p-4 rounded-xl border border-gray-100 shadow-sm'>
+            <div className='w-1/3 mr-3'>
+              <img
+                src={document.imageUrls[0]}
+                alt={document.title}
+                className='w-full h-auto rounded-lg'
+              />
+            </div>
             <div className='mb-3 sm:mb-0 w-2/3'>
               <p className='font-semibold text-gray-900 text-base line-clamp-2'>
                 {document.title}
@@ -51,11 +59,11 @@ const ConfirmPurchaseModal = ({ isOpen, onClose, onConfirm, document }) => {
             <div className='text-right w-1/3'>
               {document.discount > 0 && (
                 <p className='text-xs text-gray-400 line-through mb-1'>
-                  {document.price.toLocaleString('vi-VN')} VNĐ
+                  {formatCurrency(document.price)}
                 </p>
               )}
               <p className='text-lg font-bold text-blue-600'>
-                {finalPrice.toLocaleString('vi-VN')} VNĐ
+                {formatCurrency(finalPrice)}
               </p>
             </div>
           </div>
@@ -71,7 +79,7 @@ const ConfirmPurchaseModal = ({ isOpen, onClose, onConfirm, document }) => {
           </button>
           <button
             onClick={onConfirm}
-            className='flex-1 py-2.5 px-4 bg-gradient-to-r from-blue-500 to-purple-500 text-white rounded-xl hover:from-blue-600 hover:to-purple-600 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-200 font-medium text-sm flex items-center justify-center gap-2 shadow-md'
+            className='flex-1 py-2.5 cursor-pointer px-4 bg-gradient-to-r from-blue-500 to-purple-500 text-white rounded-xl hover:from-blue-600 hover:to-purple-600 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-200 font-medium text-sm flex items-center justify-center gap-2 shadow-md'
           >
             <DollarSign className='w-4 h-4' />
             Xác nhận

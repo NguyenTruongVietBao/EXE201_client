@@ -1,6 +1,14 @@
 import React from 'react';
 import useAuthStore from '../../stores/useAuthStore';
-import { LogOut, User, Lock, BookOpen, LayoutDashboard } from 'lucide-react';
+import {
+  LogOut,
+  User,
+  Lock,
+  BookOpen,
+  LayoutDashboard,
+  AlertCircle,
+  Users,
+} from 'lucide-react';
 import { Link, useNavigate } from 'react-router';
 import { USER_ROLE } from '../../constants';
 
@@ -16,6 +24,16 @@ export default function HeaderAvatar({ className }) {
       href: '/customer/my-documents',
       label: 'Tài liệu của tôi',
       icon: <BookOpen size={16} />,
+    },
+    {
+      href: '/customer/my-groups',
+      label: 'Nhóm của tôi',
+      icon: <Users size={16} />,
+    },
+    {
+      href: '/customer/refunds-requests',
+      label: 'Yêu cầu hoàn trả',
+      icon: <AlertCircle size={16} />,
     },
   ];
   const sellerLinks = [

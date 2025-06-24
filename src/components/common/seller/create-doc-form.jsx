@@ -18,6 +18,7 @@ import interestServices from '../../../services/interestServices';
 import documentServices from '../../../services/documentServices';
 import toast from 'react-hot-toast';
 import { useNavigate } from 'react-router';
+import { formatCurrency } from '../../../utils';
 
 export default function CreateDocForm({ onCancel, onSubmit }) {
   const [isLoading, setIsLoading] = useState(false);
@@ -585,12 +586,12 @@ export default function CreateDocForm({ onCancel, onSubmit }) {
                       Giá cuối (VND)
                     </label>
                     <div className='w-full px-4 py-3 bg-gray-100 border border-gray-200 rounded-xl text-gray-700 font-semibold'>
-                      {documentData.price
-                        ? `${(
-                            documentData.price -
-                            (documentData.price * documentData.discount) / 100
-                          ).toLocaleString('vi-VN')} VND`
-                        : '0 VND'}
+                      {formatCurrency(
+                        documentData.price
+                          ? documentData.price -
+                              (documentData.price * documentData.discount) / 100
+                          : 0
+                      )}
                     </div>
                   </div>
 
@@ -622,7 +623,7 @@ export default function CreateDocForm({ onCancel, onSubmit }) {
           <div className='space-y-6'>
             {/* Document Files Upload */}
             <div>
-              <label className='block text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2'>
+              <label className='text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2'>
                 <File className='w-4 h-4' />
                 Document Files * ({documentData.documentFiles.length} files)
               </label>
