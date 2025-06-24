@@ -5,7 +5,7 @@ const interestServices = {
   setUserInterests: async (data) => {
     try {
       const response = await axiosInstance.put(
-        `/users/${data.userId}/set-interests`,
+        `/api/users/${data.userId}/set-interests`,
         { interests: data.interests }
       );
       return response;
@@ -16,7 +16,7 @@ const interestServices = {
   // Get user's interests
   getUserInterests: async () => {
     try {
-      const response = await axiosInstance.get(`/interests/my-interests`);
+      const response = await axiosInstance.get(`/api/ interests/my-interests`);
       return response;
     } catch (error) {
       return error;
@@ -25,7 +25,7 @@ const interestServices = {
   // Get all interests
   getAllInterests: async () => {
     try {
-      const response = await axiosInstance.get('/interests');
+      const response = await axiosInstance.get('/api/interests');
       return response;
     } catch (error) {
       return error;
@@ -34,7 +34,7 @@ const interestServices = {
   // Get recommend documents and study groups and study partners
   getRecommendData: async () => {
     try {
-      const response = await axiosInstance.get('/interests/recommended');
+      const response = await axiosInstance.get('/api/interests/recommended');
       return response;
     } catch (error) {
       return error;
@@ -42,7 +42,9 @@ const interestServices = {
   },
   getPrioriryDocuments: async () => {
     try {
-      const response = await axiosInstance.get('/interests/priority-documents');
+      const response = await axiosInstance.get(
+        '/api/interests/priority-documents'
+      );
       return response;
     } catch (error) {
       return error;
@@ -50,7 +52,7 @@ const interestServices = {
   },
   getPrioriryUsers: async () => {
     try {
-      const response = await axiosInstance.get('/interests/priority-users');
+      const response = await axiosInstance.get('/api/interests/priority-users');
       return response;
     } catch (error) {
       return error;
@@ -58,7 +60,9 @@ const interestServices = {
   },
   getPrioriryGroups: async () => {
     try {
-      const response = await axiosInstance.get('/interests/priority-groups');
+      const response = await axiosInstance.get(
+        '/api/interests/priority-groups'
+      );
       return response;
     } catch (error) {
       return error;

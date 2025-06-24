@@ -4,13 +4,13 @@ const withdrawalsServices = {
   // Seller ------------------------------------------------------------
   getSellerWithdrawals: async () => {
     const response = await axiosInstance.get(
-      '/payments/seller/withdrawal-requests'
+      '/api/payments/seller/withdrawal-requests'
     );
     return response;
   },
   createSellerWithdrawal: async (data) => {
     const response = await axiosInstance.post(
-      '/payments/seller/withdrawal-requests',
+      '/api/payments/seller/withdrawal-requests',
       data
     );
     return response;
@@ -19,14 +19,14 @@ const withdrawalsServices = {
   // Manager ------------------------------------------------------------
   getAllWithdrawals: async () => {
     const response = await axiosInstance.get(
-      '/payments/manager/withdrawal-requests'
+      '/api/payments/manager/withdrawal-requests'
     );
     return response;
   },
   handleSellerWithdrawal: async (id, data) => {
     // data: { status: 'APPROVED' | 'REJECTED', notes: string }
     const response = await axiosInstance.put(
-      `/payments/manager/withdrawal-requests/${id}`,
+      `/api/payments/manager/withdrawal-requests/${id}`,
       data
     );
     return response;

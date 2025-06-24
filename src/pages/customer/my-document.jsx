@@ -29,6 +29,10 @@ export default function CustomerMyDocument() {
   const [myEnrolledDocuments, setMyEnrolledDocuments] = useState([]);
   const [mySharedDocuments, setMySharedDocuments] = useState([]);
   const [myPurchasedDocuments, setMyPurchasedDocuments] = useState([]);
+  console.log(
+    '🚀 ~ CustomerMyDocument ~ myPurchasedDocuments:',
+    myPurchasedDocuments
+  );
 
   useEffect(() => {
     const fetchMyEnrolledDocuments = async () => {

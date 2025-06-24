@@ -3,7 +3,7 @@ import axiosInstance from '../configs/axios';
 const customerService = {
   getMyDocuments: async () => {
     try {
-      const response = await axiosInstance.get(`/documents/my-documents`);
+      const response = await axiosInstance.get(`/api/documents/my-documents`);
       return response;
     } catch (error) {
       console.error('Error fetching my documents:', error);
@@ -13,7 +13,7 @@ const customerService = {
   handleEnrollFreeDocument: async (id) => {
     try {
       const response = await axiosInstance.post(
-        `/documents/${id}/enroll-free-document`
+        `/api/documents/${id}/enroll-free-document`
       );
       return response;
     } catch (error) {
@@ -23,7 +23,7 @@ const customerService = {
   },
   getMyEnrolledDocuments: async () => {
     try {
-      const response = await axiosInstance.get(`/documents/enrolled`);
+      const response = await axiosInstance.get(`/api/documents/enrolled`);
       return response;
     } catch (error) {
       console.error('Error fetching my enrolled documents:', error);
@@ -32,7 +32,7 @@ const customerService = {
   },
   getMyNotEnrolledDocuments: async () => {
     try {
-      const response = await axiosInstance.get(`/documents/not-enrolled`);
+      const response = await axiosInstance.get(`/api/documents/not-enrolled`);
       return response;
     } catch (error) {
       console.error('Error fetching my enrolled documents:', error);
@@ -41,9 +41,12 @@ const customerService = {
   },
   handleDownloadDocument: async (id) => {
     try {
-      const response = await axiosInstance.get(`/documents/${id}/download`, {
-        responseType: 'blob',
-      });
+      const response = await axiosInstance.get(
+        `/api/documents/${id}/download`,
+        {
+          responseType: 'blob',
+        }
+      );
       return response;
     } catch (error) {
       console.error('Error downloading free document:', error);
@@ -54,7 +57,7 @@ const customerService = {
   getMyPurchasedDocuments: async () => {
     try {
       const response = await axiosInstance.get(
-        `/payments/my-purchased-documents`
+        `/api/payments/my-purchased-documents`
       );
       return response;
     } catch (error) {
@@ -65,7 +68,7 @@ const customerService = {
   handleCallbackPurchase: async (id) => {
     try {
       const response = await axiosInstance.post(
-        `/payments/callback-purchase/${id}`
+        `/api/payments/callback-purchase/${id}`
       );
       return response;
     } catch (error) {
@@ -76,7 +79,7 @@ const customerService = {
   // Refunds Requests ------------------------------------------------------------
   getMyRefundsRequests: async () => {
     try {
-      const response = await axiosInstance.get(`/refunds/my-requests`);
+      const response = await axiosInstance.get(`/api/refunds/my-requests`);
       return response;
     } catch (error) {
       console.error('Error fetching my refunds requests:', error);
@@ -85,7 +88,9 @@ const customerService = {
   },
   getRefundRequestAvailable: async () => {
     try {
-      const response = await axiosInstance.get(`/payments/refundable-payments`);
+      const response = await axiosInstance.get(
+        `/api/payments/refundable-payments`
+      );
       return response;
     } catch (error) {
       console.error('Error fetching refund request available:', error);
@@ -94,7 +99,7 @@ const customerService = {
   },
   createRefundRequest: async ({ paymentId, reason, bankDetails }) => {
     try {
-      const response = await axiosInstance.post(`/refunds`, {
+      const response = await axiosInstance.post(`/api/refunds`, {
         paymentId,
         reason,
         bankDetails,
@@ -109,7 +114,7 @@ const customerService = {
   // Get group stats for current user
   getMyGroupStats: async () => {
     try {
-      const response = await axiosInstance.get(`/groups/my-stats`);
+      const response = await axiosInstance.get(`/api/groups/my-stats`);
       return response;
     } catch (error) {
       console.error('Error fetching my group stats:', error);
@@ -119,7 +124,7 @@ const customerService = {
   // Member
   getAllGroups: async () => {
     try {
-      const response = await axiosInstance.get(`/groups`);
+      const response = await axiosInstance.get(`/api/groups`);
       return response;
     } catch (error) {
       console.error('Error fetching all groups:', error);
@@ -128,7 +133,7 @@ const customerService = {
   },
   getAllMyJoinGroupRequests: async () => {
     try {
-      const response = await axiosInstance.get(`/groups/my-join-requests`);
+      const response = await axiosInstance.get(`/api/groups/my-join-requests`);
       return response;
     } catch (error) {
       console.error('Error fetching my join group requests:', error);
@@ -137,7 +142,7 @@ const customerService = {
   },
   getJoinedGroups: async () => {
     try {
-      const response = await axiosInstance.get(`/groups/joined-groups`);
+      const response = await axiosInstance.get(`/api/groups/joined-groups`);
       return response;
     } catch (error) {
       console.error('Error fetching my groups:', error);
@@ -146,7 +151,7 @@ const customerService = {
   },
   getGroupById: async (groupId) => {
     try {
-      const response = await axiosInstance.get(`/groups/${groupId}`);
+      const response = await axiosInstance.get(`/api/groups/${groupId}`);
       return response;
     } catch (error) {
       console.error('Error fetching group by id:', error);
@@ -161,7 +166,7 @@ const customerService = {
     //    "interests": ["68459bb312842521c22178c2", "68459bb312842521c22178c3"]
     //  }
     try {
-      const response = await axiosInstance.post(`/groups`, data);
+      const response = await axiosInstance.post(`/api/groups`, data);
       return response;
     } catch (error) {
       console.error('Error creating group:', error);
@@ -174,7 +179,7 @@ const customerService = {
     // }
     try {
       const response = await axiosInstance.post(
-        `/groups/${groupId}/join`,
+        `/api/groups/${groupId}/join`,
         data
       );
       return response;
@@ -186,7 +191,9 @@ const customerService = {
   // Admin Group
   getJoinGroupRequests: async (groupId) => {
     try {
-      const response = await axiosInstance.get(`/groups/${groupId}/requests`);
+      const response = await axiosInstance.get(
+        `/api/groups/${groupId}/requests`
+      );
       return response;
     } catch (error) {
       console.error('Error fetching group join requests:', error);
@@ -195,7 +202,9 @@ const customerService = {
   },
   getGroupJoinRequests: async (groupId) => {
     try {
-      const response = await axiosInstance.get(`/groups/${groupId}/requests`);
+      const response = await axiosInstance.get(
+        `/api/groups/${groupId}/requests`
+      );
       return response;
     } catch (error) {
       console.error('Error fetching group join requests:', error);
@@ -207,12 +216,12 @@ const customerService = {
     try {
       if (data.action === 'APPROVE') {
         const response = await axiosInstance.put(
-          `/groups/requests/${requestId}/accept`
+          `/api/groups/requests/${requestId}/accept`
         );
         return response;
       } else if (data.action === 'REJECT') {
         const response = await axiosInstance.put(
-          `/groups/requests/${requestId}/reject`,
+          `/api/groups/requests/${requestId}/reject`,
           { rejectionReason: data.rejectionReason || '' }
         );
         return response;
@@ -224,7 +233,7 @@ const customerService = {
   },
   getMyGroups: async () => {
     try {
-      const response = await axiosInstance.get(`/groups/my-groups`);
+      const response = await axiosInstance.get(`/api/groups/my-groups`);
       return response;
     } catch (error) {
       console.error('Error fetching my groups:', error);
@@ -236,7 +245,7 @@ const customerService = {
   // User - User
   getMyConversations: async () => {
     try {
-      const response = await axiosInstance.get(`/chat/conversations`);
+      const response = await axiosInstance.get(`/api/chat/conversations`);
       return response;
     } catch (error) {
       console.error('Error fetching my conversations:', error);
@@ -245,7 +254,7 @@ const customerService = {
   },
   createConversation: async (userId) => {
     try {
-      const response = await axiosInstance.post(`/chat/conversations`, {
+      const response = await axiosInstance.post(`/api/chat/conversations`, {
         userId,
       });
       return response;
@@ -257,7 +266,7 @@ const customerService = {
   getConversationMessages: async (conversationId) => {
     try {
       const response = await axiosInstance.get(
-        `/chat/conversations/${conversationId}/messages`
+        `/api/chat/conversations/${conversationId}/messages`
       );
       return response;
     } catch (error) {
@@ -269,7 +278,7 @@ const customerService = {
     // data: {messageType: 'text' | 'image' , content: string | File}
     try {
       const response = await axiosInstance.post(
-        `/chat/conversations/${conversationId}/messages`,
+        `/api/chat/conversations/${conversationId}/messages`,
         data
       );
       return response;
@@ -282,7 +291,7 @@ const customerService = {
   getGroupMessages: async (groupId) => {
     try {
       const response = await axiosInstance.get(
-        `/chat/groups/${groupId}/messages`
+        `/api/chat/groups/${groupId}/messages`
       );
       return response;
     } catch (error) {
@@ -294,7 +303,7 @@ const customerService = {
     // data: {messageType: 'text' | 'image', content: string | File}
     try {
       const response = await axiosInstance.post(
-        `/chat/groups/${groupId}/messages`,
+        `/api/chat/groups/${groupId}/messages`,
         data
       );
       return response;

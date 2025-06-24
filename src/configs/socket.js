@@ -25,19 +25,16 @@ class SocketManager {
     this.isConnecting = true;
 
     try {
-      this.socket = io(
-        envConfig.BACKEND_URL || 'https://exe201-server.onrender.com',
-        {
-          auth: { token },
-          transports: ['websocket'],
-          upgrade: true,
-          timeout: 10000,
-          forceNew: true,
-          reconnection: true,
-          reconnectionAttempts: this.maxReconnectAttempts,
-          reconnectionDelay: 1000,
-        }
-      );
+      this.socket = io(envConfig.BACKEND_URL, {
+        auth: { token },
+        transports: ['websocket'],
+        upgrade: true,
+        timeout: 10000,
+        forceNew: true,
+        reconnection: true,
+        reconnectionAttempts: this.maxReconnectAttempts,
+        reconnectionDelay: 1000,
+      });
 
       this.socket.on('connect', () => {
         console.log('Socket connected:', this.socket.id);

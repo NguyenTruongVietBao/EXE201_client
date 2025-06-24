@@ -11,7 +11,7 @@ const documentServices = {
           'Content-Type': 'multipart/form-data',
         };
       }
-      const response = await axiosInstance.post(`/documents`, data, config);
+      const response = await axiosInstance.post(`/api/documents`, data, config);
       return response;
     } catch (error) {
       console.error('Create document error:', error);
@@ -26,7 +26,7 @@ const documentServices = {
   // Danh sách tài liệu đã chia sẻ của tôi
   getMyDocuments: async () => {
     try {
-      const response = await axiosInstance.get(`/documents/my-documents`);
+      const response = await axiosInstance.get(`/api/documents/my-documents`);
       return response;
     } catch (error) {
       return error;
@@ -36,7 +36,7 @@ const documentServices = {
   getMyPurchasedDocuments: async () => {
     try {
       const response = await axiosInstance.get(
-        `/payments/my-purchased-documents`
+        `/api/payments/my-purchased-documents`
       );
       return response;
     } catch (error) {
@@ -46,7 +46,7 @@ const documentServices = {
   // Danh sách tài liệu đã đăng ký
   getMyEnrolledDocuments: async () => {
     try {
-      const response = await axiosInstance.get(`/documents/enrolled`);
+      const response = await axiosInstance.get(`/api/documents/enrolled`);
       return response;
     } catch (error) {
       return error;
@@ -55,7 +55,9 @@ const documentServices = {
   // Danh sách tài liệu theo ID tác giả
   getDocumentsByAuthor: async (authorId) => {
     try {
-      const response = await axiosInstance.get(`/documents/${authorId}/author`);
+      const response = await axiosInstance.get(
+        `/api/documents/${authorId}/author`
+      );
       return response;
     } catch (error) {
       return error;
@@ -64,7 +66,7 @@ const documentServices = {
   // Chi tiết tài liệu
   getDocumentDetail: async (id) => {
     try {
-      const response = await axiosInstance.get(`/documents/${id}`);
+      const response = await axiosInstance.get(`/api/documents/${id}`);
       return response;
     } catch (error) {
       return error;
@@ -73,10 +75,13 @@ const documentServices = {
   // Gửi đánh giá tài liệu
   sendFeedbackDocument: async (id, data) => {
     try {
-      const response = await axiosInstance.post(`/documents/${id}/feedback`, {
-        rating: data.rating,
-        comment: data.comment,
-      });
+      const response = await axiosInstance.post(
+        `/api/documents/${id}/feedback`,
+        {
+          rating: data.rating,
+          comment: data.comment,
+        }
+      );
       return response;
     } catch (error) {
       return error;
@@ -85,7 +90,7 @@ const documentServices = {
   // Danh sách đánh giá tài liệu
   getFeedbackDocument: async (id) => {
     try {
-      const response = await axiosInstance.get(`/documents/${id}/feedback`);
+      const response = await axiosInstance.get(`/api/documents/${id}/feedback`);
       return response;
     } catch (error) {
       return error;
@@ -94,7 +99,9 @@ const documentServices = {
   // Mua tài liệu
   purchaseDocument: async (id) => {
     try {
-      const response = await axiosInstance.post(`/payments/buy-document/${id}`);
+      const response = await axiosInstance.post(
+        `/api/payments/buy-document/${id}`
+      );
       return response;
     } catch (error) {
       return error;
@@ -103,7 +110,7 @@ const documentServices = {
   // Xử lý thanh toán
   handlePayment: async (data) => {
     try {
-      const response = await axiosInstance.post(`/payments/callback`, data);
+      const response = await axiosInstance.post(`/api/payments/callback`, data);
       return response;
     } catch (error) {
       return error;

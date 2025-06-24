@@ -23,7 +23,6 @@ import {
 export default function ManagerDocuments() {
   const navigate = useNavigate();
   const [documents, setDocuments] = useState([]);
-  console.log('🚀 ~ ManagerDocuments ~ documents:', documents);
   const [pagination, setPagination] = useState({
     currentPage: 1,
     totalPages: 1,
@@ -64,29 +63,45 @@ export default function ManagerDocuments() {
     fetchDocuments();
   }, []);
 
-  const handlePublishToggle = async (documentId, currentStatus) => {
+  const handleApproveDocument = async (documentId) => {
     try {
-      if (currentStatus === 'APPROVED') {
-        await managerServices.unpublishDocument(documentId);
-        toast.success('Ẩn bài viết thành công');
-      } else {
-        await managerServices.publishDocument(documentId);
-        toast.success('Công khai bài viết thành công');
-      }
+      await managerServices.publishDocument(documentId);
+      toast.success('Duyệt tài liệu thành công');
 
       setDocuments((prev) =>
         prev.map((doc) =>
           doc._id === documentId
             ? {
                 ...doc,
-                status: currentStatus === 'APPROVED' ? 'PENDING' : 'APPROVED',
+                status: 'APPROVED',
               }
             : doc
         )
       );
     } catch (error) {
-      console.error('Lỗi khi thay đổi trạng thái publish:', error);
-      toast.error('Lỗi khi thay đổi trạng thái');
+      console.error('Lỗi khi duyệt tài liệu:', error);
+      toast.error('Lỗi khi duyệt tài liệu');
+    }
+  };
+
+  const handleRejectDocument = async (documentId) => {
+    try {
+      await managerServices.unpublishDocument(documentId);
+      toast.success('Từ chối tài liệu thành công');
+
+      setDocuments((prev) =>
+        prev.map((doc) =>
+          doc._id === documentId
+            ? {
+                ...doc,
+                status: 'REJECTED',
+              }
+            : doc
+        )
+      );
+    } catch (error) {
+      console.error('Lỗi khi từ chối tài liệu:', error);
+      toast.error('Lỗi khi từ chối tài liệu');
     }
   };
 
@@ -479,26 +494,44 @@ export default function ManagerDocuments() {
                       Chi tiết
                     </button>
 
-                    <button
-                      onClick={() => handlePublishToggle(doc._id, doc.status)}
-                      className={`w-full py-2 px-4 rounded-xl font-medium transition-all duration-300 transform hover:scale-105 flex items-center justify-center gap-2 ${
-                        doc.status === 'APPROVED'
-                          ? 'bg-gradient-to-r from-red-500 to-pink-500 hover:from-red-600 hover:to-pink-600 text-white'
-                          : 'bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white'
-                      }`}
-                    >
-                      {doc.status === 'APPROVED' ? (
-                        <>
-                          <XCircle className='w-4 h-4' />
-                          Ẩn bài
-                        </>
-                      ) : (
-                        <>
-                          <CheckCircle className='w-4 h-4' />
-                          Duyệt bài
-                        </>
-                      )}
-                    </button>
+                    {/* Approve Button */}
+                    {(doc.status === 'PENDING' ||
+                      doc.status === 'REJECTED') && (
+                      <button
+                        onClick={() => handleApproveDocument(doc._id)}
+                        className='w-full bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white py-2 px-4 rounded-xl font-medium transition-all duration-300 transform hover:scale-105 flex items-center justify-center gap-2'
+                      >
+                        <CheckCircle className='w-4 h-4' />
+                        Duyệt bài
+                      </button>
+                    )}
+
+                    {/* Reject Button */}
+                    {(doc.status === 'PENDING' ||
+                      doc.status === 'APPROVED') && (
+                      <button
+                        onClick={() => handleRejectDocument(doc._id)}
+                        className='w-full bg-gradient-to-r from-red-500 to-pink-500 hover:from-red-600 hover:to-pink-600 text-white py-2 px-4 rounded-xl font-medium transition-all duration-300 transform hover:scale-105 flex items-center justify-center gap-2'
+                      >
+                        <XCircle className='w-4 h-4' />
+                        Từ chối bài
+                      </button>
+                    )}
+
+                    {/* Status info for already processed documents */}
+                    {doc.status === 'APPROVED' && (
+                      <div className='w-full bg-green-100 text-green-700 py-2 px-4 rounded-xl font-medium text-center flex items-center justify-center gap-2'>
+                        <CheckCircle className='w-4 h-4' />
+                        Đã được duyệt
+                      </div>
+                    )}
+
+                    {doc.status === 'REJECTED' && (
+                      <div className='w-full bg-red-100 text-red-700 py-2 px-4 rounded-xl font-medium text-center flex items-center justify-center gap-2'>
+                        <XCircle className='w-4 h-4' />
+                        Đã bị từ chối
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>

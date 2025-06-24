@@ -1,7 +1,6 @@
 const envConfig = {
-  BACKEND_URL:
-    import.meta.env.VITE_BACKEND_URL || 'https://exe201-server.onrender.com',
-  FRONTEND_URL: import.meta.env.VITE_FRONTEND_URL || 'http://localhost:5173',
+  BACKEND_URL: import.meta.env.VITE_BACKEND_URL,
+  FRONTEND_URL: import.meta.env.VITE_FRONTEND_URL,
   ACCESS_TOKEN_KEY: import.meta.env.VITE_ACCESS_TOKEN_KEY || 'accessToken',
   USER_KEY: import.meta.env.VITE_USER_KEY || 'user',
   AUTH_STORE_KEY: import.meta.env.VITE_AUTH_STORE_KEY || 'user-storage',

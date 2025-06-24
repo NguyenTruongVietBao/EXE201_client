@@ -13,6 +13,7 @@ import {
   TrendingUp,
   FileText,
   DollarSign,
+  XCircle,
 } from 'lucide-react';
 import documentServices from '../../services/documentServices';
 import { Link } from 'react-router';
@@ -53,7 +54,12 @@ export default function SellerMyDocuments() {
             feedback: doc.feedback || [],
             createdAt: formatDate(doc.createdAt),
             updatedAt: formatDate(doc.updatedAt),
-            status: doc.status === 'APPROVED' ? 'approved' : 'pending',
+            status:
+              doc.status === 'APPROVED'
+                ? 'approved'
+                : doc.status === 'REJECTED'
+                ? 'rejected'
+                : 'pending',
             downloads: doc.download || 0,
             views: doc.views || 0,
             rating: doc.rating || 0,
@@ -82,6 +88,11 @@ export default function SellerMyDocuments() {
         label: 'Chờ duyệt',
         className: 'bg-yellow-100 text-yellow-700 border-yellow-200',
         icon: <Clock className='w-3 h-3' />,
+      },
+      rejected: {
+        label: 'Bị từ chối',
+        className: 'bg-red-100 text-red-700 border-red-200',
+        icon: <XCircle className='w-3 h-3' />,
       },
     };
 
@@ -256,6 +267,11 @@ export default function SellerMyDocuments() {
               Đang xử lý
             </button>
           )}
+          {document.status === 'rejected' && (
+            <button className='flex-1 py-2 bg-red-100 text-red-700 rounded-lg hover:bg-red-200 transition-colors text-sm font-medium'>
+              Cần chỉnh sửa
+            </button>
+          )}
           <button className='p-2 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors'>
             <Edit className='w-4 h-4 text-gray-600' />
           </button>
@@ -375,6 +391,7 @@ export default function SellerMyDocuments() {
                 <option value='all'>Tất cả trạng thái</option>
                 <option value='approved'>Đã duyệt</option>
                 <option value='pending'>Chờ duyệt</option>
+                <option value='rejected'>Bị từ chối</option>
               </select>
             </div>
           </div>

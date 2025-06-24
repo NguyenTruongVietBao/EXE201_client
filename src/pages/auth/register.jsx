@@ -102,7 +102,7 @@ function Register() {
                 className='normal-case text-3xl font-bold text-primary mb-2 justify-self-center'
               >
                 <img
-                  src='./exe201-logo.png'
+                  src='/exe201-logo.png'
                   alt='Prilab'
                   className='w-auto h-15'
                 />

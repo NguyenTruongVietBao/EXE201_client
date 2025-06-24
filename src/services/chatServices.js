@@ -8,7 +8,7 @@ const chatServices = {
       formData.append('image', file);
 
       const response = await axiosInstance.post(
-        `/chat/upload-image`,
+        `/api/chat/upload-image`,
         formData,
         {
           headers: {
@@ -33,7 +33,7 @@ const chatServices = {
   // Lấy danh sách conversations
   getConversations: async () => {
     try {
-      const response = await axiosInstance.get('/chat/conversations');
+      const response = await axiosInstance.get('/api/chat/conversations');
       return response;
     } catch (error) {
       console.error('Get conversations error:', error);
@@ -47,7 +47,7 @@ const chatServices = {
   createConversation: async (participantId) => {
     try {
       const response = await axiosInstance.post(
-        `/chat/conversations/${participantId}`
+        `/api/chat/conversations/${participantId}`
       );
       return response;
     } catch (error) {
@@ -62,7 +62,7 @@ const chatServices = {
   getConversationMessages: async (conversationId) => {
     try {
       const response = await axiosInstance.get(
-        `/chat/conversations/${conversationId}/messages`
+        `/api/chat/conversations/${conversationId}/messages`
       );
       return response;
     } catch (error) {
@@ -77,7 +77,7 @@ const chatServices = {
   sendConversationMessage: async (conversationId, messageData) => {
     try {
       const response = await axiosInstance.post(
-        `/chat/conversations/${conversationId}/messages`,
+        `/api/chat/conversations/${conversationId}/messages`,
         messageData
       );
       return response;
@@ -95,7 +95,7 @@ const chatServices = {
   // Lấy danh sách groups đã tham gia
   getJoinedGroups: async () => {
     try {
-      const response = await axiosInstance.get('/chat/groups');
+      const response = await axiosInstance.get('/api/chat/groups');
       return response;
     } catch (error) {
       console.error('Get joined groups error:', error);
@@ -109,7 +109,7 @@ const chatServices = {
   getGroupMessages: async (groupId) => {
     try {
       const response = await axiosInstance.get(
-        `/chat/groups/${groupId}/messages`
+        `/api/chat/groups/${groupId}/messages`
       );
       return response;
     } catch (error) {
@@ -124,7 +124,7 @@ const chatServices = {
   sendGroupMessage: async (groupId, messageData) => {
     try {
       const response = await axiosInstance.post(
-        `/chat/groups/${groupId}/messages`,
+        `/api/chat/groups/${groupId}/messages`,
         messageData
       );
       return response;

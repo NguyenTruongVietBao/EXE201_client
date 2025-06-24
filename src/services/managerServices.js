@@ -3,7 +3,7 @@ import axiosInstance from '../configs/axios';
 const managerServices = {
   managerStatistics: async () => {
     try {
-      const response = await axiosInstance.get('/users/manager-statistics');
+      const response = await axiosInstance.get('/api/users/manager-statistics');
       return response;
     } catch (error) {
       console.error('Error fetching manager statistics:', error);
@@ -12,7 +12,7 @@ const managerServices = {
   },
   getAllDocuments: async () => {
     try {
-      const response = await axiosInstance.get(`/documents`);
+      const response = await axiosInstance.get(`/api/documents`);
       return response;
     } catch (error) {
       console.error('Error fetching documents:', error);
@@ -21,7 +21,7 @@ const managerServices = {
   },
   getDocumentDetail: async (id) => {
     try {
-      const response = await axiosInstance.get(`/documents/${id}`);
+      const response = await axiosInstance.get(`/api/documents/${id}`);
       return response;
     } catch (error) {
       console.error('Error fetching document detail:', error);
@@ -30,7 +30,7 @@ const managerServices = {
   },
   publishDocument: async (id) => {
     try {
-      const response = await axiosInstance.put(`/documents/${id}/approve`);
+      const response = await axiosInstance.put(`/api/documents/${id}/approve`);
       return response;
     } catch (error) {
       console.error('Error publishing document:', error);
@@ -39,7 +39,7 @@ const managerServices = {
   },
   unpublishDocument: async (id) => {
     try {
-      const response = await axiosInstance.put(`/documents/${id}/reject`);
+      const response = await axiosInstance.put(`/api/documents/${id}/reject`);
       return response;
     } catch (error) {
       console.error('Error unpublishing document:', error);
@@ -48,7 +48,7 @@ const managerServices = {
   },
   paymentStats: async () => {
     try {
-      const response = await axiosInstance.get(`/payments/manager/stats`);
+      const response = await axiosInstance.get(`/api/payments/manager/stats`);
       return response;
     } catch (error) {
       console.error('Error fetching payment stats:', error);
@@ -58,7 +58,7 @@ const managerServices = {
   platformWallet: async () => {
     try {
       const response = await axiosInstance.get(
-        `/payments/manager/platform-wallet`
+        `/api/payments/manager/platform-wallet`
       );
       return response;
     } catch (error) {
@@ -69,7 +69,7 @@ const managerServices = {
   getAllWithdrawsRequest: async () => {
     try {
       const response = await axiosInstance.get(
-        `/payments/manager/withdrawal-requests`
+        `/api/payments/manager/withdrawal-requests`
       );
       return response;
     } catch (error) {
@@ -80,7 +80,7 @@ const managerServices = {
   handleWithdrawRequest: async (id) => {
     try {
       const response = await axiosInstance.put(
-        `/payments/manager/withdrawal-request/${id}`
+        `/api/payments/manager/withdrawal-request/${id}`
       );
       return response;
     } catch (error) {
@@ -91,7 +91,7 @@ const managerServices = {
   // Refunds Requests ------------------------------------------------------------
   getAllRefundsRequests: async () => {
     try {
-      const response = await axiosInstance.get(`/refunds`);
+      const response = await axiosInstance.get(`/api/refunds`);
       return response;
     } catch (error) {
       console.error('Error fetching all refunds requests:', error);
@@ -100,7 +100,7 @@ const managerServices = {
   },
   getRefundRequestStats: async () => {
     try {
-      const response = await axiosInstance.get(`/refunds/stats/overview`);
+      const response = await axiosInstance.get(`/api/refunds/stats/overview`);
       return response;
     } catch (error) {
       console.error('Error fetching refund request stats:', error);
@@ -109,7 +109,7 @@ const managerServices = {
   },
   getRefundRequestDetail: async (id) => {
     try {
-      const response = await axiosInstance.get(`/refunds/${id}`);
+      const response = await axiosInstance.get(`/api/refunds/${id}`);
       return response;
     } catch (error) {
       console.error('Error fetching refund request detail:', error);
@@ -118,7 +118,7 @@ const managerServices = {
   },
   approveRefundRequest: async (id, adminResponse) => {
     try {
-      const response = await axiosInstance.put(`/refunds/${id}/process`, {
+      const response = await axiosInstance.put(`/api/refunds/${id}/process`, {
         status: 'APPROVED',
         adminResponse,
       });
@@ -130,7 +130,7 @@ const managerServices = {
   },
   rejectRefundRequest: async (id, adminResponse) => {
     try {
-      const response = await axiosInstance.put(`/refunds/${id}/process`, {
+      const response = await axiosInstance.put(`/api/refunds/${id}/process`, {
         status: 'REJECTED',
         adminResponse,
       });

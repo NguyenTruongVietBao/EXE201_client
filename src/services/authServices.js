@@ -5,7 +5,7 @@ const authServices = {
   // Login
   login: async (data) => {
     try {
-      const response = await axiosInstance.post('/auth/login', data);
+      const response = await axiosInstance.post('/api/auth/login', data);
       return response;
     } catch (error) {
       return error;
@@ -15,7 +15,7 @@ const authServices = {
   registerCustomer: async (data) => {
     try {
       const response = await axiosInstance.post(
-        '/auth/register-customer',
+        '/api/auth/register-customer',
         data
       );
       return response;
@@ -26,7 +26,10 @@ const authServices = {
   // Register Seller
   registerSeller: async (data) => {
     try {
-      const response = await axiosInstance.post('/auth/register-seller', data);
+      const response = await axiosInstance.post(
+        '/api/auth/register-seller',
+        data
+      );
       return response;
     } catch (error) {
       return error;
@@ -35,7 +38,7 @@ const authServices = {
   // Verify email
   verifyEmail: async (data) => {
     try {
-      const response = await axiosInstance.post(`/auth/verify-email`, data);
+      const response = await axiosInstance.post(`/api/auth/verify-email`, data);
       return response;
     } catch (error) {
       return error;
@@ -45,7 +48,7 @@ const authServices = {
   resendOtp: async (data) => {
     try {
       const response = await axiosInstance.post(
-        `/auth/resendemailverification?email=${data.email}`
+        `/api/auth/resendemailverification?email=${data.email}`
       );
       return response;
     } catch (error) {
