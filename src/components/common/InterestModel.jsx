@@ -10,7 +10,6 @@ const InterestModel = ({ onConfirm }) => {
   useEffect(() => {
     const fetchInterests = async () => {
       const response = await interestServices.getAllInterests();
-      console.log('🚀 ~ fetchInterests ~ response:', response);
       setInterestList(response.data);
     };
     fetchInterests();

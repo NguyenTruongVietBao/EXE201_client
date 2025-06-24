@@ -28,11 +28,9 @@ axiosInstance.interceptors.request.use(
 // Response interceptor
 axiosInstance.interceptors.response.use(
   (response) => {
-    // console.log('🚀 ~ response from axios instance:', response);
     return response.data;
   },
   (error) => {
-    // console.log('🚀 ~ error from axios instance:', error);
     if (error.response) {
       const { status, statusCode, message, data } = error.response.data;
       return Promise.reject({ status, message, statusCode, data });
