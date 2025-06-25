@@ -40,7 +40,6 @@ export default function ManagerDocuments() {
       try {
         setLoading(true);
         const response = await managerServices.getAllDocuments(1, 20);
-        console.log('🚀 ~ fetchDocuments ~ response:', response);
         if (response.status) {
           setDocuments(response.data.documents || []);
           setPagination(
@@ -202,7 +201,7 @@ export default function ManagerDocuments() {
     pending: documents.filter((doc) => doc.status === 'PENDING').length,
     rejected: documents.filter((doc) => doc.status === 'REJECTED').length,
     totalRevenue: documents.reduce(
-      (sum, doc) => sum + doc.price * (doc.download || 0),
+      (sum, doc) => sum + (doc.price - (doc.price * doc.discount) / 100),
       0
     ),
     totalDownloads: documents.reduce(
@@ -423,7 +422,9 @@ export default function ManagerDocuments() {
                             <span className='flex items-center gap-1'>
                               <DollarSign className='w-4 h-4' />
                               {doc.price > 0
-                                ? formatCurrency(doc.price)
+                                ? formatCurrency(
+                                    doc.price - (doc.price * doc.discount) / 100
+                                  )
                                 : 'Miễn phí'}
                             </span>
                             <span className='flex items-center gap-1'>

@@ -66,28 +66,6 @@ const managerServices = {
       throw error;
     }
   },
-  getAllWithdrawsRequest: async () => {
-    try {
-      const response = await axiosInstance.get(
-        `/api/payments/manager/withdrawal-requests`
-      );
-      return response;
-    } catch (error) {
-      console.error('Error fetching all withdraws:', error);
-      throw error;
-    }
-  },
-  handleWithdrawRequest: async (id) => {
-    try {
-      const response = await axiosInstance.put(
-        `/api/payments/manager/withdrawal-request/${id}`
-      );
-      return response;
-    } catch (error) {
-      console.error('Error handling withdraw request:', error);
-      throw error;
-    }
-  },
   // Refunds Requests ------------------------------------------------------------
   getAllRefundsRequests: async () => {
     try {
@@ -137,6 +115,30 @@ const managerServices = {
       return response;
     } catch (error) {
       console.error('Error handling refund request:', error);
+      throw error;
+    }
+  },
+  // Withdrawals Requests ------------------------------------------------------------
+  getAllWithdrawalsRequests: async () => {
+    try {
+      const response = await axiosInstance.get(
+        `/api/payments/manager/withdrawal-requests`
+      );
+      return response;
+    } catch (error) {
+      console.error('Error fetching all withdrawals requests:', error);
+      throw error;
+    }
+  },
+  handleWithdrawRequest: async (id, data) => {
+    try {
+      const response = await axiosInstance.put(
+        `/api/payments/manager/withdrawal-request/${id}`,
+        data
+      );
+      return response;
+    } catch (error) {
+      console.error('Error handling withdraw request:', error);
       throw error;
     }
   },

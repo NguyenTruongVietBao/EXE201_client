@@ -42,7 +42,6 @@ function VerifyEmail() {
     } else {
       toast.error(result.message);
     }
-    console.log('🚀 ~ handleVerifyEmail ~ result:', result);
     setIsLoading(false);
   };
 
@@ -56,7 +55,6 @@ function VerifyEmail() {
         interests: selectedItems,
         userId,
       });
-      console.log('🚀 ~ handleConfirmInterest ~ res:', res);
       if (res.status === true) {
         toast.success(res.message);
         const response = await initUserData(res);
@@ -78,7 +76,6 @@ function VerifyEmail() {
 
   const handleResendOtp = async () => {
     const res = await authServices.resendOtp({ email });
-    console.log('🚀 ~ handleResendOtp ~ res:', res);
     if (res.status === true) {
       toast.success(res.message);
       setIsResending(true);

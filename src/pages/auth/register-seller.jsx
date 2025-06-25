@@ -15,7 +15,6 @@ export default function RegisterSeller() {
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
   const [banksInfo, setBanksInfo] = useState([]);
-  console.log('🚀 ~ RegisterSeller ~ banksInfo:', banksInfo);
   const [errors, setErrors] = useState({});
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -98,7 +97,6 @@ export default function RegisterSeller() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log('🚀 ~ handleSubmit: ~ form:', form);
     if (validateForm()) {
       try {
         setIsLoading(true);
@@ -111,7 +109,6 @@ export default function RegisterSeller() {
           bankAccountName: form.bankAccountName,
           bankAccountNumber: form.bankAccountNumber,
         });
-        console.log('🚀 ~ handleSubmit: ~ result:', result);
         if (result.status === true) {
           toast.success('Đăng ký thành công');
           navigate('/verify-email', {

@@ -1,4 +1,4 @@
-import { useEffect, useCallback } from 'react';
+import { useEffect, useCallback, useRef } from 'react';
 import { socketManager } from '../configs/socket';
 import { useChatStore } from '../stores/useChatStore';
 import useAuthStore from '../stores/useAuthStore';
@@ -15,6 +15,10 @@ export const useSocket = () => {
     loadConversations,
     clearChat,
   } = useChatStore();
+
+  // Refs để track connection state
+  const isConnectedRef = useRef(false);
+  const retryTimeoutRef = useRef(null);
 
   // Memoize socket emitters để tránh re-render
   const sendDirectMessage = useCallback(
@@ -61,10 +65,26 @@ export const useSocket = () => {
     socketManager.emit('leave_group', { groupId });
   }, []);
 
+  // Load data sau khi connect thành công
+  const loadDataAfterConnect = useCallback(async () => {
+    try {
+      console.log('Loading data after socket connection...');
+      await Promise.all([loadConversations(), loadJoinedGroups()]);
+      console.log('Data loaded successfully after socket connection');
+    } catch (error) {
+      console.error('Error loading data after socket connection:', error);
+    }
+  }, [loadConversations, loadJoinedGroups]);
+
   useEffect(() => {
     if (!user) {
       // Clear chat data và disconnect socket khi không có user
       clearChat();
+      isConnectedRef.current = false;
+      if (retryTimeoutRef.current) {
+        clearTimeout(retryTimeoutRef.current);
+        retryTimeoutRef.current = null;
+      }
       if (socketManager.isConnected()) {
         socketManager.disconnect();
       }
@@ -81,10 +101,16 @@ export const useSocket = () => {
     // Socket connected successfully
     const handleConnect = () => {
       console.log('Socket connected successfully');
+      isConnectedRef.current = true;
+
+      // Clear retry timeout nếu có
+      if (retryTimeoutRef.current) {
+        clearTimeout(retryTimeoutRef.current);
+        retryTimeoutRef.current = null;
+      }
 
       // Load conversations và groups khi connect thành công
-      loadConversations();
-      loadJoinedGroups();
+      loadDataAfterConnect();
 
       // Add current user vào onlineUsers
       addOnlineUser({
@@ -135,6 +161,22 @@ export const useSocket = () => {
       toast.error(error.message || 'Lỗi kết nối');
     };
 
+    // Socket disconnect
+    const handleDisconnect = (reason) => {
+      console.log('Socket disconnected:', reason);
+      isConnectedRef.current = false;
+
+      // Retry connection sau 3 giây nếu disconnect không phải do manual
+      if (reason !== 'io client disconnect' && user) {
+        retryTimeoutRef.current = setTimeout(() => {
+          console.log('Attempting to reconnect socket...');
+          if (!socketManager.isConnected() && user) {
+            socketManager.connect();
+          }
+        }, 3000);
+      }
+    };
+
     // Message sent confirmation
     const handleMessageSent = (data) => {
       console.log('Message sent successfully:', data);
@@ -154,11 +196,6 @@ export const useSocket = () => {
     const handleOnlineUsers = (users) => {
       console.log('Received online users:', users);
       setOnlineUsers(users);
-    };
-
-    // Socket disconnect
-    const handleDisconnect = (reason) => {
-      console.log('Socket disconnected:', reason);
     };
 
     // Remove existing listeners trước khi add mới (tránh duplicate)
@@ -189,6 +226,11 @@ export const useSocket = () => {
 
     // Cleanup khi unmount hoặc user change
     return () => {
+      if (retryTimeoutRef.current) {
+        clearTimeout(retryTimeoutRef.current);
+        retryTimeoutRef.current = null;
+      }
+
       socketManager.off('connect', handleConnect);
       socketManager.off('disconnect', handleDisconnect);
       socketManager.off('new_direct_message', handleNewDirectMessage);
@@ -207,8 +249,7 @@ export const useSocket = () => {
     setOnlineUsers,
     addOnlineUser,
     removeOnlineUser,
-    loadJoinedGroups,
-    loadConversations,
+    loadDataAfterConnect,
     clearChat,
   ]);
 

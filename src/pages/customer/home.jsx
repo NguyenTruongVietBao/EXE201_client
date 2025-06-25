@@ -3,9 +3,6 @@ import {
   BookOpen,
   Users,
   UserPlus,
-  Star,
-  Download,
-  Eye,
   Plus,
   Clock,
   BookOpenCheck,
@@ -14,7 +11,6 @@ import {
   TrendingUp,
   MessageSquare,
   Brain,
-  Bookmark,
   Search,
   Gift,
   User,
@@ -24,13 +20,61 @@ import { Link } from 'react-router';
 import useAuthStore from '../../stores/useAuthStore';
 import { formatCurrency, formatDate } from '../../utils';
 import LoadingPage from '../../components/common/LoadingPage';
+import chatServices from '../../services/chatServices';
+import customerService from '../../services/customerService';
 
 export default function CustomerHome() {
   const [recommendDocuments, setRecommendDocuments] = useState([]);
   const [recommendStudyPartners, setRecommendStudyPartners] = useState([]);
   const [recommendStudyGroups, setRecommendStudyGroups] = useState([]);
+  const [connectedUsers, setConnectedUsers] = useState([]);
+  const [joinedGroups, setJoinedGroups] = useState([]);
+  const [enrolledDocuments, setEnrolledDocuments] = useState([]);
   const { user } = useAuthStore();
   const [loading, setLoading] = useState(true);
+
+  // Helper functions to check status
+  const isDocumentEnrolled = (docId) => {
+    return enrolledDocuments.some((doc) => doc._id === docId);
+  };
+
+  const isUserConnected = (userId) => {
+    return connectedUsers.some((conversation) =>
+      conversation.participants.some(
+        (participant) => participant._id === userId
+      )
+    );
+  };
+
+  const isGroupJoined = (groupId) => {
+    return joinedGroups.some((group) => group._id === groupId);
+  };
+
+  // Handle connect with study partner
+  const handleConnectPartner = async (partnerId) => {
+    try {
+      // TODO: Implement connect partner API call
+      console.log('Connecting with partner:', partnerId);
+      // After successful connection, refresh connectedUsers data
+      const response = await chatServices.getConversations();
+      setConnectedUsers(response.data || []);
+    } catch (error) {
+      console.error('Error connecting with partner:', error);
+    }
+  };
+
+  // Handle join study group
+  const handleJoinGroup = async (groupId) => {
+    try {
+      // TODO: Implement join group API call
+      console.log('Joining group:', groupId);
+      // After successful join, refresh joinedGroups data
+      const response = await customerService.getJoinedGroups();
+      setJoinedGroups(response.data.groups || []);
+    } catch (error) {
+      console.error('Error joining group:', error);
+    }
+  };
 
   useEffect(() => {
     const fetchRecommendData = async () => {
@@ -58,6 +102,21 @@ export default function CustomerHome() {
         setLoading(false);
       }
     };
+    const fetchUserConnected = async () => {
+      const response = await chatServices.getConversations();
+      setConnectedUsers(response.data || []);
+    };
+    const fetchEnrolledDocuments = async () => {
+      const response = await customerService.getMyEnrolledDocuments();
+      setEnrolledDocuments(response.data || []);
+    };
+    const fetchJoinedGroups = async () => {
+      const response = await customerService.getJoinedGroups();
+      setJoinedGroups(response.data.groups || []);
+    };
+    fetchJoinedGroups();
+    fetchEnrolledDocuments();
+    fetchUserConnected();
     fetchRecommendData();
   }, []);
 
@@ -88,12 +147,12 @@ export default function CustomerHome() {
   ];
 
   const userStats = {
-    documentsRead: 147,
-    studyHours: 312,
-    groupsJoined: 12,
-    partnersConnected: 28,
-    weeklyGoal: 20,
-    weeklyProgress: 14,
+    documentsRead: enrolledDocuments.length,
+    studyHours: 312, // Keep static for now
+    groupsJoined: joinedGroups.length,
+    partnersConnected: connectedUsers.length,
+    weeklyGoal: 20, // Keep static for now
+    weeklyProgress: 14, // Keep static for now
   };
 
   const quickActions = [
@@ -306,12 +365,22 @@ export default function CustomerHome() {
                               : formatCurrency(doc.price)}
                           </span>
                         </div>
-                        <Link
-                          to={`/customer/documents/${doc._id}`}
-                          className='px-3 py-1 bg-gradient-to-r from-blue-500 to-purple-500 text-white rounded-lg hover:from-blue-600 hover:to-purple-600 transition-all duration-300 text-xs font-medium'
-                        >
-                          Chi tiết
-                        </Link>
+                        {isDocumentEnrolled(doc._id) ? (
+                          <Link
+                            to={`/customer/documents/${doc._id}`}
+                            className='px-3 py-1 bg-gradient-to-r from-green-500 to-emerald-500 text-white rounded-lg hover:from-green-600 hover:to-emerald-600 transition-all duration-300 text-xs font-medium flex items-center gap-1'
+                          >
+                            <BookOpenCheck className='w-3 h-3' />
+                            Đã sở hữu
+                          </Link>
+                        ) : (
+                          <Link
+                            to={`/customer/documents/${doc._id}`}
+                            className='px-3 py-1 bg-gradient-to-r from-blue-500 to-purple-500 text-white rounded-lg hover:from-blue-600 hover:to-purple-600 transition-all duration-300 text-xs font-medium'
+                          >
+                            Chi tiết
+                          </Link>
+                        )}
                       </div>
                     </div>
                   ))
@@ -387,9 +456,22 @@ export default function CustomerHome() {
                         </div>
                       </div>
                       <div className='flex items-center justify-between'>
-                        <button className='w-full py-2 bg-gradient-to-r from-emerald-500 to-teal-500 text-white rounded-lg hover:from-emerald-600 hover:to-teal-600 transition-all duration-300 text-xs font-medium'>
-                          Kết nối
-                        </button>
+                        {isUserConnected(partner._id) ? (
+                          <Link
+                            to='/customer/chat'
+                            className='w-full py-2 bg-gradient-to-r from-blue-500 to-indigo-500 text-white rounded-lg hover:from-blue-600 hover:to-indigo-600 transition-all duration-300 text-xs font-medium flex items-center justify-center gap-1'
+                          >
+                            <MessageSquare className='w-3 h-3' />
+                            Nhắn tin
+                          </Link>
+                        ) : (
+                          <button
+                            onClick={() => handleConnectPartner(partner._id)}
+                            className='w-full py-2 bg-gradient-to-r from-emerald-500 to-teal-500 text-white rounded-lg hover:from-emerald-600 hover:to-teal-600 transition-all duration-300 text-xs font-medium'
+                          >
+                            Kết nối
+                          </button>
+                        )}
                       </div>
                     </div>
                   ))
@@ -471,9 +553,22 @@ export default function CustomerHome() {
                             {group.newMessages || 0} tin mới
                           </span>
                         </div>
-                        <button className='px-3 py-1 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-lg hover:from-purple-600 hover:to-pink-600 transition-all duration-300 text-xs font-medium'>
-                          Tham gia
-                        </button>
+                        {isGroupJoined(group._id) ? (
+                          <Link
+                            to={`/customer/groups/${group._id}`}
+                            className='px-3 py-1 bg-gradient-to-r from-green-500 to-emerald-500 text-white rounded-lg hover:from-green-600 hover:to-emerald-600 transition-all duration-300 text-xs font-medium flex items-center gap-1'
+                          >
+                            <Users className='w-3 h-3' />
+                            Đã tham gia
+                          </Link>
+                        ) : (
+                          <button
+                            onClick={() => handleJoinGroup(group._id)}
+                            className='px-3 py-1 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-lg hover:from-purple-600 hover:to-pink-600 transition-all duration-300 text-xs font-medium'
+                          >
+                            Tham gia
+                          </button>
+                        )}
                       </div>
                     </div>
                   ))
@@ -617,6 +712,80 @@ export default function CustomerHome() {
                 ))}
               </div>
             </section>
+            {/* My Documents */}
+            {enrolledDocuments.length > 0 && (
+              <section>
+                <div className='bg-white/80 backdrop-blur-sm rounded-2xl p-4 shadow-xl border border-white/20'>
+                  <h3 className='font-bold text-gray-900 mb-3 flex items-center gap-2'>
+                    <BookOpenCheck className='w-4 h-4 text-blue-600' />
+                    Tài liệu của tôi ({enrolledDocuments.length})
+                  </h3>
+                  <div className='space-y-2 max-h-32 overflow-y-auto'>
+                    {enrolledDocuments.slice(0, 3).map((doc) => (
+                      <Link
+                        key={doc._id}
+                        to={`/customer/documents/${doc._id}`}
+                        className='block p-2 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors duration-200'
+                      >
+                        <p className='text-sm font-medium text-gray-900 line-clamp-1'>
+                          {doc.title}
+                        </p>
+                        <p className='text-xs text-gray-600'>
+                          {doc.price === 0
+                            ? 'Miễn phí'
+                            : formatCurrency(doc.price)}
+                        </p>
+                      </Link>
+                    ))}
+                  </div>
+                  {enrolledDocuments.length > 3 && (
+                    <Link
+                      to='/customer/my-document'
+                      className='block text-center text-sm text-blue-600 hover:text-blue-700 mt-2 font-medium'
+                    >
+                      Xem tất cả ({enrolledDocuments.length})
+                    </Link>
+                  )}
+                </div>
+              </section>
+            )}
+
+            {/* My Groups */}
+            {joinedGroups.length > 0 && (
+              <section>
+                <div className='bg-white/80 backdrop-blur-sm rounded-2xl p-4 shadow-xl border border-white/20'>
+                  <h3 className='font-bold text-gray-900 mb-3 flex items-center gap-2'>
+                    <Users className='w-4 h-4 text-purple-600' />
+                    Nhóm của tôi ({joinedGroups.length})
+                  </h3>
+                  <div className='space-y-2 max-h-32 overflow-y-auto'>
+                    {joinedGroups.slice(0, 3).map((group) => (
+                      <Link
+                        key={group._id}
+                        to={`/customer/groups/${group._id}`}
+                        className='block p-2 bg-purple-50 rounded-lg hover:bg-purple-100 transition-colors duration-200'
+                      >
+                        <p className='text-sm font-medium text-gray-900 line-clamp-1'>
+                          {group.name}
+                        </p>
+                        <p className='text-xs text-gray-600'>
+                          {group.members?.length || 0} thành viên
+                        </p>
+                      </Link>
+                    ))}
+                  </div>
+                  {joinedGroups.length > 3 && (
+                    <Link
+                      to='/customer/my-group'
+                      className='block text-center text-sm text-purple-600 hover:text-purple-700 mt-2 font-medium'
+                    >
+                      Xem tất cả ({joinedGroups.length})
+                    </Link>
+                  )}
+                </div>
+              </section>
+            )}
+
             {/* Quick Links */}
             <section>
               <div className='bg-gradient-to-br from-blue-100 to-purple-100 rounded-2xl p-4 border border-blue-200'>

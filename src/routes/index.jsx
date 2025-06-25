@@ -42,6 +42,7 @@ import CustomerGroup from '../pages/customer/group';
 import CustomerMyGroup from '../pages/customer/my-group';
 import CustomerGroupDetail from '../pages/customer/group-detail';
 import SellerWithdrawals from '../pages/seller/withdrawals';
+import ManagerWithdrawals from '../pages/manager/withdrawals';
 
 const { ADMIN, CUSTOMER, SELLER, MANAGER } = USER_ROLE;
 
@@ -295,6 +296,14 @@ const router = createBrowserRouter([
         element: (
           <ProtectedRoute requiredRoles={[MANAGER]}>
             <ManagerRefundRequests />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: 'withdrawals',
+        element: (
+          <ProtectedRoute requiredRoles={[MANAGER]}>
+            <ManagerWithdrawals />
           </ProtectedRoute>
         ),
       },

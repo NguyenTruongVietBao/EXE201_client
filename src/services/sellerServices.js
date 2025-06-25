@@ -25,6 +25,19 @@ const sellerServices = {
     const response = await axiosInstance.get('/api/refunds/seller/stats');
     return response;
   },
+  getMyWithdrawalRequests: async () => {
+    const response = await axiosInstance.get(
+      '/api/payments/seller/withdrawal-requests'
+    );
+    return response;
+  },
+  createWithdrawalRequest: async (data) => {
+    const response = await axiosInstance.post(
+      '/api/payments/seller/withdrawal-request',
+      data
+    );
+    return response;
+  },
 };
 
 export default sellerServices;

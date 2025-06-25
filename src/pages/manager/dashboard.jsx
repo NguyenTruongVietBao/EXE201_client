@@ -10,16 +10,12 @@ import {
   PieChart,
   Pie,
   Cell,
-  AreaChart,
-  Area,
 } from 'recharts';
 import {
-  DollarSign,
   TrendingUp,
   Users,
   Wallet,
   CreditCard,
-  AlertCircle,
   FileText,
   Award,
   Activity,
@@ -146,13 +142,6 @@ export default function ManagerDashboard() {
     },
   ].filter((item) => item.value > 0);
 
-  // Dữ liệu cho daily revenue chart
-  const dailyRevenueData = stats.dailyRevenueStats.map((day) => ({
-    date: formatDate(day.date),
-    revenue: day.revenue,
-    sales: day.sales,
-  }));
-
   // Commission colors
   const commissionColors = [
     '#10B981',
@@ -179,7 +168,7 @@ export default function ManagerDashboard() {
         </div>
 
         {/* Main Stats Cards */}
-        <div className='grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 sm:gap-6 mb-10'>
+        <div className='grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6 mb-10'>
           <StatCard
             title='Tổng người dùng'
             value={stats.overview.users.total}
@@ -208,15 +197,6 @@ export default function ManagerDashboard() {
             textColor='text-white'
             subtitle={`${stats.overview.payments.completed} thành công`}
           />
-          <StatCard
-            title='Tổng doanh thu'
-            value={formatCurrency(stats.revenue.totalRevenue)}
-            IconComponent={DollarSign}
-            bgGradient='bg-gradient-to-br from-orange-500 to-orange-600'
-            iconBg='bg-orange-400/30'
-            textColor='text-white'
-            subtitle='Tất cả giao dịch'
-          />
         </div>
 
         {/* Revenue & Wallet Section */}
@@ -229,21 +209,20 @@ export default function ManagerDashboard() {
             </div>
 
             {/* Main Balance Overview */}
-            <div className='grid grid-cols-1 sm:grid-cols-2 gap-3 mb-4'>
-              <div className='p-3 bg-gradient-to-r from-blue-50 to-blue-100 rounded-xl border border-blue-200'>
-                <div className='flex items-center justify-between'>
-                  <div>
-                    <p className='text-sm font-medium text-blue-700'>
-                      Tổng số dư
-                    </p>
-                    <p className='text-lg font-bold text-blue-900'>
-                      {formatCurrency(platformWallet.totalBalance)}
-                    </p>
-                  </div>
-                  <Wallet className='h-6 w-6 text-blue-600' />
+            <div className='p-3 bg-gradient-to-r from-blue-100 to-blue-200 rounded-xl border border-blue-200 mb-4'>
+              <div className='flex items-center justify-between'>
+                <div>
+                  <p className='text-lg font-semibold text-blue-700'>
+                    Tổng doanh thu (Tạm tính)
+                  </p>
+                  <p className='text-2xl font-bold text-blue-900'>
+                    {formatCurrency(platformWallet.totalBalance)}
+                  </p>
                 </div>
+                <Wallet className='h-6 w-6 text-blue-600' />
               </div>
-
+            </div>
+            <div className='grid grid-cols-1 sm:grid-cols-2 gap-3 mb-4'>
               <div className='p-3 bg-gradient-to-r from-emerald-50 to-emerald-100 rounded-xl border border-emerald-200'>
                 <div className='flex items-center justify-between'>
                   <div>
@@ -258,20 +237,6 @@ export default function ManagerDashboard() {
                 </div>
               </div>
 
-              <div className='p-3 bg-gradient-to-r from-orange-50 to-orange-100 rounded-xl border border-orange-200'>
-                <div className='flex items-center justify-between'>
-                  <div>
-                    <p className='text-sm font-medium text-orange-700'>
-                      Đang chờ xử lý
-                    </p>
-                    <p className='text-lg font-bold text-orange-900'>
-                      {formatCurrency(platformWallet.pendingBalance)}
-                    </p>
-                  </div>
-                  <Clock className='h-6 w-6 text-orange-600' />
-                </div>
-              </div>
-
               <div className='p-3 bg-gradient-to-r from-yellow-50 to-yellow-100 rounded-xl border border-yellow-200'>
                 <div className='flex items-center justify-between'>
                   <div>
@@ -283,6 +248,80 @@ export default function ManagerDashboard() {
                     </p>
                   </div>
                   <Award className='h-6 w-6 text-yellow-600' />
+                </div>
+              </div>
+            </div>
+
+            {/* Commission Distribution Section */}
+            <div className='border-t border-gray-200 pt-4 mb-4'>
+              <div className='p-3 bg-gradient-to-r from-orange-100 to-orange-200 rounded-xl border border-orange-200'>
+                <div className='flex items-center justify-between'>
+                  <div>
+                    <p className='text-sm font-semibold text-orange-700'>
+                      Đang chờ xử lý
+                    </p>
+                    <p className='text-xl font-bold text-orange-900'>
+                      {formatCurrency(platformWallet.pendingBalance)}
+                    </p>
+                  </div>
+                  <Clock className='h-6 w-6 text-orange-600' />
+                </div>
+              </div>
+              <h4 className='text-sm font-semibold text-gray-700 my-1 ml-1'>
+                Phân chia doanh thu
+              </h4>
+              <div className='grid grid-cols-1 sm:grid-cols-2 gap-3'>
+                <div className='p-3 bg-orange-50 rounded-xl border border-orange-100'>
+                  <div className='flex items-center justify-between mb-2'>
+                    <div>
+                      <p className='text-sm font-medium text-orange-700'>
+                        Seller (85%)
+                      </p>
+                      <p className='text-lg font-bold text-orange-900'>
+                        {formatCurrency(
+                          platformWallet.pendingBalance * 0.85 || 0
+                        )}
+                      </p>
+                    </div>
+                    <Users className='h-5 w-5 text-orange-600' />
+                  </div>
+                </div>
+
+                <div className='p-3 bg-orange-50 rounded-xl border border-orange-100'>
+                  <div className='flex items-center justify-between mb-2'>
+                    <div>
+                      <p className='text-sm font-medium text-orange-700'>
+                        Nền tảng (15%)
+                      </p>
+                      <p className='text-lg font-bold text-orange-900'>
+                        {formatCurrency(
+                          platformWallet.pendingBalance * 0.15 || 0
+                        )}
+                      </p>
+                    </div>
+                    <Award className='h-5 w-5 text-orange-600' />
+                  </div>
+                </div>
+              </div>
+
+              {/* Visual Progress Bar */}
+              <div className='mt-3 p-3 bg-gray-50 rounded-xl border border-gray-100'>
+                <div className='text-xs text-gray-600 mb-2'>
+                  Tỷ lệ phân chia doanh thu
+                </div>
+                <div className='w-full bg-gray-200 rounded-full h-3 mb-2'>
+                  <div
+                    className='bg-gradient-to-r from-emerald-500 to-emerald-600 h-3 rounded-l-full'
+                    style={{ width: '85%' }}
+                  ></div>
+                  <div
+                    className='bg-gradient-to-r from-yellow-500 to-yellow-600 h-3 rounded-r-full ml-auto -mt-3'
+                    style={{ width: '15%' }}
+                  ></div>
+                </div>
+                <div className='flex justify-between text-xs text-gray-600'>
+                  <span>🛒 Seller: 85%</span>
+                  <span>🏢 Platform: 15%</span>
                 </div>
               </div>
             </div>
@@ -353,67 +392,6 @@ export default function ManagerDashboard() {
                 </div>
               </div>
             </div>
-          </div>
-
-          {/* Daily Revenue Chart */}
-          <div className='xl:col-span-2 bg-white/90 rounded-2xl shadow-lg p-6 border border-gray-100 animate-fade-in'>
-            <div className='flex items-center mb-4'>
-              <div className='w-2 h-6 bg-gradient-to-b from-green-500 to-green-600 rounded-full mr-3'></div>
-              <h3 className='text-xl font-bold text-gray-800'>
-                Doanh thu theo ngày
-              </h3>
-            </div>
-            {dailyRevenueData.length > 0 ? (
-              <ResponsiveContainer width='100%' height={280}>
-                <AreaChart data={dailyRevenueData}>
-                  <CartesianGrid strokeDasharray='3 3' stroke='#e5e7eb' />
-                  <XAxis
-                    dataKey='date'
-                    tick={{ fontSize: 12, fill: '#6b7280' }}
-                  />
-                  <YAxis tick={{ fontSize: 12, fill: '#6b7280' }} />
-                  <Tooltip
-                    formatter={(value, name) => [
-                      name === 'revenue' ? formatCurrency(value) : value,
-                      name === 'revenue' ? 'Doanh thu' : 'Số lượng bán',
-                    ]}
-                    contentStyle={{
-                      backgroundColor: 'white',
-                      border: 'none',
-                      borderRadius: '8px',
-                      boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
-                    }}
-                  />
-                  <Area
-                    type='monotone'
-                    dataKey='revenue'
-                    stroke='#10B981'
-                    fill='url(#revenueGradient)'
-                    strokeWidth={2}
-                  />
-                  <defs>
-                    <linearGradient
-                      id='revenueGradient'
-                      x1='0'
-                      y1='0'
-                      x2='0'
-                      y2='1'
-                    >
-                      <stop offset='0%' stopColor='#10B981' stopOpacity={0.7} />
-                      <stop
-                        offset='100%'
-                        stopColor='#10B981'
-                        stopOpacity={0.1}
-                      />
-                    </linearGradient>
-                  </defs>
-                </AreaChart>
-              </ResponsiveContainer>
-            ) : (
-              <div className='flex items-center justify-center h-64 text-gray-500'>
-                Chưa có dữ liệu doanh thu
-              </div>
-            )}
           </div>
         </div>
 

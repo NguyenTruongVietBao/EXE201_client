@@ -213,7 +213,6 @@ export default function CustomerDocumentDetail() {
   const handlePurchase = async () => {
     try {
       const response = await documentServices.purchaseDocument(document._id);
-      console.log('🚀 ~ handlePurchase ~ response:', response);
 
       if (response.status) {
         // Redirect to checkoutUrl to complete payment

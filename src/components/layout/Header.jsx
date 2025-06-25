@@ -46,6 +46,7 @@ const Header = () => {
     { href: '/manager', label: 'Bảng điều khiển' },
     { href: '/manager/documents', label: 'Tài liệu' },
     { href: '/manager/refunds-requests', label: 'Yêu cầu hoàn trả' },
+    { href: '/manager/withdrawals', label: 'Yêu cầu rút tiền' },
   ];
 
   const sellerLinks = [
@@ -58,7 +59,6 @@ const Header = () => {
   const adminLinks = [
     { href: '/admin', label: 'Bảng điều khiển' },
     { href: '/admin/users', label: 'Người dùng' },
-    { href: '/admin/documents', label: 'Tài liệu' },
   ];
 
   const navLinks =

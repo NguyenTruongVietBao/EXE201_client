@@ -83,7 +83,6 @@ export default function ChatContainer() {
         if (response?.status) {
           setMessages(response.data || []);
         } else {
-          console.error('Error fetching messages:', response?.message);
           setMessages([]);
         }
       } catch (error) {
@@ -242,7 +241,12 @@ export default function ChatContainer() {
           <div className='chat-header mb-1'>
             <span className='text-sm opacity-50'>{message.senderId.name}</span>
             <time className='text-xs opacity-50 ml-2'>
-              {new Date(message.createdAt).toLocaleTimeString()}
+              {new Date(message.createdAt).toLocaleString('vi-VN', {
+                day: '2-digit',
+                month: '2-digit',
+                hour: '2-digit',
+                minute: '2-digit',
+              })}
             </time>
           </div>
 

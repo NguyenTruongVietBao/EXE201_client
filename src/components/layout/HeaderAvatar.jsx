@@ -65,11 +65,6 @@ export default function HeaderAvatar({ className }) {
       icon: <LayoutDashboard size={16} />,
     },
     { href: '/admin/users', label: 'Người dùng', icon: <BookOpen size={16} /> },
-    {
-      href: '/admin/documents',
-      label: 'Tài liệu',
-      icon: <BookOpen size={16} />,
-    },
   ];
 
   const navLinks =

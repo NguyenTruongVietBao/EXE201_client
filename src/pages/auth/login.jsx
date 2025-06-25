@@ -45,6 +45,8 @@ function Login() {
             email: form.email,
           },
         });
+      } else if (result.statusCode === 401) {
+        toast.error(result.message);
       } else {
         toast.error(result.message);
       }

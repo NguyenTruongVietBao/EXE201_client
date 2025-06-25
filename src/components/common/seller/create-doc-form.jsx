@@ -597,17 +597,65 @@ export default function CreateDocForm({ onCancel, onSubmit }) {
 
                   {/* Commission Info */}
                   <div className='bg-green-50 border border-green-200 rounded-xl p-4'>
-                    <div className='flex items-center gap-3'>
+                    <div className='flex items-center gap-3 mb-3'>
                       <div className='w-8 h-8 bg-green-500 rounded-full flex items-center justify-center'>
                         <Percent className='w-4 h-4 text-white' />
                       </div>
                       <div>
                         <h5 className='font-semibold text-green-700'>
-                          Platform Commission: 15%
+                          Phân chia hoa hồng
                         </h5>
                         <p className='text-sm text-green-600'>
-                          Standard commission rate for all sellers
+                          Tỷ lệ chuẩn cho tất cả seller
                         </p>
+                      </div>
+                    </div>
+
+                    {/* Commission Breakdown */}
+                    <div className='grid grid-cols-2 gap-3'>
+                      <div className='p-2 bg-emerald-100 rounded-lg text-center'>
+                        <div className='text-lg font-bold text-emerald-700'>
+                          {formatCurrency(
+                            documentData.price
+                              ? (documentData.price -
+                                  (documentData.price * documentData.discount) /
+                                    100) *
+                                  0.85
+                              : 0
+                          )}
+                        </div>
+                        <div className='text-xs text-emerald-600'>Cho bạn</div>
+                      </div>
+                      <div className='p-2 bg-yellow-100 rounded-lg text-center'>
+                        <div className='text-lg font-bold text-yellow-700'>
+                          {formatCurrency(
+                            documentData.price
+                              ? (documentData.price -
+                                  (documentData.price * documentData.discount) /
+                                    100) *
+                                  0.15
+                              : 0
+                          )}
+                        </div>
+                        <div className='text-xs text-yellow-600'>Nền tảng</div>
+                      </div>
+                    </div>
+
+                    {/* Visual Bar */}
+                    <div className='mt-3'>
+                      <div className='w-full bg-gray-200 rounded-full h-2'>
+                        <div
+                          className='bg-gradient-to-r from-emerald-500 to-emerald-600 h-2 rounded-l-full'
+                          style={{ width: '85%' }}
+                        ></div>
+                        <div
+                          className='bg-gradient-to-r from-yellow-500 to-yellow-600 h-2 rounded-r-full ml-auto -mt-2'
+                          style={{ width: '15%' }}
+                        ></div>
+                      </div>
+                      <div className='flex justify-between text-xs text-gray-600 mt-1'>
+                        <span>Seller</span>
+                        <span>Platform</span>
                       </div>
                     </div>
                   </div>

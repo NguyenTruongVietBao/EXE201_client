@@ -64,7 +64,6 @@ export default function SellerHome() {
       try {
         setLoading(true);
         const response = await sellerServices.getSellerStatistic();
-        console.log('🚀 ~ fetchSellerStats ~ response:', response);
         setStats(response.data);
       } catch (error) {
         console.error('Lỗi khi tải dữ liệu:', error);

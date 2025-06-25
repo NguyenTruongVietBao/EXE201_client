@@ -51,7 +51,7 @@ export default function PaymentProcess() {
         toast.error(response.message || 'Thanh toán thất bại');
       }
     } catch (error) {
-      console.log(error);
+      console.error(error);
       setIsFailed(true);
       toast.error('Đã có lỗi xảy ra, vui lòng thử lại');
     } finally {

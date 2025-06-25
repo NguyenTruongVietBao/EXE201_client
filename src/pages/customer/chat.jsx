@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router';
 import { useChatStore } from '../../stores/useChatStore';
 import { useSocket } from '../../hooks/useSocket';
@@ -12,18 +12,49 @@ export default function Chat() {
   const [searchParams] = useSearchParams();
   const receiverId = searchParams.get('receiverId');
   const groupId = searchParams.get('groupId');
+  const [isInitialLoading, setIsInitialLoading] = useState(true);
 
   const { user } = useAuthStore();
-  const { conversations, groups, setSelectedConversation, setSelectedGroup } =
-    useChatStore();
+  const {
+    conversations,
+    groups,
+    setSelectedConversation,
+    setSelectedGroup,
+    loadConversations,
+    loadJoinedGroups,
+  } = useChatStore();
 
   // Initialize socket connection
   useSocket();
 
+  // Load initial data ngay khi component mount
+  useEffect(() => {
+    const loadInitialData = async () => {
+      if (!user) {
+        setIsInitialLoading(false);
+        return;
+      }
+
+      try {
+        setIsInitialLoading(true);
+
+        // Load conversations và groups song song
+        await Promise.all([loadConversations(), loadJoinedGroups()]);
+      } catch (error) {
+        console.error('Error loading initial chat data:', error);
+        toast.error('Lỗi khi tải dữ liệu chat');
+      } finally {
+        setIsInitialLoading(false);
+      }
+    };
+
+    loadInitialData();
+  }, [user?._id, loadConversations, loadJoinedGroups]);
+
   // Handle URL parameters để tự động select conversation/group
   useEffect(() => {
     const handleUrlParams = async () => {
-      if (!user) return;
+      if (!user || isInitialLoading) return;
 
       if (receiverId && conversations.length > 0) {
         // Tìm conversation với user này
@@ -40,6 +71,8 @@ export default function Chat() {
             if (response?.status) {
               setSelectedConversation(response.data);
               toast.success('Bắt đầu cuộc trò chuyện mới');
+              // Reload conversations để cập nhật danh sách
+              loadConversations();
             } else {
               console.error('Error creating conversation:', response?.message);
               toast.error(response?.message || 'Lỗi khi tạo cuộc trò chuyện');
@@ -62,8 +95,8 @@ export default function Chat() {
       }
     };
 
-    // Chỉ handle URL params khi đã có data
-    if (user && (receiverId || groupId)) {
+    // Chỉ handle URL params khi đã load xong initial data
+    if (user && !isInitialLoading) {
       handleUrlParams();
     }
   }, [
@@ -72,8 +105,10 @@ export default function Chat() {
     conversations,
     groups,
     user,
+    isInitialLoading,
     setSelectedConversation,
     setSelectedGroup,
+    loadConversations,
   ]);
 
   if (!user) {
@@ -84,6 +119,21 @@ export default function Chat() {
           <p className='text-base-content/60'>
             Bạn cần đăng nhập để sử dụng tính năng chat
           </p>
+        </div>
+      </div>
+    );
+  }
+
+  // Hiển thị loading khi đang load dữ liệu ban đầu
+  if (isInitialLoading) {
+    return (
+      <div className='container mx-auto h-screen flex items-center justify-center'>
+        <div className='text-center'>
+          <span className='loading loading-spinner loading-lg mb-4'></span>
+          <h2 className='text-xl font-semibold mb-2'>
+            Đang tải dữ liệu chat...
+          </h2>
+          <p className='text-base-content/60'>Vui lòng chờ trong giây lát</p>
         </div>
       </div>
     );

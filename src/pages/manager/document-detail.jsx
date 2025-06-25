@@ -9,7 +9,6 @@ export default function ManagerDocumentDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
   const [document, setDocument] = useState(null);
-  console.log('🚀 ~ ManagerDocumentDetail ~ document:', document);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('overview');
 
@@ -18,7 +17,6 @@ export default function ManagerDocumentDetail() {
       try {
         setLoading(true);
         const response = await managerServices.getDocumentDetail(id);
-        console.log('🚀 ~ fetchDocumentDetail ~ response:', response);
         if (response.status) {
           setDocument(response.data);
         }

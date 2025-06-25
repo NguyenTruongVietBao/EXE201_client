@@ -19,11 +19,18 @@ export const useChatStore = create((set, get) => ({
     try {
       set({ isLoading: true });
       const response = await chatServices.getJoinedGroups();
-      if (response.status) {
+      if (response?.status) {
         set({ groups: response.data || [] });
+        return response.data || [];
+      } else {
+        console.error('Error loading joined groups:', response?.message);
+        set({ groups: [] });
+        return [];
       }
     } catch (error) {
       console.error('Error loading joined groups:', error);
+      set({ groups: [] });
+      return [];
     } finally {
       set({ isLoading: false });
     }
@@ -34,11 +41,18 @@ export const useChatStore = create((set, get) => ({
     try {
       set({ isLoading: true });
       const response = await chatServices.getConversations();
-      if (response.status) {
+      if (response?.status) {
         set({ conversations: response.data || [] });
+        return response.data || [];
+      } else {
+        console.error('Error loading conversations:', response?.message);
+        set({ conversations: [] });
+        return [];
       }
     } catch (error) {
       console.error('Error loading conversations:', error);
+      set({ conversations: [] });
+      return [];
     } finally {
       set({ isLoading: false });
     }

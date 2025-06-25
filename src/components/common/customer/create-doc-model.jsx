@@ -112,7 +112,6 @@ export default function CreateDocModel() {
       }
 
       const response = await documentServices.createDocument(formData);
-      console.log('Response:', response);
 
       if (response.statusCode === 201) {
         toast.success('Tải tài liệu thành công');

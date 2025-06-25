@@ -58,11 +58,9 @@ function Register() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log('🚀 ~ handleSubmit: ~ form:', form);
     if (validateForm()) {
       try {
         const result = await register(form);
-        console.log('🚀 ~ handleSubmit: ~ result:', result);
         if (result.status === true) {
           toast.success('Register successfully');
           navigate('/verify-email', {
