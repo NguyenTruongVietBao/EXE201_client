@@ -11,8 +11,8 @@ function Login() {
   const [showPassword, setShowPassword] = useState(false);
 
   const [form, setForm] = useState({
-    email: 'bao@gmail.com',
-    password: '123123',
+    email: 'joindoe@gmail.com',
+    password: '123456',
   });
 
   const handleSubmit = async (e) => {

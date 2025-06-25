@@ -22,13 +22,13 @@ export default function RegisterSeller() {
 
   const [form, setForm] = useState({
     name: 'John Doe',
-    phone: '0888641656',
+    phone: '0987654321',
     email: 'joindoe@gmail.com',
-    password: '123123',
-    confirmPassword: '123123',
-    bankName: '',
-    bankAccountName: '',
-    bankAccountNumber: '',
+    password: '123456',
+    confirmPassword: '123456',
+    bankName: 'TPBank',
+    bankAccountName: 'John Doe',
+    bankAccountNumber: '08886416567',
   });
 
   // Get selected bank info

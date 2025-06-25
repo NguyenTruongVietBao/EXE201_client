@@ -639,6 +639,81 @@ export default function CustomerHome() {
                 </div>
               </div>
             </section>
+            <section className='flex flex-1 justify-between gap-4'>
+              {/* My Documents */}
+              {enrolledDocuments.length > 0 && (
+                <section className='flex-1'>
+                  <div className='bg-white/80 backdrop-blur-sm rounded-2xl p-4 shadow-xl border border-white/20'>
+                    <h3 className='font-bold text-gray-900 mb-3 flex items-center gap-2'>
+                      <BookOpenCheck className='w-4 h-4 text-blue-600' />
+                      Tài liệu của tôi ({enrolledDocuments.length})
+                    </h3>
+                    <div className='space-y-2 max-h-32 overflow-y-auto'>
+                      {enrolledDocuments.slice(0, 3).map((doc) => (
+                        <Link
+                          key={doc._id}
+                          to={`/customer/documents/${doc._id}`}
+                          className='block p-2 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors duration-200'
+                        >
+                          <p className='text-sm font-medium text-gray-900 line-clamp-1'>
+                            {doc.title}
+                          </p>
+                          <p className='text-xs text-gray-600'>
+                            {doc.price === 0
+                              ? 'Miễn phí'
+                              : formatCurrency(doc.price)}
+                          </p>
+                        </Link>
+                      ))}
+                    </div>
+                    {enrolledDocuments.length > 3 && (
+                      <Link
+                        to='/customer/my-document'
+                        className='block text-center text-sm text-blue-600 hover:text-blue-700 mt-2 font-medium'
+                      >
+                        Xem tất cả ({enrolledDocuments.length})
+                      </Link>
+                    )}
+                  </div>
+                </section>
+              )}
+
+              {/* My Groups */}
+              {joinedGroups.length > 0 && (
+                <section className='flex-1'>
+                  <div className='bg-white/80 backdrop-blur-sm rounded-2xl p-4 shadow-xl border border-white/20'>
+                    <h3 className='font-bold text-gray-900 mb-3 flex items-center gap-2'>
+                      <Users className='w-4 h-4 text-purple-600' />
+                      Nhóm của tôi ({joinedGroups.length})
+                    </h3>
+                    <div className='space-y-2 max-h-32 overflow-y-auto'>
+                      {joinedGroups.slice(0, 3).map((group) => (
+                        <Link
+                          key={group._id}
+                          to={`/customer/groups/${group._id}`}
+                          className='block p-2 bg-purple-50 rounded-lg hover:bg-purple-100 transition-colors duration-200'
+                        >
+                          <p className='text-sm font-medium text-gray-900 line-clamp-1'>
+                            {group.name}
+                          </p>
+                          <p className='text-xs text-gray-600'>
+                            {group.members?.length || 0} thành viên
+                          </p>
+                        </Link>
+                      ))}
+                    </div>
+                    {joinedGroups.length > 3 && (
+                      <Link
+                        to='/customer/my-group'
+                        className='block text-center text-sm text-purple-600 hover:text-purple-700 mt-2 font-medium'
+                      >
+                        Xem tất cả ({joinedGroups.length})
+                      </Link>
+                    )}
+                  </div>
+                </section>
+              )}
+            </section>
           </div>
 
           {/* Right Sidebar */}
@@ -712,79 +787,6 @@ export default function CustomerHome() {
                 ))}
               </div>
             </section>
-            {/* My Documents */}
-            {enrolledDocuments.length > 0 && (
-              <section>
-                <div className='bg-white/80 backdrop-blur-sm rounded-2xl p-4 shadow-xl border border-white/20'>
-                  <h3 className='font-bold text-gray-900 mb-3 flex items-center gap-2'>
-                    <BookOpenCheck className='w-4 h-4 text-blue-600' />
-                    Tài liệu của tôi ({enrolledDocuments.length})
-                  </h3>
-                  <div className='space-y-2 max-h-32 overflow-y-auto'>
-                    {enrolledDocuments.slice(0, 3).map((doc) => (
-                      <Link
-                        key={doc._id}
-                        to={`/customer/documents/${doc._id}`}
-                        className='block p-2 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors duration-200'
-                      >
-                        <p className='text-sm font-medium text-gray-900 line-clamp-1'>
-                          {doc.title}
-                        </p>
-                        <p className='text-xs text-gray-600'>
-                          {doc.price === 0
-                            ? 'Miễn phí'
-                            : formatCurrency(doc.price)}
-                        </p>
-                      </Link>
-                    ))}
-                  </div>
-                  {enrolledDocuments.length > 3 && (
-                    <Link
-                      to='/customer/my-document'
-                      className='block text-center text-sm text-blue-600 hover:text-blue-700 mt-2 font-medium'
-                    >
-                      Xem tất cả ({enrolledDocuments.length})
-                    </Link>
-                  )}
-                </div>
-              </section>
-            )}
-
-            {/* My Groups */}
-            {joinedGroups.length > 0 && (
-              <section>
-                <div className='bg-white/80 backdrop-blur-sm rounded-2xl p-4 shadow-xl border border-white/20'>
-                  <h3 className='font-bold text-gray-900 mb-3 flex items-center gap-2'>
-                    <Users className='w-4 h-4 text-purple-600' />
-                    Nhóm của tôi ({joinedGroups.length})
-                  </h3>
-                  <div className='space-y-2 max-h-32 overflow-y-auto'>
-                    {joinedGroups.slice(0, 3).map((group) => (
-                      <Link
-                        key={group._id}
-                        to={`/customer/groups/${group._id}`}
-                        className='block p-2 bg-purple-50 rounded-lg hover:bg-purple-100 transition-colors duration-200'
-                      >
-                        <p className='text-sm font-medium text-gray-900 line-clamp-1'>
-                          {group.name}
-                        </p>
-                        <p className='text-xs text-gray-600'>
-                          {group.members?.length || 0} thành viên
-                        </p>
-                      </Link>
-                    ))}
-                  </div>
-                  {joinedGroups.length > 3 && (
-                    <Link
-                      to='/customer/my-group'
-                      className='block text-center text-sm text-purple-600 hover:text-purple-700 mt-2 font-medium'
-                    >
-                      Xem tất cả ({joinedGroups.length})
-                    </Link>
-                  )}
-                </div>
-              </section>
-            )}
 
             {/* Quick Links */}
             <section>

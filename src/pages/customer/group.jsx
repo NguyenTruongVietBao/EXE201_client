@@ -756,10 +756,13 @@ export default function CustomerGroup() {
                     Khám phá nhóm
                   </button>
                 )}
-                <button className='px-6 py-3 bg-gradient-to-r from-emerald-500 to-teal-500 text-white rounded-xl hover:from-emerald-600 hover:to-teal-600 transition-all duration-300 font-medium flex items-center gap-2'>
+                <Link
+                  to='/customer/my-groups'
+                  className='px-6 py-3 bg-gradient-to-r from-emerald-500 to-teal-500 text-white rounded-xl hover:from-emerald-600 hover:to-teal-600 transition-all duration-300 font-medium flex items-center gap-2'
+                >
                   <UserPlus className='w-4 h-4' />
                   Tạo nhóm mới
-                </button>
+                </Link>
               </div>
             </div>
           ) : (

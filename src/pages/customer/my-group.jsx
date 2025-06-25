@@ -25,6 +25,7 @@ import {
 import { formatJustDate } from '../../utils';
 import toast from 'react-hot-toast';
 import { Link } from 'react-router';
+import LoadingPage from '../../components/common/LoadingPage';
 
 export default function CustomerMyGroup() {
   const [myGroups, setMyGroups] = useState([]);
@@ -268,14 +269,7 @@ export default function CustomerMyGroup() {
   ];
 
   if (isLoading && myGroups.length === 0) {
-    return (
-      <div className='min-h-screen bg-gradient-to-br from-slate-50 via-purple-50 to-pink-50 flex items-center justify-center'>
-        <div className='text-center'>
-          <div className='animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mx-auto mb-4'></div>
-          <p className='text-gray-600'>Đang tải dữ liệu...</p>
-        </div>
-      </div>
-    );
+    return <LoadingPage />;
   }
 
   return (

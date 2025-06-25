@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router';
 
 export default function AboutPage() {
   const features = [
@@ -42,31 +43,39 @@ export default function AboutPage() {
 
   const teamMembers = [
     {
-      name: 'Nguyễn Văn An',
-      role: 'CEO & Founder',
-      avatar: '👨‍💼',
-      description:
-        '10+ năm kinh nghiệm trong lĩnh vực công nghệ và quản lý dự án.',
-    },
-    {
-      name: 'Trần Thị Bình',
-      role: 'CTO',
-      avatar: '👩‍💻',
-      description:
-        'Chuyên gia công nghệ với expertise về cloud computing và AI.',
-    },
-    {
-      name: 'Lê Minh Cường',
-      role: 'Lead Developer',
+      name: 'Nguyễn Trương Viết Bảo',
+      role: 'Frontend Developer',
       avatar: '👨‍💻',
       description:
-        'Full-stack developer với đam mê tạo ra những sản phẩm tuyệt vời.',
+        'Chuyên phát triển giao diện người dùng hiện đại và tối ưu trải nghiệm người dùng.',
     },
     {
-      name: 'Phạm Thu Dung',
+      name: 'Bùi Bích Phương',
       role: 'UI/UX Designer',
       avatar: '👩‍🎨',
-      description: 'Tạo ra những trải nghiệm người dùng đẹp mắt và dễ sử dụng.',
+      description:
+        'Thiết kế giao diện và trải nghiệm người dùng trực quan, sáng tạo và dễ sử dụng.',
+    },
+    {
+      name: 'Trần Đình Nguyên',
+      role: 'Backend Developer',
+      avatar: '👨‍💻',
+      description:
+        'Xây dựng hệ thống máy chủ ổn định, bảo mật và hiệu suất cao.',
+    },
+    {
+      name: 'Đặng Tuấn Anh',
+      role: 'AI Developer',
+      avatar: '👨‍💻',
+      description:
+        'Phát triển các giải pháp AI giúp tăng cường tự động hóa và tối ưu hóa quy trình.',
+    },
+    {
+      name: 'Nguyễn Đức Tín',
+      role: 'AI Developer',
+      avatar: '👨‍💻',
+      description:
+        'Nghiên cứu và triển khai mô hình học máy để giải quyết các bài toán thực tiễn.',
     },
   ];
 
@@ -92,12 +101,18 @@ export default function AboutPage() {
             </p>
           </div>
           <div className='flex flex-col sm:flex-row gap-4 justify-center items-center'>
-            <button className='px-8 py-4 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-xl font-semibold hover:from-blue-700 hover:to-blue-800 transition-all duration-300 shadow-lg hover:shadow-xl'>
+            <Link
+              to='/login'
+              className='px-8 py-4 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-xl font-semibold hover:from-blue-700 hover:to-blue-800 transition-all duration-300 shadow-lg hover:shadow-xl'
+            >
               Bắt đầu ngay
-            </button>
-            <button className='px-8 py-4 border-2 border-blue-600 text-blue-600 rounded-xl font-semibold hover:bg-blue-50 transition-all duration-300'>
+            </Link>
+            <Link
+              to='/about'
+              className='px-8 py-4 border-2 border-blue-600 text-blue-600 rounded-xl font-semibold hover:bg-blue-50 transition-all duration-300'
+            >
               Tìm hiểu thêm
-            </button>
+            </Link>
           </div>
         </div>
       </section>
@@ -186,7 +201,7 @@ export default function AboutPage() {
               vời mỗi ngày
             </p>
           </div>
-          <div className='grid md:grid-cols-2 lg:grid-cols-4 gap-8'>
+          <div className='grid md:grid-cols-2 lg:grid-cols-5 gap-8'>
             {teamMembers.map((member, index) => (
               <div key={index} className='text-center group'>
                 <div className='bg-gradient-to-br from-blue-100 to-purple-100 rounded-full w-24 h-24 mx-auto mb-4 flex items-center justify-center text-4xl group-hover:scale-110 transition-transform duration-300'>
@@ -242,7 +257,7 @@ export default function AboutPage() {
             <div className='bg-white rounded-xl p-6 shadow-lg'>
               <div className='text-3xl mb-4'>📧</div>
               <h3 className='text-xl font-bold text-gray-800 mb-2'>Email</h3>
-              <p className='text-gray-600'>support@Prilab.vn</p>
+              <p className='text-gray-600'>weare.viethere@gmail.com</p>
             </div>
             <div className='bg-white rounded-xl p-6 shadow-lg'>
               <div className='text-3xl mb-4'>📞</div>
@@ -266,9 +281,12 @@ export default function AboutPage() {
             Tham gia cùng hàng nghìn người dùng đã tin tưởng Prilab để quản lý
             tài liệu của họ.
           </p>
-          <button className='px-8 py-4 bg-white text-blue-600 rounded-xl font-semibold hover:bg-gray-100 transition-all duration-300 shadow-lg hover:shadow-xl'>
+          <Link
+            to='/register'
+            className='px-8 py-4 bg-white text-blue-600 rounded-xl font-semibold hover:bg-gray-100 transition-all duration-300 shadow-lg hover:shadow-xl'
+          >
             Đăng ký miễn phí ngay
-          </button>
+          </Link>
         </div>
       </section>
     </div>
