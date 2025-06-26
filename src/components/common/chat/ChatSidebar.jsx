@@ -3,6 +3,7 @@ import { Users, MessageCircle, Search } from 'lucide-react';
 import { useChatStore } from '../../../stores/useChatStore';
 import SidebarSkeleton from './SidebarSkeleton';
 import useAuthStore from '../../../stores/useAuthStore';
+import ThemeToggle from '../ThemeToggle';
 
 export default function ChatSidebar() {
   const { user } = useAuthStore();
@@ -199,9 +200,15 @@ export default function ChatSidebar() {
     <aside className='h-full w-20 lg:w-80 border-r border-base-300 flex flex-col transition-all duration-200'>
       {/* Header */}
       <div className='border-b border-base-300 p-4'>
-        <div className='flex items-center gap-2 mb-4'>
-          <MessageCircle className='w-6 h-6' />
-          <span className='font-medium hidden lg:block'>Chat</span>
+        <div className='flex items-center justify-between gap-2 mb-4'>
+          <div className='flex items-center gap-2'>
+            <MessageCircle className='w-6 h-6' />
+            <span className='font-medium hidden lg:block'>Prilab Chat</span>
+          </div>
+          <div className='flex items-center'>
+            <ThemeToggle />
+            <span className='text-sm'>Theme</span>
+          </div>
         </div>
 
         {/* Search */}

@@ -686,7 +686,7 @@ export default function CustomerHome() {
                       <Users className='w-4 h-4 text-purple-600' />
                       Nhóm của tôi ({joinedGroups.length})
                     </h3>
-                    <div className='space-y-2 max-h-32 overflow-y-auto'>
+                    <div className='space-y-2 max-h-52 overflow-y-auto'>
                       {joinedGroups.slice(0, 3).map((group) => (
                         <Link
                           key={group._id}
@@ -704,7 +704,7 @@ export default function CustomerHome() {
                     </div>
                     {joinedGroups.length > 3 && (
                       <Link
-                        to='/customer/my-group'
+                        to='/customer/my-groups'
                         className='block text-center text-sm text-purple-600 hover:text-purple-700 mt-2 font-medium'
                       >
                         Xem tất cả ({joinedGroups.length})

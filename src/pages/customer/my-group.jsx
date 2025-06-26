@@ -16,7 +16,6 @@ import {
   TrendingUp,
   Shield,
   X,
-  ChevronDown,
   UserPlus,
   BarChart3,
   Activity,
@@ -26,6 +25,7 @@ import { formatJustDate } from '../../utils';
 import toast from 'react-hot-toast';
 import { Link } from 'react-router';
 import LoadingPage from '../../components/common/LoadingPage';
+import CreateGroupModel from '../../components/common/customer/create-group-model';
 
 export default function CustomerMyGroup() {
   const [myGroups, setMyGroups] = useState([]);
@@ -43,13 +43,6 @@ export default function CustomerMyGroup() {
   // Create Group Modal
   const [isModalCreateGroupOpen, setIsModalCreateGroupOpen] = useState(false);
   const [allInterests, setAllInterests] = useState([]);
-  const [newGroup, setNewGroup] = useState({
-    name: '',
-    description: '',
-    maxMembers: 100,
-    interests: [],
-  });
-  const [showInterestsDropdown, setShowInterestsDropdown] = useState(false);
 
   // Search and Filter
   const [searchQuery, setSearchQuery] = useState('');
@@ -108,42 +101,17 @@ export default function CustomerMyGroup() {
     }
   };
 
-  const createNewGroup = async () => {
-    if (!newGroup.name.trim()) {
-      toast.error('Vui lòng nhập tên nhóm');
-      return;
-    }
-    if (!newGroup.description.trim()) {
-      toast.error('Vui lòng nhập mô tả nhóm');
-      return;
-    }
-    if (newGroup.interests.length === 0) {
-      toast.error('Vui lòng chọn ít nhất 1 sở thích');
-      return;
-    }
-
+  const handleCreateNewGroup = async (groupData) => {
     try {
       setIsLoading(true);
-      const response = await customerService.createGroup({
-        name: newGroup.name,
-        description: newGroup.description,
-        maxMembers: newGroup.maxMembers,
-        interests: newGroup.interests.map((interest) => interest._id),
-      });
+      const response = await customerService.createGroup(groupData);
 
       setMyGroups([...myGroups, { ...response.data, userRole: 'creator' }]);
       setIsModalCreateGroupOpen(false);
-      setNewGroup({
-        name: '',
-        description: '',
-        maxMembers: 100,
-        interests: [],
-      });
-      toast.success('Tạo nhóm thành công!');
       fetchData(); // Refresh data
     } catch (error) {
       console.error('Error creating new group:', error);
-      toast.error('Có lỗi xảy ra khi tạo nhóm');
+      throw error; // Ném lỗi để component CreateGroupModel xử lý
     } finally {
       setIsLoading(false);
     }
@@ -174,23 +142,6 @@ export default function CustomerMyGroup() {
     } finally {
       setIsLoading(false);
     }
-  };
-
-  const addInterestToNewGroup = (interest) => {
-    if (!newGroup.interests.find((i) => i._id === interest._id)) {
-      setNewGroup({
-        ...newGroup,
-        interests: [...newGroup.interests, interest],
-      });
-    }
-    setShowInterestsDropdown(false);
-  };
-
-  const removeInterestFromNewGroup = (interestId) => {
-    setNewGroup({
-      ...newGroup,
-      interests: newGroup.interests.filter((i) => i._id !== interestId),
-    });
   };
 
   const handleRejectRequest = async () => {
@@ -408,9 +359,9 @@ export default function CustomerMyGroup() {
                 </h3>
               </div>
               <div className='p-6'>
-                {groupStats.recentGroups.slice(0, 3).length > 0 ? (
+                {groupStats.recentGroups.length > 0 ? (
                   <div className='space-y-4'>
-                    {groupStats.recentGroups.slice(0, 3).map((group) => (
+                    {groupStats.recentGroups.map((group) => (
                       <div
                         key={group._id}
                         className='flex items-center justify-between p-4 bg-gray-50 rounded-xl'
@@ -431,7 +382,9 @@ export default function CustomerMyGroup() {
                         </div>
                         <div className='text-right'>
                           <span className='px-3 py-1 bg-yellow-100 text-yellow-700 rounded-full text-xs font-medium'>
-                            {group.userRole === 'ADMIN' ? 'Admin' : 'Member'}
+                            {group.userRole === 'ADMIN'
+                              ? 'Admin nhóm'
+                              : 'Thành viên'}
                           </span>
                           <p className='text-xs text-gray-500 mt-1'>
                             {formatJustDate(group.updatedAt)}
@@ -734,44 +687,47 @@ export default function CustomerMyGroup() {
                           </div>
                         </div>
                         {/* Group Info */}
-                        {request.groupId && (
-                          <div className='bg-gray-50 rounded-lg p-4 mb-4'>
-                            <div className='flex items-start gap-3'>
-                              <div className='w-10 h-10 bg-gradient-to-br from-purple-500 to-pink-500 rounded-lg flex items-center justify-center text-white text-sm font-bold'>
-                                {request.groupId.name?.charAt(0) || 'G'}
-                              </div>
-                              <div className='flex-1'>
-                                <h5 className='font-semibold text-gray-900 mb-1'>
-                                  {request.groupId.name}
-                                </h5>
-                                <p className='text-sm text-gray-600 mb-2'>
-                                  {request.groupId.description}
-                                </p>
-                                <div className='flex items-center gap-4 text-xs text-gray-500'>
-                                  <span className='flex items-center gap-1'>
-                                    <Users className='w-3 h-3' />
-                                    {request.groupId.members?.length || 0} thành
-                                    viên
-                                  </span>
-                                  <span className='flex items-center gap-1'>
-                                    <Crown className='w-3 h-3' />
-                                    {request.groupId.members?.filter(
-                                      (m) => m.isAdmin
-                                    ).length || 0}{' '}
-                                    admin
-                                  </span>
-                                  {request.groupId.interests && (
+                        <div className='flex items-start gap-4 mb-4 w-1/2'>
+                          {request.groupId && (
+                            <div className='bg-gray-50 rounded-lg p-4 mb-4 w-full'>
+                              <div className='flex items-start gap-3'>
+                                <div className='w-10 h-10 bg-gradient-to-br from-purple-500 to-pink-500 rounded-lg flex items-center justify-center text-white text-sm font-bold'>
+                                  {request.groupId.name?.charAt(0) || 'G'}
+                                </div>
+                                <div className='flex-1'>
+                                  <h5 className='font-semibold text-gray-900 mb-1'>
+                                    {request.groupId.name}
+                                  </h5>
+                                  <p className='text-sm text-gray-600 mb-2'>
+                                    {request.groupId.description}
+                                  </p>
+                                  <div className='flex items-center gap-4 text-xs text-gray-500'>
                                     <span className='flex items-center gap-1'>
-                                      <Star className='w-3 h-3' />
-                                      {request.groupId.interests.length} sở
-                                      thích
+                                      <Users className='w-3 h-3' />
+                                      {request.groupId.members?.length ||
+                                        0}{' '}
+                                      thành viên
                                     </span>
-                                  )}
+                                    <span className='flex items-center gap-1'>
+                                      <Crown className='w-3 h-3' />
+                                      {request.groupId.members?.filter(
+                                        (m) => m.isAdmin
+                                      ).length || 0}{' '}
+                                      admin
+                                    </span>
+                                    {request.groupId.interests && (
+                                      <span className='flex items-center gap-1'>
+                                        <Star className='w-3 h-3' />
+                                        {request.groupId.interests.length} sở
+                                        thích
+                                      </span>
+                                    )}
+                                  </div>
                                 </div>
                               </div>
                             </div>
-                          </div>
-                        )}
+                          )}
+                        </div>
                       </div>
 
                       <div className='flex justify-start'>
@@ -856,184 +812,13 @@ export default function CustomerMyGroup() {
         )}
 
         {/* Create Group Modal */}
-        {isModalCreateGroupOpen && (
-          <div className='fixed inset-0 bg-black/80 bg-opacity-50 flex items-center justify-center z-50 p-4'>
-            <div className='bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto'>
-              <div className='p-6 border-b border-gray-200'>
-                <div className='flex items-center justify-between'>
-                  <h3 className='text-2xl font-bold text-gray-900'>
-                    Tạo nhóm mới
-                  </h3>
-                  <button
-                    onClick={() => setIsModalCreateGroupOpen(false)}
-                    className='p-2 hover:bg-gray-100 rounded-xl transition-colors'
-                  >
-                    <X className='w-6 h-6 text-gray-500' />
-                  </button>
-                </div>
-              </div>
-
-              <div className='p-6 space-y-6'>
-                {/* Group Name */}
-                <div>
-                  <label className='block text-sm font-medium text-gray-700 mb-2'>
-                    Tên nhóm *
-                  </label>
-                  <input
-                    type='text'
-                    value={newGroup.name}
-                    onChange={(e) =>
-                      setNewGroup({ ...newGroup, name: e.target.value })
-                    }
-                    placeholder='Ví dụ: ReactJS Việt Nam'
-                    className='w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent'
-                  />
-                </div>
-
-                {/* Description */}
-                <div>
-                  <label className='block text-sm font-medium text-gray-700 mb-2'>
-                    Mô tả nhóm *
-                  </label>
-                  <textarea
-                    value={newGroup.description}
-                    onChange={(e) =>
-                      setNewGroup({ ...newGroup, description: e.target.value })
-                    }
-                    placeholder='Mô tả về mục đích và hoạt động của nhóm...'
-                    rows={4}
-                    className='w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent resize-none'
-                  />
-                </div>
-
-                {/* Max Members */}
-                <div>
-                  <label className='block text-sm font-medium text-gray-700 mb-2'>
-                    Số thành viên tối đa
-                  </label>
-                  <input
-                    type='number'
-                    value={newGroup.maxMembers}
-                    onChange={(e) =>
-                      setNewGroup({
-                        ...newGroup,
-                        maxMembers: parseInt(e.target.value) || 100,
-                      })
-                    }
-                    min='2'
-                    max='1000'
-                    className='w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent'
-                  />
-                </div>
-
-                {/* Interests */}
-                <div>
-                  <label className='block text-sm font-medium text-gray-700 mb-2'>
-                    Sở thích nhóm * (chọn ít nhất 1)
-                  </label>
-
-                  {/* Selected Interests */}
-                  {newGroup.interests.length > 0 && (
-                    <div className='flex flex-wrap gap-2 mb-3'>
-                      {newGroup.interests.map((interest) => (
-                        <span
-                          key={interest._id}
-                          className='px-3 py-1 bg-purple-100 text-purple-700 rounded-full text-sm flex items-center gap-2'
-                        >
-                          <span>{interest.emoji}</span>
-                          <span>{interest.name}</span>
-                          <button
-                            onClick={() =>
-                              removeInterestFromNewGroup(interest._id)
-                            }
-                            className='hover:bg-purple-200 rounded-full p-0.5'
-                          >
-                            <X className='w-3 h-3' />
-                          </button>
-                        </span>
-                      ))}
-                    </div>
-                  )}
-
-                  {/* Interest Dropdown */}
-                  <div className='relative'>
-                    <button
-                      onClick={() =>
-                        setShowInterestsDropdown(!showInterestsDropdown)
-                      }
-                      className='w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 bg-white text-left flex items-center justify-between'
-                    >
-                      <span className='text-gray-500'>Chọn sở thích...</span>
-                      <ChevronDown className='w-5 h-5 text-gray-400' />
-                    </button>
-
-                    {showInterestsDropdown && (
-                      <div className='absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded-xl shadow-lg z-10 max-h-60 overflow-y-auto'>
-                        {allInterests.map((interest) => (
-                          <button
-                            key={interest._id}
-                            onClick={() => addInterestToNewGroup(interest)}
-                            disabled={newGroup.interests.find(
-                              (i) => i._id === interest._id
-                            )}
-                            className={`w-full px-4 py-3 text-left hover:bg-gray-50 transition-colors flex items-center gap-3 ${
-                              newGroup.interests.find(
-                                (i) => i._id === interest._id
-                              )
-                                ? 'opacity-50 cursor-not-allowed'
-                                : ''
-                            }`}
-                          >
-                            <span className='text-xl'>{interest.emoji}</span>
-                            <span>{interest.name}</span>
-                            {newGroup.interests.find(
-                              (i) => i._id === interest._id
-                            ) && (
-                              <CheckCircle className='w-4 h-4 text-green-500 ml-auto' />
-                            )}
-                          </button>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                </div>
-              </div>
-
-              <div className='p-6 border-t border-gray-200'>
-                <div className='flex items-center gap-3'>
-                  <button
-                    onClick={() => setIsModalCreateGroupOpen(false)}
-                    className='flex-1 px-6 py-3 border border-gray-300 text-gray-700 rounded-xl hover:bg-gray-50 transition-colors font-medium'
-                  >
-                    Hủy
-                  </button>
-                  <button
-                    onClick={createNewGroup}
-                    disabled={
-                      isLoading ||
-                      !newGroup.name.trim() ||
-                      !newGroup.description.trim() ||
-                      newGroup.interests.length === 0
-                    }
-                    className='flex-1 px-6 py-3 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-xl hover:from-purple-600 hover:to-pink-600 transition-all duration-300 font-medium disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2'
-                  >
-                    {isLoading ? (
-                      <>
-                        <div className='animate-spin rounded-full h-4 w-4 border-b-2 border-white'></div>
-                        Đang tạo...
-                      </>
-                    ) : (
-                      <>
-                        <Plus className='w-5 h-5' />
-                        Tạo nhóm
-                      </>
-                    )}
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
+        <CreateGroupModel
+          isOpen={isModalCreateGroupOpen}
+          onClose={() => setIsModalCreateGroupOpen(false)}
+          onCreateGroup={handleCreateNewGroup}
+          allInterests={allInterests}
+          isLoading={isLoading}
+        />
 
         {/* Reject Request Modal */}
         {isRejectModalOpen && (

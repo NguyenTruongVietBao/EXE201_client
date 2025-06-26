@@ -77,9 +77,13 @@ const InterestModel = ({ onConfirm }) => {
         </button>
 
         {/* Tiêu đề */}
-        <h2 className='text-3xl font-bold text-center mb-4 text-gray-800'>
-          Prilab
-        </h2>
+        <div className='flex justify-center items-center'>
+          <img
+            src='/exe201-logo.png'
+            alt='logo'
+            className='w-auto h-20 rounded-full'
+          />
+        </div>
         <p className='text-center text-gray-500 mb-6'>
           Chọn ít nhất 3 sở thích để tìm bạn học và tài liệu phù hợp
         </p>

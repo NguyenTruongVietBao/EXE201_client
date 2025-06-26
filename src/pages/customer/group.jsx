@@ -16,6 +16,7 @@ import {
   CheckCircle,
   Settings,
   XCircle,
+  Plus,
 } from 'lucide-react';
 import interestServices from '../../services/interestServices';
 import { formatDate, formatJustDate } from '../../utils';
@@ -23,6 +24,7 @@ import customerService from '../../services/customerService';
 import { Link } from 'react-router';
 import toast from 'react-hot-toast';
 import useAuthStore from '../../stores/useAuthStore';
+import CreateGroupModel from '../../components/common/customer/create-group-model';
 
 export default function CustomerGroup() {
   const [searchQuery, setSearchQuery] = useState('');
@@ -34,6 +36,11 @@ export default function CustomerGroup() {
   const [myGroups, setMyGroups] = useState([]);
   const [myJoinGroupRequests, setMyJoinGroupRequests] = useState([]);
   const { user: currentUser } = useAuthStore();
+
+  // Create Group Modal states
+  const [isCreateGroupModalOpen, setIsCreateGroupModalOpen] = useState(false);
+  const [allInterests, setAllInterests] = useState([]);
+  const [isCreatingGroup, setIsCreatingGroup] = useState(false);
 
   useEffect(() => {
     const fetchPriorityGroups = async () => {
@@ -52,11 +59,16 @@ export default function CustomerGroup() {
       const response = await customerService.getMyGroups();
       setMyGroups(response.data.groups || []);
     };
+    const fetchAllInterests = async () => {
+      const response = await interestServices.getAllInterests();
+      setAllInterests(response.data || []);
+    };
 
     fetchMyJoinGroupRequests();
     fetchPriorityGroups();
     fetchJoinedGroups();
     fetchMyGroups();
+    fetchAllInterests();
   }, []);
 
   const sendJoinGroupRequest = async (groupId) => {
@@ -71,6 +83,35 @@ export default function CustomerGroup() {
     } catch (error) {
       console.error('Error sending join group request:', error);
       toast.error('Có lỗi xảy ra khi gửi yêu cầu');
+    }
+  };
+
+  const handleCreateGroup = async (groupData) => {
+    try {
+      setIsCreatingGroup(true);
+      const response = await customerService.createGroup(groupData);
+
+      // Thêm group mới vào danh sách myGroups
+      setMyGroups((prev) => [...prev, response.data]);
+
+      // Refresh dữ liệu để cập nhật UI
+      const [priorityResponse, joinedResponse, myGroupsResponse] =
+        await Promise.all([
+          interestServices.getPrioriryGroups(),
+          customerService.getJoinedGroups(),
+          customerService.getMyGroups(),
+        ]);
+
+      setPriorityGroups(priorityResponse.data.groups || []);
+      setJoinedGroups(joinedResponse.data.groups || []);
+      setMyGroups(myGroupsResponse.data.groups || []);
+
+      setIsCreateGroupModalOpen(false);
+    } catch (error) {
+      console.error('Error creating group:', error);
+      throw error; // Re-throw để component xử lý
+    } finally {
+      setIsCreatingGroup(false);
     }
   };
 
@@ -511,10 +552,19 @@ export default function CustomerGroup() {
         {/* Header */}
         <div className='mb-8'>
           <div className='bg-white/80 backdrop-blur-lg rounded-3xl p-8 shadow-xl border border-white/20 mb-8'>
-            <div className='flex items-center gap-3 mb-4'>
-              <h1 className='text-4xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent'>
-                Nhóm học 🎓
-              </h1>
+            <div className='flex items-center justify-between mb-4'>
+              <div className='flex items-center gap-3'>
+                <h1 className='text-4xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent'>
+                  Nhóm học 🎓
+                </h1>
+              </div>
+              <button
+                onClick={() => setIsCreateGroupModalOpen(true)}
+                className='px-6 py-3 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-xl hover:from-purple-600 hover:to-pink-600 transition-all duration-300 font-medium flex items-center gap-2 shadow-lg'
+              >
+                <Plus className='w-5 h-5' />
+                Tạo nhóm mới
+              </button>
             </div>
             <p className='text-xl text-gray-600 mb-6'>
               Tham gia các nhóm học và phát triển cùng cộng đồng
@@ -756,13 +806,13 @@ export default function CustomerGroup() {
                     Khám phá nhóm
                   </button>
                 )}
-                <Link
-                  to='/customer/my-groups'
+                <button
+                  onClick={() => setIsCreateGroupModalOpen(true)}
                   className='px-6 py-3 bg-gradient-to-r from-emerald-500 to-teal-500 text-white rounded-xl hover:from-emerald-600 hover:to-teal-600 transition-all duration-300 font-medium flex items-center gap-2'
                 >
                   <UserPlus className='w-4 h-4' />
                   Tạo nhóm mới
-                </Link>
+                </button>
               </div>
             </div>
           ) : (
@@ -782,6 +832,16 @@ export default function CustomerGroup() {
             </button>
           </div>
         )}
+
+        {/* Create Group Modal */}
+        <CreateGroupModel
+          isOpen={isCreateGroupModalOpen}
+          onClose={() => setIsCreateGroupModalOpen(false)}
+          onCreateGroup={handleCreateGroup}
+          allInterests={allInterests}
+          isLoading={isCreatingGroup}
+          title='Tạo nhóm học mới'
+        />
       </div>
     </div>
   );

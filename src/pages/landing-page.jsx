@@ -43,7 +43,7 @@ export default function LandingPage() {
     },
     {
       icon: <UsersRound className='w-12 h-12 text-purple-600' />,
-      title: 'Tìm Bạn học',
+      title: 'Tìm Bạn và Nhóm',
       description:
         'Kết nối với những sinh viên cùng chí hướng, tạo nhóm học tập và cộng tác trong các dự án.',
       gradient: 'from-purple-50 to-purple-100',
@@ -85,23 +85,23 @@ export default function LandingPage() {
 
   const stats = [
     {
-      value: '15,000+',
-      label: 'Sinh viên tham gia',
+      value: '1,500+',
+      label: 'Người dùng tham gia',
       icon: <Users className='w-6 h-6 text-emerald-600' />,
     },
     {
-      value: '50,000+',
+      value: '1000+',
       label: 'Tài liệu chia sẻ',
       icon: <FileText className='w-6 h-6 text-blue-600' />,
     },
     {
-      value: '2,500+',
+      value: '450+',
       label: 'Nhóm học tập',
       icon: <UsersRound className='w-6 h-6 text-purple-600' />,
     },
     {
-      value: '98%',
-      label: 'Độ hài lòng',
+      value: '87%',
+      label: 'Đánh giá tích cực',
       icon: <Star className='w-6 h-6 text-yellow-600' />,
     },
   ];
@@ -109,7 +109,7 @@ export default function LandingPage() {
   const testimonials = [
     {
       name: 'Nguyễn Minh Anh',
-      role: 'Sinh viên Đại học Bách Khoa',
+      role: 'Sinh viên Đại học FPT',
       content:
         'Prilab đã giúp tôi tìm được rất nhiều tài liệu chất lượng cho môn học khó. AI hỗ trợ rất thông minh và chính xác.',
       avatar: 'https://api.dicebear.com/9.x/micah/svg?seed=Minh-Anh',
@@ -117,7 +117,7 @@ export default function LandingPage() {
     },
     {
       name: 'Trần Hoàng Nam',
-      role: 'Sinh viên Đại học Kinh tế Quốc dân',
+      role: 'Sinh viên Đại học FPT',
       content:
         'Platform này thật tuyệt vời! Tôi đã bán được nhiều tài liệu và kiếm thêm thu nhập trong lúc học.',
       avatar: 'https://api.dicebear.com/9.x/micah/svg?seed=Hoang-Nam',
@@ -125,7 +125,7 @@ export default function LandingPage() {
     },
     {
       name: 'Lê Thị Hường',
-      role: 'Sinh viên Đại học Y Hà Nội',
+      role: 'Sinh viên Đại học FPT',
       content:
         'Nhóm học tập trên Prilab giúp tôi kết nối với bạn cùng ngành và cùng nhau tiến bộ.',
       avatar: 'https://api.dicebear.com/9.x/micah/svg?seed=Le-Huong',
@@ -163,7 +163,7 @@ export default function LandingPage() {
   return (
     <main className='min-h-screen'>
       {/* Hero Section */}
-      <section className='py-20 md:py-28 bg-gradient-to-r from-emerald-50/90 via-white/95 to-cyan-50/90 relative overflow-hidden'>
+      <section className='py-20 md:pb-28 md:pt-18 bg-gradient-to-r from-emerald-50/90 via-white/95 to-cyan-50/90 relative overflow-hidden'>
         {/* Background decorations */}
         <div className='container flex justify-center mx-auto'>
           <div className='grid lg:grid-cols-2 gap-10 items-center'>
@@ -224,7 +224,7 @@ export default function LandingPage() {
 
             {/* Image Content */}
             <div className='relative lg:mt-0 mx-auto lg:mx-10 max-w-lg'>
-              <div className='relative'>
+              <div className='relative '>
                 {/* Background decorations */}
                 <div className='absolute -inset-4 bg-gradient-to-r from-indigo-200 to-cyan-200 rounded-3xl blur-2xl opacity-30'></div>
                 <div className='absolute -inset-2 bg-gradient-to-r from-indigo-300 to-cyan-300 rounded-2xl blur-xl opacity-40'></div>
@@ -245,10 +245,10 @@ export default function LandingPage() {
 
                   <div className='absolute -bottom-4 -left-4 bg-white p-4 rounded-xl shadow-lg'>
                     <div className='flex items-center'>
-                      <Star className='w-5 h-5 text-yellow-500 mr-1' />
-                      <span className='font-bold text-gray-900'>4.9/5</span>
+                      <Sparkles className='w-5 h-5 text-yellow-500 mr-1' />
+                      <span className='font-bold text-gray-900'>#1</span>
                     </div>
-                    <p className='text-sm text-gray-600'>15,000+ đánh giá</p>
+                    <p className='text-sm text-gray-600'>Học với AI</p>
                   </div>
                 </div>
               </div>
@@ -570,7 +570,7 @@ export default function LandingPage() {
               </button>
 
               <button className='border-2 border-white text-white font-semibold px-8 py-4 rounded-2xl hover:bg-white hover:text-blue-600 transition-all duration-300'>
-                Xem demo
+                <Link to='/login'>Đăng nhập</Link>
               </button>
             </div>
 
@@ -582,12 +582,12 @@ export default function LandingPage() {
               <div className='text-center'>
                 <Heart className='w-8 h-8 text-blue-200 mx-auto mb-2' />
                 <p className='text-blue-200 text-sm'>
-                  15,000+ Người dùng hài lòng
+                  1,500+ Người dùng hài lòng
                 </p>
               </div>
               <div className='text-center'>
                 <GraduationCap className='w-8 h-8 text-blue-200 mx-auto mb-2' />
-                <p className='text-blue-200 text-sm'>50+ Trường đại học</p>
+                <p className='text-blue-200 text-sm'>100+ Trường đại học</p>
               </div>
             </div>
           </div>

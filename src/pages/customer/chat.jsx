@@ -140,7 +140,7 @@ export default function Chat() {
   }
 
   return (
-    <div className='container mx-auto h-[850px] max-h-screen'>
+    <div className='container mx-auto h-[820px] max-h-screen'>
       <div className='flex h-full'>
         <ChatSidebar />
         <ChatContainer />

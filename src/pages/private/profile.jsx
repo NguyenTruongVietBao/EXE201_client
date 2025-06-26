@@ -97,9 +97,7 @@ const Profile = () => {
             className='flex items-center gap-2 text-gray-700'
           >
             <FileText className='w-4 h-4 text-blue-500' />
-            <span className='text-sm'>
-              Tài liệu : {docId.title || 'Không có'}
-            </span>
+            <span className='text-sm'>{docId.title || 'Không có'}</span>
           </div>
         ))}
       </div>
@@ -123,7 +121,7 @@ const Profile = () => {
             className='flex items-center gap-2 text-gray-700'
           >
             <Users className='w-4 h-4 text-blue-500' />
-            <span className='text-sm'>Nhóm : {groupId.name || 'Kh có '}</span>
+            <span className='text-sm'>{groupId.name || 'Kh có '}</span>
           </div>
         ))}
       </div>
@@ -132,7 +130,7 @@ const Profile = () => {
 
   return (
     <div className='min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 py-8 px-4 sm:px-6'>
-      <div className='max-w-2xl mx-auto space-y-6'>
+      <div className='max-w-5xl mx-auto space-y-6'>
         {/* Header Section */}
         <div className='bg-white rounded-2xl shadow-lg border border-gray-100 p-6 sm:p-8 animate-fade-in'>
           <div className='flex flex-col items-center text-center'>
@@ -190,80 +188,75 @@ const Profile = () => {
             Thông tin cá nhân
           </h2>
 
-          <div className='grid gap-4'>
-            <div className='p-3 rounded-xl bg-gray-50 border border-gray-100'>
-              <label className='block text-sm font-medium text-gray-600 mb-1'>
-                ID
-              </label>
-              <p className='text-sm text-gray-800 font-mono break-all'>
-                {user._id}
-              </p>
-            </div>
+          <div className='flex items-center justify-between gap-10'>
+            <div className='w-1/2 space-y-4'>
+              <div className='p-3 rounded-xl bg-gray-50 border border-gray-100'>
+                <label className=' text-sm font-medium text-gray-600 mb-1 flex items-center gap-1'>
+                  <Phone className='w-4 h-4' />
+                  Số điện thoại
+                </label>
+                <p className='text-sm text-gray-800'>
+                  {user.phone || 'Chưa cập nhật'}
+                </p>
+              </div>
 
-            <div className='p-3 rounded-xl bg-gray-50 border border-gray-100'>
-              <label className='block text-sm font-medium text-gray-600 mb-1 flex items-center gap-1'>
-                <Phone className='w-4 h-4' />
-                Số điện thoại
-              </label>
-              <p className='text-sm text-gray-800'>
-                {user.phone || 'Chưa cập nhật'}
-              </p>
-            </div>
+              {user.role === 'CUSTOMER' && (
+                <div className='p-3 rounded-xl bg-gray-50 border border-gray-100'>
+                  <label className='block text-sm font-medium text-gray-600 mb-1'>
+                    Sở thích
+                  </label>
+                  {renderInterests(user.interests)}
+                </div>
+              )}
 
-            {user.role === 'CUSTOMER' && (
+              <div className='p-3 rounded-xl bg-gray-50 border border-gray-100'>
+                <label className=' text-sm font-medium text-gray-600 mb-1 flex items-center gap-1'>
+                  <Calendar className='w-4 h-4' />
+                  Ngày tạo tài khoản
+                </label>
+                <p className='text-sm text-gray-800'>
+                  {formatDate(user.createdAt)}
+                </p>
+              </div>
+
               <div className='p-3 rounded-xl bg-gray-50 border border-gray-100'>
                 <label className='block text-sm font-medium text-gray-600 mb-1'>
-                  Sở thích
+                  Thông tin ngân hàng
                 </label>
-                {renderInterests(user.interests)}
+                <p className='text-sm text-gray-800'>
+                  {user.bankName ||
+                  user.bankAccountName ||
+                  user.bankAccountNumber
+                    ? `${user.bankName || 'N/A'} - ${
+                        user.bankAccountName || 'N/A'
+                      } - ${user.bankAccountNumber || 'N/A'}`
+                    : 'Chưa cập nhật'}
+                </p>
               </div>
-            )}
-
-            <div className='p-3 rounded-xl bg-gray-50 border border-gray-100'>
-              <label className='block text-sm font-medium text-gray-600 mb-1 flex items-center gap-1'>
-                <Calendar className='w-4 h-4' />
-                Ngày tạo tài khoản
-              </label>
-              <p className='text-sm text-gray-800'>
-                {formatDate(user.createdAt)}
-              </p>
+              {user.isVerified && (
+                <div className='flex items-center gap-2 text-green-700 bg-green-50 px-3 py-2 rounded-xl border border-green-100'>
+                  <Shield className='w-4 h-4' />
+                  <span className='text-sm font-medium'>
+                    Tài khoản đã được xác thực
+                  </span>
+                </div>
+              )}
             </div>
-
-            <div className='p-3 rounded-xl bg-gray-50 border border-gray-100'>
-              <label className='block text-sm font-medium text-gray-600 mb-1'>
-                Thông tin ngân hàng
-              </label>
-              <p className='text-sm text-gray-800'>
-                {user.bankName || user.bankAccountName || user.bankAccountNumber
-                  ? `${user.bankName || 'N/A'} - ${
-                      user.bankAccountName || 'N/A'
-                    } - ${user.bankAccountNumber || 'N/A'}`
-                  : 'Chưa cập nhật'}
-              </p>
-            </div>
-
-            <div className='p-3 rounded-xl bg-gray-50 border border-gray-100'>
-              <label className='block text-sm font-medium text-gray-600 mb-1'>
-                Tài liệu
-              </label>
-              {renderDocuments(user.documents)}
-            </div>
-
-            <div className='p-3 rounded-xl bg-gray-50 border border-gray-100'>
-              <label className='block text-sm font-medium text-gray-600 mb-1'>
-                Nhóm
-              </label>
-              {renderGroups(user.groups)}
-            </div>
-
-            {user.isVerified && (
-              <div className='flex items-center gap-2 text-green-700 bg-green-50 px-3 py-2 rounded-xl border border-green-100'>
-                <Shield className='w-4 h-4' />
-                <span className='text-sm font-medium'>
-                  Tài khoản đã được xác thực
-                </span>
+            <div className='w-1/2 space-y-4'>
+              <div className='p-3 rounded-xl bg-gray-50 border border-gray-100'>
+                <label className='block text-sm font-medium text-gray-600 mb-1'>
+                  Tài liệu đã đăng ký
+                </label>
+                {renderDocuments(user.documents)}
               </div>
-            )}
+
+              <div className='p-3 rounded-xl bg-gray-50 border border-gray-100'>
+                <label className='block text-sm font-medium text-gray-600 mb-1'>
+                  Nhóm đã tham gia
+                </label>
+                {renderGroups(user.groups)}
+              </div>
+            </div>
           </div>
         </div>
       </div>

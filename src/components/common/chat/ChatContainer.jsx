@@ -26,18 +26,8 @@ export default function ChatContainer() {
   const [messageInput, setMessageInput] = useState('');
   const [selectedImage, setSelectedImage] = useState(null);
   const [isUploading, setIsUploading] = useState(false);
-  const messagesEndRef = useRef(null);
   const fileInputRef = useRef(null);
   const currentGroupRef = useRef(null); // Track current group để cleanup
-
-  // Scroll to bottom khi có message mới
-  const scrollToBottom = useCallback(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, []);
-
-  useEffect(() => {
-    scrollToBottom();
-  }, [messages, scrollToBottom]);
 
   // Fetch messages khi select conversation/group
   useEffect(() => {
@@ -108,7 +98,6 @@ export default function ChatContainer() {
     selectedGroup?._id,
     setMessages,
     setIsLoadingMessages,
-    // Remove joinGroup và leaveGroup khỏi dependencies để tránh infinite loop
   ]);
 
   // Handle image selection
@@ -358,7 +347,6 @@ export default function ChatContainer() {
         ) : (
           messages.map((message, index) => renderMessage(message, index))
         )}
-        <div ref={messagesEndRef} />
       </div>
 
       {/* Input */}
