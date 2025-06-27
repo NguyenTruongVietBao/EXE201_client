@@ -43,6 +43,7 @@ import CustomerMyGroup from '../pages/customer/my-group';
 import CustomerGroupDetail from '../pages/customer/group-detail';
 import SellerWithdrawals from '../pages/seller/withdrawals';
 import ManagerWithdrawals from '../pages/manager/withdrawals';
+import CustomerPaymentHistory from '../pages/customer/payment-history';
 
 const { ADMIN, CUSTOMER, SELLER, MANAGER } = USER_ROLE;
 
@@ -228,6 +229,14 @@ const router = createBrowserRouter([
       {
         path: 'chat',
         element: <Chat />,
+      },
+      {
+        path: 'payment-history',
+        element: (
+          <ProtectedRoute requiredRoles={[CUSTOMER]}>
+            <CustomerPaymentHistory />
+          </ProtectedRoute>
+        ),
       },
     ],
   },

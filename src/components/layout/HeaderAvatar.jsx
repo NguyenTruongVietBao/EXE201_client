@@ -8,6 +8,7 @@ import {
   LayoutDashboard,
   AlertCircle,
   Users,
+  CreditCard,
 } from 'lucide-react';
 import { Link, useNavigate } from 'react-router';
 import { USER_ROLE } from '../../constants';
@@ -34,6 +35,11 @@ export default function HeaderAvatar({ className }) {
       href: '/customer/refunds-requests',
       label: 'Yêu cầu hoàn trả',
       icon: <AlertCircle size={16} />,
+    },
+    {
+      href: '/customer/payment-history',
+      label: 'Lịch sử thanh toán',
+      icon: <CreditCard size={16} />,
     },
   ];
   const sellerLinks = [

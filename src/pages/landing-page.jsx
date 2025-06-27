@@ -163,7 +163,7 @@ export default function LandingPage() {
   return (
     <main className='min-h-screen'>
       {/* Hero Section */}
-      <section className='py-20 md:pb-28 md:pt-18 bg-gradient-to-r from-emerald-50/90 via-white/95 to-cyan-50/90 relative overflow-hidden'>
+      <section className='py-20 md:py-28 md:pb-32 bg-gradient-to-r from-emerald-50/90 via-white/95 to-cyan-50/90 relative overflow-hidden'>
         {/* Background decorations */}
         <div className='container flex justify-center mx-auto'>
           <div className='grid lg:grid-cols-2 gap-10 items-center'>
