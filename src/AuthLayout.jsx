@@ -1,7 +1,6 @@
 import { Navigate, Outlet } from 'react-router';
 import useAuthStore from './stores/useAuthStore';
 import useThemeStore from './stores/useThemeStore';
-import Header from './components/layout/Header';
 import { USER_ROLE } from './constants';
 
 const { ADMIN, SELLER, MANAGER, CUSTOMER } = USER_ROLE;
