@@ -25,7 +25,22 @@ class SocketManager {
     this.isConnecting = true;
 
     try {
-      this.socket = io(envConfig.BACKEND_URL, {
+      const url = new URL(envConfig.BACKEND_URL);
+      // If the URL has a subpath (like /prilab-server), we need to include it in the socket.io path
+      // e.g., if BACKEND_URL=http://.../prilab-server, path should be /prilab-server/socket.io/
+      const socketPath =
+        url.pathname === '/' || !url.pathname
+          ? '/socket.io/'
+          : `${url.pathname}/socket.io/`.replace(/\/+/g, '/');
+
+      console.log('Connecting to socket:', {
+        origin: url.origin,
+        path: socketPath,
+        fullUrl: envConfig.BACKEND_URL,
+      });
+
+      this.socket = io(url.origin, {
+        path: socketPath,
         auth: { token },
         transports: ['websocket'],
         upgrade: true,
@@ -49,6 +64,14 @@ class SocketManager {
 
       this.socket.on('connect_error', (error) => {
         console.error('Socket connection error:', error);
+        console.error('Connection details:', {
+          backendUrl: envConfig.BACKEND_URL,
+          origin: new URL(envConfig.BACKEND_URL).origin,
+          path:
+            new URL(envConfig.BACKEND_URL).pathname === '/'
+              ? '/socket.io/'
+              : `${new URL(envConfig.BACKEND_URL).pathname}/socket.io/`.replace(/\/+/g, '/'),
+        });
         this.isConnecting = false;
         this.reconnectAttempts++;
 
