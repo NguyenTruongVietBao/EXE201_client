@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
-import useAuthStore from '../../stores/useAuthStore';
+import { ArrowLeftIcon, Loader2, LogInIcon } from 'lucide-react';
+import { useState } from 'react';
 import { toast } from 'react-hot-toast';
 import { Link, useNavigate } from 'react-router';
-import { Loader2, LogInIcon, ArrowLeftIcon } from 'lucide-react';
 import InputCustom from '../../components/common/InputCustom';
+import useAuthStore from '../../stores/useAuthStore';
 
 function Login() {
   const { login, isLoading } = useAuthStore();
@@ -58,76 +58,70 @@ function Login() {
   };
 
   return (
-    <div className='min-h-screen bg-gradient-to-r from-emerald-50/90 via-white/95 to-cyan-50/90 backdrop-blur-sm flex items-center justify-center p-4'>
-      <div className='card w-full max-w-md bg-base-100 shadow-xl'>
-        <div className='card-body'>
-          <div className='text-center mb-8'>
-            <div className='grid grid-cols-3 items-center'>
-              <Link to='/' className='justify-self-start'>
-                <ArrowLeftIcon className='w-6 h-6 text-primary' />
+    <div className="min-h-screen bg-gradient-to-r from-emerald-50/90 via-white/95 to-cyan-50/90 backdrop-blur-sm flex items-center justify-center p-4">
+      <div className="card w-full max-w-md bg-base-100 shadow-xl">
+        <div className="card-body">
+          <div className="text-center mb-8">
+            <div className="grid grid-cols-3 items-center">
+              <Link to="/" className="justify-self-start">
+                <ArrowLeftIcon className="w-6 h-6 text-primary" />
               </Link>
               <Link
-                to='/'
-                className='normal-case text-3xl font-bold text-primary mb-2 justify-self-center'
+                to="/"
+                className="normal-case text-3xl font-bold text-primary mb-2 justify-self-center"
               >
-                <img
-                  src='/exe201-logo.png'
-                  alt='Prilab'
-                  className='w-auto h-15'
-                />
+                <img src="/exe201-logo.png" alt="Prilab" className="w-auto h-15" />
               </Link>
             </div>
-            <h2 className='text-2xl font-semibold'>Chào mừng trở lại !</h2>
-            <p className='text-base-content/70'>
-              Đăng nhập để tiếp tục sử dụng hệ thống
-            </p>
+            <h2 className="text-2xl font-semibold">Chào mừng trở lại !</h2>
+            <p className="text-base-content/70">Đăng nhập để tiếp tục sử dụng hệ thống</p>
           </div>
 
-          <form onSubmit={handleSubmit} className='space-y-4'>
+          <form onSubmit={handleSubmit} className="space-y-4">
             <InputCustom
-              type='email'
-              name='email'
-              placeholder='Nhập email'
+              type="email"
+              name="email"
+              placeholder="Nhập email"
               form={form}
               handleChange={handleChange}
             />
 
             <InputCustom
-              type='password'
-              name='password'
-              placeholder='Nhập mật khẩu'
+              type="password"
+              name="password"
+              placeholder="Nhập mật khẩu"
               showPassword={showPassword}
               setShowPassword={setShowPassword}
               form={form}
               handleChange={handleChange}
             />
-            <div className='flex justify-end'>
+            <div className="flex justify-end">
               <Link
-                to='/forgot-password'
-                className='text-sm text-gray-500 hover:text-gray-700 font-semibold'
+                to="/forgot-password"
+                className="text-sm text-gray-500 hover:text-gray-700 font-semibold"
               >
                 Quên mật khẩu?
               </Link>
             </div>
-            <div className='form-control mt-5 '>
+            <div className="form-control mt-5 ">
               <button
-                type='submit'
-                className='btn btn-outline btn-primary btn-lg w-full py-3 border-2'
+                type="submit"
+                className="btn btn-outline btn-primary btn-lg w-full py-3 border-2 rounded-lg"
                 disabled={isLoading}
               >
                 {isLoading ? (
-                  <Loader2 className='w-5 h-5 mr-2 animate-spin' />
+                  <Loader2 className="w-5 h-5 mr-2 animate-spin" />
                 ) : (
-                  <LogInIcon className='w-5 h-5 mr-2' />
+                  <LogInIcon className="w-5 h-5 mr-2" />
                 )}
                 {isLoading ? '' : 'Đăng nhập'}
               </button>
             </div>
           </form>
 
-          <div className='mt-8 text-center text-md font-semibold'>
+          <div className="mt-8 text-center text-md font-semibold">
             Chưa có tài khoản?{' '}
-            <Link to='/register' className='link link-primary font-semibold'>
+            <Link to="/register" className="link link-primary font-semibold">
               Đăng ký
             </Link>
           </div>

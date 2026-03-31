@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
-import useAuthStore from '../../stores/useAuthStore';
+import { ArrowLeftIcon, Loader2, UserPlus } from 'lucide-react';
+import { useState } from 'react';
 import { toast } from 'react-hot-toast';
 import { Link, useNavigate } from 'react-router';
-import { ArrowLeftIcon, Loader2, UserPlus } from 'lucide-react';
 import InputCustom from '../../components/common/InputCustom';
+import useAuthStore from '../../stores/useAuthStore';
 
 function Register() {
   const navigate = useNavigate();
@@ -87,56 +87,49 @@ function Register() {
   };
 
   return (
-    <div className='min-h-screen bg-gradient-to-r from-emerald-50/90 via-white/95 to-cyan-50/90 backdrop-blur-sm flex items-center justify-center p-4'>
-      <div className='card w-full max-w-lg bg-base-100 shadow-xl'>
-        <div className='card-body'>
-          <div className='text-center mb-8'>
-            <div className='grid grid-cols-3 items-center'>
-              <Link to='/' className='justify-self-start'>
-                <ArrowLeftIcon className='w-6 h-6 text-primary' />
+    <div className="min-h-screen bg-gradient-to-r from-emerald-50/90 via-white/95 to-cyan-50/90 backdrop-blur-sm flex items-center justify-center p-4">
+      <div className="card w-full max-w-lg bg-base-100 shadow-xl">
+        <div className="card-body">
+          <div className="text-center mb-8">
+            <div className="grid grid-cols-3 items-center">
+              <Link to="/" className="justify-self-start">
+                <ArrowLeftIcon className="w-6 h-6 text-primary" />
               </Link>
               <Link
-                to='/'
-                className='normal-case text-3xl font-bold text-primary mb-2 justify-self-center'
+                to="/"
+                className="normal-case text-3xl font-bold text-primary mb-2 justify-self-center"
               >
-                <img
-                  src='/exe201-logo.png'
-                  alt='Prilab'
-                  className='w-auto h-15'
-                />
+                <img src="/exe201-logo.png" alt="Prilab" className="w-auto h-15" />
               </Link>
               <div></div>
             </div>
-            <h2 className='text-2xl font-semibold'>Đăng ký tài khoản</h2>
-            <p className='text-base-content/70'>
-              Đăng ký để tiếp tục sử dụng dịch vụ của chúng tôi.
-            </p>
+            <h2 className="text-2xl font-semibold">Đăng ký tài khoản</h2>
           </div>
 
-          <form onSubmit={handleSubmit} className='space-y-3'>
+          <form onSubmit={handleSubmit} className="space-y-3">
             <InputCustom
-              type='text'
-              name='name'
-              label='Họ và tên'
-              placeholder='John Doe'
+              type="text"
+              name="name"
+              label="Họ và tên"
+              placeholder="John Doe"
               form={form}
               handleChange={handleChange}
             />
 
             <InputCustom
-              type='email'
-              name='email'
-              label='Email'
-              placeholder='Nhập email'
+              type="email"
+              name="email"
+              label="Email"
+              placeholder="Nhập email"
               form={form}
               handleChange={handleChange}
             />
 
             <InputCustom
-              type='password'
-              name='password'
-              label='Mật khẩu'
-              placeholder='Nhập mật khẩu'
+              type="password"
+              name="password"
+              label="Mật khẩu"
+              placeholder="Nhập mật khẩu"
               showPassword={showPassword}
               setShowPassword={setShowPassword}
               form={form}
@@ -144,43 +137,43 @@ function Register() {
             />
 
             <InputCustom
-              type='password'
-              name='confirmPassword'
-              label='Xác nhận mật khẩu'
-              placeholder='Nhập lại mật khẩu'
+              type="password"
+              name="confirmPassword"
+              label="Xác nhận mật khẩu"
+              placeholder="Nhập lại mật khẩu"
               showPassword={showConfirmPassword}
               setShowPassword={setShowConfirmPassword}
               form={form}
               handleChange={handleChange}
             />
             <InputCustom
-              type='text'
-              name='phone'
-              label='Số điện thoại'
-              placeholder='Nhập số điện thoại'
+              type="text"
+              name="phone"
+              label="Số điện thoại"
+              placeholder="Nhập số điện thoại"
               form={form}
               handleChange={handleChange}
             />
 
-            <div className='form-control mt-10'>
+            <div className="form-control mt-10">
               <button
-                type='submit'
-                className='btn btn-outline btn-primary btn-lg w-full py-3 border-2'
+                type="submit"
+                className="btn btn-outline btn-primary btn-lg w-full py-3 border-2 rounded-lg"
                 disabled={isLoading}
               >
                 {isLoading ? (
-                  <Loader2 className='w-5 h-5 mr-2 animate-spin' />
+                  <Loader2 className="w-5 h-5 mr-2 animate-spin" />
                 ) : (
-                  <UserPlus className='w-5 h-5 mr-2' />
+                  <UserPlus className="w-5 h-5 mr-2" />
                 )}
                 {isLoading ? '' : 'Tạo tài khoản'}
               </button>
             </div>
           </form>
 
-          <div className='mt-8 text-center text-md font-semibold'>
+          <div className="mt-8 text-center text-md font-semibold">
             Đã có tài khoản?{' '}
-            <Link to='/login' className='link link-primary font-semibold'>
+            <Link to="/login" className="link link-primary font-semibold">
               Đăng nhập
             </Link>
           </div>

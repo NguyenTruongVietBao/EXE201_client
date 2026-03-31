@@ -1,8 +1,8 @@
-import React, { useEffect } from 'react';
+import { useEffect } from 'react';
 import { Navigate } from 'react-router';
-import useAuthStore from '../stores/useAuthStore';
-import { USER_ROLE } from '../constants';
 import LoadingPage from '../components/common/LoadingPage';
+import { USER_ROLE } from '../constants';
+import useAuthStore from '../stores/useAuthStore';
 
 const { ADMIN, MANAGER, SELLER, CUSTOMER } = USER_ROLE;
 
@@ -20,9 +20,7 @@ const ProtectedRoute = ({
 
   // Hiển thị loading khi đang check auth
   if (isLoading) {
-    return (
-      fallback || <LoadingPage message='Đang kiểm tra quyền truy cập...' />
-    );
+    return fallback || <LoadingPage message="Đang kiểm tra quyền truy cập..." />;
   }
 
   // Redirect nếu chưa đăng nhập
@@ -36,15 +34,15 @@ const ProtectedRoute = ({
     if (!hasPermission) {
       switch (user.role) {
         case ADMIN:
-          return <Navigate to='/admin' replace />;
+          return <Navigate to="/admin" replace />;
         case MANAGER:
-          return <Navigate to='/manager' replace />;
+          return <Navigate to="/manager" replace />;
         case SELLER:
-          return <Navigate to='/seller' replace />;
+          return <Navigate to="/seller" replace />;
         case CUSTOMER:
-          return <Navigate to='/customer' replace />;
+          return <Navigate to="/customer" replace />;
         default:
-          return <Navigate to='/' replace />;
+          return <Navigate to="/" replace />;
       }
     }
   }
